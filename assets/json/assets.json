@@ -1,0 +1,54 @@
+{
+    "image": [
+        "player.png",
+        "tileCube.png",
+        "tile.png",
+        "debug.png",
+        "terrain2/Abstract Tiles/abstractTile_02.png",
+        "terrain2/Abstract Tiles/abstractTile_03.png",
+        "terrain2/Abstract Tiles/abstractTile_04.png",
+        "terrain2/Abstract Tiles/abstractTile_06.png",
+        "terrain2/Abstract Tiles/abstractTile_07.png",
+        "terrain2/Abstract Tiles/abstractTile_09.png",
+        "terrain2/Abstract Tiles/abstractTile_10.png",
+        "terrain2/Abstract Tiles/abstractTile_11.png",
+        "terrain2/Abstract Tiles/abstractTile_13.png",
+        "terrain2/Abstract Tiles/abstractTile_14.png",
+        "terrain2/Abstract Tiles/abstractTile_15.png",
+        "terrain2/Abstract Tiles/abstractTile_16.png",
+        "terrain2/Abstract Tiles/abstractTile_17.png",
+        "terrain2/Abstract Tiles/abstractTile_18.png",
+        "terrain2/Abstract Tiles/abstractTile_19.png",
+        "terrain2/Abstract Tiles/abstractTile_20.png",
+        "terrain2/Abstract Tiles/abstractTile_21.png",
+        "terrain2/Abstract Tiles/abstractTile_22.png",
+        "terrain2/Abstract Tiles/abstractTile_23.png",
+        "terrain2/Abstract Tiles/abstractTile_24.png",
+        "terrain2/Abstract Tiles/abstractTile_25.png",
+        "terrain2/Abstract Tiles/abstractTile_26.png",
+        "terrain2/Abstract Tiles/abstractTile_27.png",
+        "terrain2/Abstract Tiles/abstractTile_28.png",
+        "terrain2/Abstract Tiles/abstractTile_29.png",
+        "terrain2/Abstract Tiles/abstractTile_30.png",
+        "terrain2/Abstract Tiles/abstractTile_31.png",
+        "terrain2/Abstract Tiles/abstractTile_32.png",
+        "terrain2/room_tiles/tile_01.png",
+        "terrain2/room_tiles/tile_02.png",
+        "terrain2/room_tiles/tile_03.png",
+        "terrain2/room_tiles/tile_04.png",
+        "terrain2/room_tiles/tile_05.png",
+        "terrain2/room_tiles/tile_06.png",
+        "terrain2/room_tiles/tile_07.png",
+        "terrain2/room_tiles/tile_00.png"
+    ],
+    "json": [
+        "level_big.json",
+        "level_test.json"
+    ],
+    "spritesheet": {
+        "cowboy.png": {
+            "frameWidth": 128,
+            "frameHeight": 128
+        }
+    }
+}

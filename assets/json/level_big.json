@@ -1,0 +1,201 @@
+{
+    "Level": {
+        "rooms": [
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "TOP",
+                        "dest": 1,
+                        "en_sm": 3,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "BOTTOM",
+                        "dest": 3,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "LEFT",
+                        "dest": 5,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 0
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "BOTTOM",
+                        "dest": 0,
+                        "en_sm": 4,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "RIGHT",
+                        "dest": 2,
+                        "en_sm": 5,
+                        "en_med": {
+                            "nb": 2,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 2,
+                "id": 1
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "TOP",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 2
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "TOP",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "RIGHT",
+                        "dest": 4,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 3
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "LEFT",
+                        "dest": 3,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 4
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "RIGHT",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "TOP",
+                        "dest": 7,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 5
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "BOTTOM",
+                        "dest": 5,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 7
+            }
+        ],
+        "start": 0,
+        "finish": 7
+    }
+}
