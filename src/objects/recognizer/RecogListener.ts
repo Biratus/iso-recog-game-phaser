@@ -7,19 +7,26 @@ export default class RecogListener {
     points: Point[] = [];
     emitter: Phaser.Events.EventEmitter;
     recognizer: Recognizer;
-    _isDown: boolean
+    _isDown: boolean;
+    enabled: boolean;
 
     constructor() {
         this.recognizer = new Recognizer();
         this.emitter = new Phaser.Events.EventEmitter();
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            if (!this.enabled) return;
             this._isDown = true;
+            currentScene.graphics.clear();
+            currentScene.graphics.fillCircle(pointer.x, pointer.y, 2);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointermove', (pointer) => {
+            if (!this.enabled) return;
+            currentScene.graphics.fillCircle(pointer.x, pointer.y, 2);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointerup', (pointer) => {
+            if (!this.enabled) return;
             this._isDown = false;
             currentScene.events.emit('shapeDrown', this.getShape());
         });
@@ -32,7 +39,7 @@ export default class RecogListener {
 
     getShape() {
         this.uniformizePoints();
-        console.log(this.points);
+        if(this.points.length<10) return[];
         currentScene.drawPoints(this.points, 0xff0000, false);
         const shape = this.recognizer.Rank(this.points);
 
@@ -45,22 +52,19 @@ export default class RecogListener {
         const safeI = 1000;
         let count = 0;
         let initMax = this.maxDistanceBetweenPoints();
-        const minDistance = initMax*0.3;
+        const minDistance = initMax * 0.3;
         const maxDistance = initMax * 0.8;
         let next, current;
         count++;
         let i = 0;
-        let removals=0;
-        let addings=0;
         while (i < this.points.length - 1) {
             if (this.points.length >= 100) return;
             current = this.points[i];
             next = this.points[i + 1];
             let d = Phaser.Math.Distance.Between(current.X, current.Y, next.X, next.Y);
             if (d <= minDistance) {
-                removals++;
-                if(i+1==this.points.length-1) {
-                    this.points.splice(i,1);
+                if (i + 1 == this.points.length - 1) {
+                    this.points.splice(i, 1);
                     break;
                 }
                 this.points.splice(i + 1, 1);
@@ -68,29 +72,29 @@ export default class RecogListener {
             }
             i++;
         }
-    
-        let hasDoneSmth=true;
+
+        let hasDoneSmth = true;
         while (hasDoneSmth && count <= safeI) {
             let next, current;
             count++;
             let i = 0;
-            hasDoneSmth=false;
+            hasDoneSmth = false;
             while (i < this.points.length - 1) {
                 if (this.points.length >= 100) return;
                 current = this.points[i];
                 next = this.points[i + 1];
                 let d = Phaser.Math.Distance.Between(current.X, current.Y, next.X, next.Y);
                 if (d <= minDistance) {
-                    hasDoneSmth=true;
-                    if(i+1==this.points.length-1) {
-                        this.points.splice(i,1);
+                    hasDoneSmth = true;
+                    if (i + 1 == this.points.length - 1) {
+                        this.points.splice(i, 1);
                         break;
                     }
                     this.points.splice(i + 1, 1);
                     continue;
                 }
                 else if (d > maxDistance) {
-                    hasDoneSmth=true;
+                    hasDoneSmth = true;
                     let p = new Point((current.X + next.X) / 2, (current.Y + next.Y) / 2, this.shapeCount);
                     let restPile = this.points.splice(i + 1, this.points.length);
                     this.points.push(p);
@@ -99,7 +103,7 @@ export default class RecogListener {
                 i++;
             }
         }
-        if(count>=safeI) console.error("Exit because looped more than "+safeI);
+        if (count >= safeI) console.error("Exit because looped more than " + safeI);
     }
     avgDistanceBetweenPoints(): number {
         return this.totalDistanceBetweenPoints() / this.points.length;
@@ -138,5 +142,8 @@ export default class RecogListener {
         }
         return min;
     }
+
+    enable() { this.enabled = true; }
+    disable() { this.enabled = false; }
 
 }

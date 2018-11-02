@@ -22,7 +22,7 @@ export const TILE_CONFIG = {
 }
 
 export const ENEMY_CONFIG = {
-    scale:0.4
+    scale:0.6
 }
 
 export const GAME_CONFIG = {
@@ -35,6 +35,6 @@ export const GAME_CONFIG = {
 
 export const DEFAULT_ROOM_CONFIG = {
     key: "abstractTile_01",
-    // block_size: 21// /!\ IMPAIR /!\
-    block_size: 5// /!\ IMPAIR /!\
+    // block_size: 17// /!\ IMPAIR /!\
+    block_size: 7// /!\ IMPAIR /!\
 }

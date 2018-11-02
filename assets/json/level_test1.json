@@ -1,42 +1,77 @@
-{"Level":{	"rooms":[
-{"entries":[
-{"diff":"LOW",
-"sign":"SQUARE",
-"loc":"TOP",
-"dest":1,
-"en_sm":10,
-"en_med":{"nb":0,"events":[]},
-"en_big":{}},
-{"diff":"LOW",
-"sign":"CIRCLE",
-"loc":"LEFT",
-"dest":2,
-"en_sm":10,
-"en_med":{"nb":0,"events":[]},
-"en_big":{}}],
-"specials":[],
-"diff":0,
-"id":0},
-{"entries":[
-{"diff":"LOW",
-"sign":"SQUARE",
-"loc":"BOTTOM",
-"dest":0,
-"en_sm":0,
-"en_med":{"nb":0,"events":[]},
-"en_big":{}}],
-"specials":[],
-"diff":1,
-"id":1},
-{"entries":[
-{"diff":"LOW",
-"sign":"SQUARE",
-"loc":"RIGHT",
-"dest":0,
-"en_sm":0,
-"en_med":{"nb":0,"events":[]},
-"en_big":{}}],
-"specials":[],
-"diff":1,
-"id":2}],"start":0,
-"finish":2}}
+{
+    "Level": {
+        "rooms": [
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "TOP",
+                        "dest": 1,
+                        "en_sm": 10,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "LEFT",
+                        "dest": 2,
+                        "en_sm": 10,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 0,
+                "id": 0
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "BOTTOM",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 1
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "RIGHT",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 2
+            }
+        ],
+        "start": 0,
+        "finish": 2
+    }
+}

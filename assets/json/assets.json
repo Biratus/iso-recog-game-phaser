@@ -39,11 +39,14 @@
         "terrain2/room_tiles/tile_05.png",
         "terrain2/room_tiles/tile_06.png",
         "terrain2/room_tiles/tile_07.png",
-        "terrain2/room_tiles/tile_00.png"
+        "terrain2/room_tiles/tile_00.png",
+        "en_sm_square.png",
+        "en_sm_circle.png"
     ],
     "json": [
         "level_big.json",
-        "level_test.json"
+        "level_test.json",
+        "level_test1.json"
     ],
     "spritesheet": {
         "cowboy.png": {

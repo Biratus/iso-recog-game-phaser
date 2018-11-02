@@ -1,10 +1,11 @@
 import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
 import MapManager from "./MapRenderer";
-import { LOCATION } from "../../constants/Location";
+import { LOCATION } from "../../constants/Enums";
 import {IsoSprite} from 'phaser3-plugin-isometric';
 import Level from "../core/Level";
 import Room from "../core/Room";
+import RenderRoom from "./RenderRoom";
 
 export var renderer:Renderer;
 
@@ -36,7 +37,6 @@ export default class Renderer {
         let renderedRoom :number[]= [];
 
         renderedRoom.push(level.start.id);
-        console.log('tile_0' + level.start.id);
         this.mapManager.addRoom(currLoc.x, currLoc.y, currLoc.z, 'tile_0' + level.start.id, level.start);
 
         for (let e of level.start.entries) {
@@ -49,8 +49,7 @@ export default class Renderer {
 
     renderRoom = (rendered:number[], room:Room, loc:{x:number,y:number,z:number}):void => {
         rendered.push(room.id);
-        console.log('tile_0' + room.id);
-        this.mapManager.addRoom(loc.x, loc.y, loc.z, 'tile_0' + room.id, room);
+        let r=this.mapManager.addRoom(loc.x, loc.y, loc.z, 'tile_0' + room.id, room);
 
         if (room.entries.length <= 1) return;
 
@@ -62,8 +61,31 @@ export default class Renderer {
         }
     }
 
+    getCenterXYOfRoom(room:Room):{x:number,y:number} {
+        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
+        if(!r) console.error('Cannot find room '+[room.id],room);
+        return {
+            x:r[0]._position.x,
+            y:r[0]._position.y
+        }
+    }
+
+    getCenterXYZOfRoom(room:Room):{x:number,y:number,z:number} {
+        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
+        if(!r) console.error('Cannot find room '+[room.id],room);
+        return {
+            x:r[0]._position.x,
+            y:r[0]._position.y,
+            z:r[0]._position.z
+        }
+    }
+    getRenderRoom(room:Room):RenderRoom | undefined {
+        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
+        return r.length>0?r[0]:undefined;
+    }
+
     addGroundLayer = (x, y, z, texture,frame?):IsoSprite => this.add(x, y, z, texture,frame);
 
-    addCharacterLayer = (x, y, z, texture,frame?):void => this.add(x, y, z + GAME_CONFIG.tile_height, texture,frame);
+    addCharacterLayer = (x, y, z, texture,frame?):void => this.add(x, y, z + GAME_CONFIG.scale*GAME_CONFIG.tile_height/2, texture,frame);
 
 }

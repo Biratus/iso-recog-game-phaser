@@ -11,10 +11,10 @@ export default class Map3D {
     this.map = new Phaser.Structs.Map([]);
     this.scene = scene;
   }
-  getTileAt = (x, y, z): IsoSprite => { return this.isEmpty(x, y, z) ? null : this.map.get(x).get(y).get(z); }
+  getTileAt (x, y, z): Tile | undefined { return this.isEmpty(x, y, z) ? undefined : this.map.get(x).get(y).get(z); }
   setTileAt = (x, y, z, key): IsoSprite => {
     if (!this.isEmpty(x, y, z)) {
-      this.getTileAt(x, y, z).destroy();
+      this.getTileAt(x, y, z)!.destroy();
     }
     if (!this.map.get(x)) this.map.set(x, new Phaser.Structs.Map([]));
     if (!this.map.get(x).get(y)) this.map.get(x).set(y, new Phaser.Structs.Map([]));

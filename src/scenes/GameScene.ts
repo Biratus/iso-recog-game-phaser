@@ -1,10 +1,13 @@
 import 'phaser'
 import { SCENE_GAME } from '../constants/Constants'
 import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric'
+import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
+import Cube from 'phaser3-plugin-isometric/src/Cube';
 import Level from '../objects/core/Level';
 import Renderer, { renderer } from '../objects/render/Renderer';
 import { _ } from 'underscore';
 import RecogListener from '../objects/recognizer/RecogListener';
+import Loader from '../objects/utils/Loader';
 
 export var currentScene: GameScene;
 
@@ -13,9 +16,17 @@ export default class GameScene extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics;
   currentLevel: Level;
   recogListener: RecogListener;
-  info: Phaser.GameObjects.Text;
 
-  _screenSize:number;
+  info: Phaser.GameObjects.Text;
+  info2: Phaser.GameObjects.Text;
+  currentShape: Phaser.GameObjects.Text;
+
+  projectionText: string;
+
+  isPause = false;
+  pauseBtn: Phaser.GameObjects.Sprite;
+
+  _screenSize: number;
 
   constructor() {
     super(SCENE_GAME);
@@ -35,44 +46,94 @@ export default class GameScene extends Phaser.Scene {
       url: IsoPhysics,
       sceneKey: 'isoPhysics'
     });
-    this._screenSize=Phaser.Math.Distance.Between(0,0,this.game.canvas.width,this.game.canvas.height);
-    this.recogListener = new RecogListener();
+    this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
+    // this.recogListener = new RecogListener();
   }
 
   create = () => {
 
     this.children.sortChildrenFlag = true;
     //EVENT
-    this.initEvents();
-    this.info = this.add.text(10, 10, '', { font: '15px Arial', fill: '#ffffff' });
+    // this.input.keyboard.createCursorKeys();
+    // this.initEvents();
 
     // ISO PLUGIN
     // this.isoPhysics.world.gravity.setTo(0, 0, -500);
     let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
-    let ry = 0.5 * window.innerHeight / this.sys.game.canvas.width;
-    console.log('iso', this.iso);
-    console.log('physics', this.isoPhysics);
+    let ry = 0.5 * window.innerHeight / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
-    this.iso.projector.projectionAngle = Math.atan(65 / 111);
+    this.projectionText = 'CLASSIC';
+    console.log("classic", CLASSIC);
+    this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
     this.graphics = this.add.graphics({
       x: 0, y: 0,
-      lineStyle: { color: 0xffff00, width: 1 },
+      lineStyle: { color: 0xffffff, width: 10 },
       fillStyle: { color: 0xffff00, alpha: 1 }
     });
 
-    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
-    // this.currentLevel.init();
-    // console.log("Level", this.currentLevel);
+    this.input.once('pointerup', (pointer) => {
+      let factor = 0.5;
+      let cube = new Cube(0, 0, 0, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
+      let sides = [
+        [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+      ];
+      console.log('cube', cube);
+      let corners = cube.getCorners();
+      console.log('corners', corners);
+      let canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let graph = canvas.getContext('2d');
+      graph!.strokeStyle = "#000000";
+      graph!.lineWidth = 2;
+      for (let path of sides) {
+        let pt = this.iso.projector.project(corners[path[0]]);
+        graph!.moveTo(pt.x, pt.y);
+        for (let i = 1; i < path.length; i++) {
+          pt = this.iso.projector.project(corners[path[i]]);
+          graph!.lineTo(pt.x, pt.y);
+        }
+        graph!.stroke();
+      }
+      document.body.appendChild(canvas);
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+      a.setAttribute('style', "display: none");
+      let img = new Image();
+      img.src = canvas.toDataURL();
+      // console.log('canvas',img.src.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
+      a.href = img.src;
+      a.download = this.projectionText + '.png';
+      a.click();
+      // window.URL.revokeObjectURL(url);
 
+    });
+
+    // this.pauseBtn = this.add.sprite(50, 50, 'tileCube').setInteractive();
+    // this.pauseBtn.on('pointerup', () => this.isPause ? this.resume() : this.pause());
+
+    // this.info = this.add.text(10, 10, '', { font: '12px Arial', fill: '#ffffff' });
+    // this.info2 = this.add.text(0.5 * window.innerWidth, 10,
+    //   "innerW: " + window.innerWidth + " gameW: " + this.sys.game.canvas.width +
+    //   "\ninnerH: " + window.innerHeight + " gameH: " + this.sys.game.canvas.height +
+    //   '\nScreen Size: ' + this._screenSize +
+    //   '\nFPS: ' + this.game.loop.actualFps + ' target: ' + this.game.loop.targetFps, { font: '12px Arial', fill: '#ffffff' });
+    // this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+
+    // //LEVEL
+    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test1').Level);
+    // this.currentLevel.init();
     // renderer.renderLevel(this.currentLevel);
 
+    // this.recogListener.disable();
+
+
+    console.log('iso', this.iso);
+    console.log('physics', this.isoPhysics);
+    console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
-
-    this.children.sortChildrenFlag = true;
-
-    this.input.keyboard.createCursorKeys();
 
     // this.buildAxes();
   }
@@ -81,36 +142,59 @@ export default class GameScene extends Phaser.Scene {
 
   }
 
-  initEvents() {
+  pause() {
+    this.isPause = true;
+    this.recogListener.disable();
+    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
+  }
+
+  resume() {
+    this.isPause = false;
+    this.recogListener.enable();
+    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+
+  }
+
+  initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', (result) => {
       console.log('results ' + result[0].Name + " " + result[0].Score, result);
-        this.info.setText('Results :'+_.reduce(result, (acc,elt) => acc+'\n'+elt.Name+" "+elt.Score,'')+'\nScreen Size: '+this._screenSize) ;
+
+      if (result[0].Score - result[1].Score > 0.15) {
+        this.currentShape.setText(result[0].Name);
+        this.currentLevel.currentRoom.killEnemies(result[0].Name);
+      } else this.currentShape.setText("UNDEFINED");
+
+      this.info.setText('Results :' + _.reduce(result, (acc, elt) => acc + '\n' + elt.Name + " " + elt.Score, ''));
     });
     this.input.on('pointerdown', (pointer) => {
-      this.graphics.clear();
-      this.graphics.fillCircle(pointer.x, pointer.y, 2);
+      if (this.isPause) return;
       this.recogListener.emitter.emit('pointerdown', pointer);
 
     });
     this.input.on('pointermove', (pointer) => {
-      this.graphics.fillCircle(pointer.x, pointer.y, 2);
+      if (this.isPause) return;
       this.recogListener.emitter.emit('pointermove', pointer);
     });
-    this.input.on('pointerup', (pointer) => {
-      this.recogListener.emitter.emit('pointerup', pointer);
+    this.input.once('pointerup', (pointer) => {
+      this.input.on('pointerup', (pointer) => {
+        if (this.isPause) return;
+        this.recogListener.emitter.emit('pointerup', pointer);
+      });
+      this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+      this.recogListener.enable();
 
     });
   }
 
-  drawPoints(points,color,clear) {
+  drawPoints(points, color, clear) {
     let initColor = this.graphics.defaultFillColor;
-    if(clear) this.graphics.clear();
-    if(color) this.graphics.fillStyle(color,1);
-    for(let p of points) {
+    if (clear) this.graphics.clear();
+    if (color) this.graphics.fillStyle(color, 1);
+    for (let p of points) {
       this.graphics.fillCircle(p.X, p.Y, 2);
     }
-    this.graphics.defaultFillColor=initColor;
+    this.graphics.defaultFillColor = initColor;
   }
 
-  get screenSize() {return this._screenSize;}
+  get screenSize() { return this._screenSize; }
 }

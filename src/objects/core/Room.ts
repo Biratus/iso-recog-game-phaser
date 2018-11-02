@@ -6,8 +6,10 @@ export default class Room {
 
     _id: number;
     entries: Entry[];
+    diff:number;
     constructor(id, diff) {
         this._id = id;
+        this.diff=diff;
         this.entries = new Array();
     }
 
@@ -24,4 +26,8 @@ export default class Room {
     }
 
     getAllEnemiesManager = (): EnemyManager[] => this.entries.map(e => e.enemyManager);
+
+    killEnemies(sign) {
+        this.getAllEnemiesManager().forEach((enMana) => enMana.getClosestWithSign(sign).forEach((en)=>en.takeHit()));
+    }
 }
