@@ -1,7 +1,7 @@
 import 'phaser'
 import { SCENE_GAME } from '../constants/Constants'
 import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric'
-import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
+import { CLASSIC, ISOMETRIC, MILITARY } from 'phaser3-plugin-isometric/src/Projector';
 import Cube from 'phaser3-plugin-isometric/src/Cube';
 import Level from '../objects/core/Level';
 import Renderer, { renderer } from '../objects/render/Renderer';
@@ -63,7 +63,6 @@ export default class GameScene extends Phaser.Scene {
     let ry = 0.5 * window.innerHeight / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
     this.projectionText = 'CLASSIC';
-    console.log("classic", CLASSIC);
     this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
@@ -74,41 +73,16 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.input.once('pointerup', (pointer) => {
-      let factor = 0.5;
-      let cube = new Cube(0, 0, 0, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
-      let sides = [
-        [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
-      ];
-      console.log('cube', cube);
-      let corners = cube.getCorners();
-      console.log('corners', corners);
-      let canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      let graph = canvas.getContext('2d');
-      graph!.strokeStyle = "#000000";
-      graph!.lineWidth = 2;
-      for (let path of sides) {
-        let pt = this.iso.projector.project(corners[path[0]]);
-        graph!.moveTo(pt.x, pt.y);
-        for (let i = 1; i < path.length; i++) {
-          pt = this.iso.projector.project(corners[path[i]]);
-          graph!.lineTo(pt.x, pt.y);
-        }
-        graph!.stroke();
-      }
-      document.body.appendChild(canvas);
-      var a = document.createElement("a");
-      document.body.appendChild(a);
-      a.setAttribute('style', "display: none");
-      let img = new Image();
-      img.src = canvas.toDataURL();
-      // console.log('canvas',img.src.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
-      a.href = img.src;
-      a.download = this.projectionText + '.png';
-      a.click();
-      // window.URL.revokeObjectURL(url);
+      // const projections=[[ISOMETRIC,'ISOMETRIC'],[CLASSIC,'CLASSIC'],[MILITARY,'MILITARY'],[Math.atan(65/111),'Math.atan(65/111)'],[120,'120'],[Math.PI/8,'Math.PI/8'],[Math.PI/4,'Math.PI/4']];
+      // for(let proj of projections) {
+      //   this.downloadPlane(proj);
+      // }
 
+      // this.downloadCube([Math.PI/4,'Math.PI/8=4']);
+      // this.downloadPlane([Math.PI/4,'Math.PI/4']);
+
+      this.downloadFullCube([CLASSIC, 'CLASSIC']);
+      this.downloadElongatedCube([CLASSIC, 'CLASSIC'],0.7,1.5);
     });
 
     // this.pauseBtn = this.add.sprite(50, 50, 'tileCube').setInteractive();
@@ -136,6 +110,160 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
 
     // this.buildAxes();
+  }
+
+  downloadCube(projection) {
+    this.projectionText = projection[1];
+    this.iso.projector.projectionAngle = projection[0];
+    let factor = 0.5;
+
+    // draw 1 cube
+    let cube = new Cube(0, 0, 0, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
+    let sides = [
+      [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+    ];
+    let corners = cube.getCorners();
+    let canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let graph = canvas.getContext('2d');
+    graph!.strokeStyle = "#000000";
+    graph!.lineWidth = 1;
+    for (let path of sides) {
+      let pt = this.iso.projector.project(corners[path[0]]);
+      graph!.moveTo(pt.x, pt.y);
+      for (let i = 1; i < path.length; i++) {
+        pt = this.iso.projector.project(corners[path[i]]);
+        graph!.lineTo(pt.x, pt.y);
+      }
+      graph!.stroke();
+    }
+    document.body.appendChild(canvas);
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', "display: none");
+    let img = new Image();
+    img.src = canvas.toDataURL();
+    a.href = img.src;
+    a.download = this.projectionText + '.png';
+    a.click();
+  }
+
+  downloadPlane(projection) {
+    let sides = [
+      [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+    ];
+    this.iso.projector.projectionAngle = projection[0];
+    this.projectionText = projection[1];
+    let factor = 0.1;
+    let initZ = -3 * window.innerWidth * factor;
+    let canvasPlane = document.createElement('canvas');
+    canvasPlane.width = window.innerWidth;
+    canvasPlane.height = window.innerHeight;
+    let graphPlane = canvasPlane.getContext('2d');
+    let size = 5;
+    let topface = [[1, 3, 7, 5, 1]];
+    let topleftface = [[1, 5, 7, 6, 2, 3, 1], [3, 7]];
+    let toprightface = [[1, 5, 7, 6, 4, 5, 1], [5, 7]];
+    graphPlane!.strokeRect(0, 0, window.innerWidth, window.innerHeight);
+    for (let i = -size / 2; i < size; i++) {
+      for (let j = -size / 2; j < size; j++) {
+        let cube = new Cube(i * window.innerWidth * factor, j * window.innerWidth * factor, initZ, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
+        let corners = cube.getCorners();
+        let toDrawSides = (i < size - 1 && j < size - 1) ? topface : (i == size - 1 ? (j == size - 1 ? sides : toprightface) : topleftface);
+        for (let path of toDrawSides) {
+          let pt = this.iso.projector.project(corners[path[0]]);
+          graphPlane!.moveTo(pt.x, pt.y);
+          for (let i = 1; i < path.length; i++) {
+            pt = this.iso.projector.project(corners[path[i]]);
+            graphPlane!.lineTo(pt.x, pt.y);
+          }
+          graphPlane!.stroke();
+        }
+      }
+    }
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', "display: none");
+    let img = new Image();
+    img.src = canvasPlane.toDataURL();
+    a.href = img.src;
+    a.download = this.projectionText + '_plane_lowered_f' + factor + '_size' + size + '.png';
+    a.click();
+  }
+
+  downloadElongatedCube(projection, width, sizeZ) {
+    this.projectionText = projection[1];
+    this.iso.projector.projectionAngle = projection[0];
+    let factor = 0.5;
+
+    // draw 1 cube
+    let cube = new Cube(0, 0, 0, window.innerWidth * factor * width, window.innerWidth * factor * width, window.innerWidth * factor * sizeZ);
+    let sides = [
+      [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+    ];
+    let corners = cube.getCorners();
+    let canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let graph = canvas.getContext('2d');
+    graph!.strokeStyle = "#000000";
+    graph!.lineWidth = 1;
+    for (let path of sides) {
+      let pt = this.iso.projector.project(corners[path[0]]);
+      graph!.moveTo(pt.x, pt.y);
+      for (let i = 1; i < path.length; i++) {
+        pt = this.iso.projector.project(corners[path[i]]);
+        graph!.lineTo(pt.x, pt.y);
+      }
+      graph!.stroke();
+    }
+    document.body.appendChild(canvas);
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', "display: none");
+    let img = new Image();
+    img.src = canvas.toDataURL();
+    a.href = img.src;
+    a.download = this.projectionText + '_Elongated _w'+width+'_Z'+sizeZ+'.png';
+    a.click();
+  }
+
+  downloadFullCube(projection) {
+    this.projectionText = projection[1];
+    this.iso.projector.projectionAngle = projection[0];
+    let factor = 0.5;
+
+    // draw 1 cube
+    let cube = new Cube(0, 0, 0, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
+    let sides = [
+      [0,1,3,2,6,7,5,4,0,1,5],[3,7],[2,0],[4,6]
+    ];
+    let corners = cube.getCorners();
+    let canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let graph = canvas.getContext('2d');
+    graph!.strokeStyle = "#000000";
+    graph!.lineWidth = 1;
+    for (let path of sides) {
+      let pt = this.iso.projector.project(corners[path[0]]);
+      graph!.moveTo(pt.x, pt.y);
+      for (let i = 1; i < path.length; i++) {
+        pt = this.iso.projector.project(corners[path[i]]);
+        graph!.lineTo(pt.x, pt.y);
+      }
+      graph!.stroke();
+    }
+    document.body.appendChild(canvas);
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', "display: none");
+    let img = new Image();
+    img.src = canvas.toDataURL();
+    a.href = img.src;
+    a.download = this.projectionText + '_Full.png';
+    a.click();
   }
 
   update(time: number, delta: number) {
