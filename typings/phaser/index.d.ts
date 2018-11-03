@@ -58243,12 +58243,13 @@ declare namespace Phaser {
                 setBounds(x: number, y: number, z: number, widthX: number, widthY: number, height: number): void;
                 setBoundsToWorld(): void;
                 computeVelocity(axis: number, body: Phaser.Plugins.Isometric.Body, velocity: number, acceleration: number, drag: number, max?: number): number;
-                intersects(body1: Phaser.Plugins.Isometric.Body): boolean;
-                overlap(object1: any, object2: any, overlapCallback?: Function, processCallback?: Function, callbackContext?: any): boolean;
-                collide(object1: any, object2: any, overlapCallback?: Function, processCallback?: Function, callbackContext?: any): boolean;
+                overlap(object1: Phaser.Plugins.Isometric.IsoSprite|Phaser.GameObjects.Group, object2: Phaser.Plugins.Isometric.IsoSprite|Phaser.GameObjects.Group|any[], overlapCallback?: Function, processCallback?: Function, callbackContext?: any): boolean;
+                collide(object1: Phaser.Plugins.Isometric.IsoSprite|Phaser.GameObjects.Group, object2: Phaser.Plugins.Isometric.IsoSprite|Phaser.GameObjects.Group|any[], overlapCallback?: Function, processCallback?: Function, callbackContext?: any): boolean;
                 updateMotion(body: Phaser.Plugins.Isometric.Body): void;
-                // enable(object: any, children?: boolean): void;
-                // enableBody(object: any): void;
+                enable(object: any, children?: boolean): void;
+                enableBody(object: any): void;
+                intersects(body1:Phaser.Plugins.Isometric.Body, body2:Phaser.Plugins.Isometric.Body):boolean;
+                
                 // distanceBetween(source: any, target: any): number;
                 // distanceToXY(displayObject: any, x: number, y: number): number;
                 // distanceToXYZ(displayObject: any, x: number, y: number, z: number): number;

@@ -2,6 +2,7 @@ import { GAME_CONFIG } from "../../constants/Constants";
 import Tile from "./Tile";
 import { renderer } from "./Renderer";
 import { IsoSprite } from 'phaser3-plugin-isometric';
+import { currentScene } from "../../scenes/GameScene";
 
 
 export default class Map3D {
@@ -12,7 +13,7 @@ export default class Map3D {
     this.scene = scene;
   }
   getTileAt (x, y, z): Tile | undefined { return this.isEmpty(x, y, z) ? undefined : this.map.get(x).get(y).get(z); }
-  setTileAt = (x, y, z, key): IsoSprite => {
+  setTileAt = (x, y, z, key): Tile => {
     if (!this.isEmpty(x, y, z)) {
       this.getTileAt(x, y, z)!.destroy();
     }
@@ -29,8 +30,9 @@ export default class Map3D {
 
     let tile = new Tile(x, y, z, t);
     this.map.get(x).get(y).set(z, tile);
-    // this.fillNeighbours(x, y, z, tile);
-    return t;
+    if(GAME_CONFIG.enablePhysics) currentScene.isoPhysics.world.enable(tile.sprite);
+    this.fillNeighbours(x, y, z, tile);
+    return tile;
   }
   isEmpty = (x, y, z): boolean => {
     let argumentsLength = (x != undefined ? 1 : 0) + (y != undefined ? 1 : 0) + (z != undefined ? 1 : 0);
@@ -77,12 +79,30 @@ export default class Map3D {
   }
   fillNeighbours = (x, y, z, t: Tile) => {
     let tile;
-    if ((tile = this.getTileAt(x - 1, y, z))) tile.setNext('west', t);
-    if ((tile = this.getTileAt(x + 1, y, z))) tile.setNext('east', t);
-    if ((tile = this.getTileAt(x, y - 1, z))) tile.setNext('south', t);
-    if ((tile = this.getTileAt(x, y + 1, z))) tile.setNext('north', t);
-    if ((tile = this.getTileAt(x, y, z - 1))) tile.setNext('down', t);
-    if ((tile = this.getTileAt(x, y, z + 1))) tile.setNext('up', t);
+    if ((tile = this.getTileAt(x - 1, y, z))) {
+      t.setNext('east',tile);
+      tile.setNext('west', t);
+    }
+    if ((tile = this.getTileAt(x + 1, y, z))) {
+      t.setNext('west',tile);
+      tile.setNext('east', t);
+    }
+    if ((tile = this.getTileAt(x, y - 1, z))) {
+      t.setNext('north',tile);
+      tile.setNext('south', t);
+    }
+    if ((tile = this.getTileAt(x, y + 1, z))) {
+      t.setNext('south',tile);
+      tile.setNext('north', t);
+    }
+    if ((tile = this.getTileAt(x, y, z - 1))) {
+      t.setNext('up',tile);
+      tile.setNext('down', t);
+    }
+    if ((tile = this.getTileAt(x, y, z + 1))) {
+      t.setNext('down',tile);
+      tile.setNext('up', t);
+    }
   }
   forEachTile = (eachFunc) => {
     for (let x of this.map.keys()) {

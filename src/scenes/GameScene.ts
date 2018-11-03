@@ -8,6 +8,8 @@ import Renderer, { renderer } from '../objects/render/Renderer';
 import { _ } from 'underscore';
 import RecogListener from '../objects/recognizer/RecogListener';
 import Loader from '../objects/utils/Loader';
+import { MapRenderer } from '../objects/render/MapRenderer';
+import Tile from '../objects/render/Tile';
 
 export var currentScene: GameScene;
 
@@ -47,7 +49,7 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    // this.recogListener = new RecogListener();
+    this.recogListener = new RecogListener();
   }
 
   create = () => {
@@ -55,12 +57,12 @@ export default class GameScene extends Phaser.Scene {
     this.children.sortChildrenFlag = true;
     //EVENT
     // this.input.keyboard.createCursorKeys();
-    // this.initEvents();
+    this.initEvents();
 
     // ISO PLUGIN
     // this.isoPhysics.world.gravity.setTo(0, 0, -500);
     let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
-    let ry = 0.5 * window.innerHeight / this.sys.game.canvas.height;
+    let ry = 0.75 * window.innerHeight / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
     this.iso.projector.projectionAngle = Math.atan(65/111);
 
@@ -87,6 +89,13 @@ export default class GameScene extends Phaser.Scene {
     this.currentLevel.init();
     renderer.renderLevel(this.currentLevel);
 
+    renderer.buildUnderground();
+    renderer.mapManager.rooms.forEach((room) => {
+      let nbTile = Math.round(1+Math.random()*5);
+      for(let i=0;i<=nbTile;i++) room.tiles[Math.floor(Math.random()*room.tiles.length)].destroy();
+    });
+    // renderer.hideRooms();
+
     this.recogListener.disable();
 
 
@@ -94,6 +103,11 @@ export default class GameScene extends Phaser.Scene {
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
+
+    console.log('origin tile',MapRenderer.getTileAt(0,0,0));
+
+    console.log('first tile',renderer.children[0]);
+    console.log('last tile',renderer.children[renderer.children.length-1]);
 
     // this.buildAxes();
   }
@@ -136,12 +150,25 @@ export default class GameScene extends Phaser.Scene {
       this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.once('pointerup', (pointer) => {
-      this.input.on('pointerup', (pointer) => {
-        if (this.isPause) return;
-        this.recogListener.emitter.emit('pointerup', pointer);
+      MapRenderer.forEachTile((tile:Tile,x,y,z) => {
+        for(let loc in tile._neighbours) {
+          if(tile._neighbours[loc] !== null && this.isoPhysics.world.collide(tile._neighbours[loc].sprite.body,tile.sprite.body)) {
+            console.log(x+" "+" "+y+" "+z,tile);
+            console.log("neigh "+loc,tile._neighbours[loc]);
+            console.log('INTERSECT');
+            return;
+          }
+        }
       });
-      this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
-      this.recogListener.enable();
+      
+      console.log('done');
+
+      // this.input.on('pointerup', (pointer) => {
+      //   if (this.isPause) return;
+      //   this.recogListener.emitter.emit('pointerup', pointer);
+      // });
+      // this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+      // this.recogListener.enable();
 
     });
   }

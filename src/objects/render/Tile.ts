@@ -6,13 +6,13 @@ export default class Tile {
     sprite: IsoSprite;
     _position: { x: number, y: number, z: number };
     _neighbours: {
-        north: Tile | undefined,//y+1
-        south: Tile | undefined,//y-1
-        west: Tile | undefined,//x-1,
-        east: Tile | undefined,//x+1
-        down: Tile | undefined,//z-1
-        up: Tile | undefined//z+1
-    } = { north: undefined, south: undefined, west: undefined, east: undefined, down: undefined, up: undefined };
+        north: Tile | null,//y+1
+        south: Tile | null,//y-1
+        west: Tile | null,//x-1,
+        east: Tile | null,//x+1
+        down: Tile | null,//z-1
+        up: Tile | null//z+1
+    } = { north: null, south: null, west: null, east: null, down: null, up: null };
 
     constructor(x, y, z, sprite) {
         this.sprite = sprite;
@@ -52,6 +52,7 @@ export default class Tile {
     }
 
     destroy() {
+        if(this.sprite.body) this.sprite.body.destroy();
         this.sprite.destroy();
     }
 }
