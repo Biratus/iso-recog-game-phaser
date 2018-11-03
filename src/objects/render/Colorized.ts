@@ -31,10 +31,10 @@ export default class Colorized {
             graph!.fill();
             graph!.closePath();
         }
-        document.body.appendChild(canvas);
+        // document.body.appendChild(canvas);
         const a = document.createElement("a");
-        document.body.appendChild(a);
-        a.setAttribute('style', "display: none");
+        // document.body.appendChild(a);
+        // a.setAttribute('style', "display: none");
         const img = new Image();
         img.src = canvas.toDataURL();
         a.href = img.src;

@@ -31,6 +31,9 @@ export default class GameScene extends Phaser.Scene {
 
   _screenSize: number;
 
+  countColor = 0;
+  doneCombi: string[] = [];
+
   constructor() {
     super(SCENE_GAME);
     currentScene = this;
@@ -68,7 +71,13 @@ export default class GameScene extends Phaser.Scene {
       fillStyle: { color: 0xffff00, alpha: 1 }
     });
 
-    this.input.once('pointerup', (pointer) => {
+    this.input.on('pointerup', (pointer) => {
+      setInterval(() => {
+
+        let colors = ['blue_violet', 'red', 'violet', 'blue', 'green', 'yellow'];
+        this.downloadCubes(colors[this.countColor++]);
+        if (this.countColor >= colors.length) this.countColor = 0;
+      },10*1000);
       // const projections=[[ISOMETRIC,'ISOMETRIC'],[CLASSIC,'CLASSIC'],[MILITARY,'MILITARY'],[Math.atan(65/111),'Math.atan(65/111)'],[120,'120'],[Math.PI/8,'Math.PI/8'],[Math.PI/4,'Math.PI/4']];
       // for(let proj of projections) {
       //   Wireframe.downloadPlane(proj);
@@ -79,7 +88,9 @@ export default class GameScene extends Phaser.Scene {
 
       // Wireframe.downloadFullCube([CLASSIC, 'CLASSIC']);
       // Wireframe.downloadElongatedCube([CLASSIC, 'CLASSIC'],0.7,1.5);
-      Colorized.downloadElongatedCube([CLASSIC,'CLASSIC'],1,0.5,new IsoColor('#D8E7E2','#688490','#364A53'));
+
+      // Colorized.downloadCube([CLASSIC,'CLASSIC'],new IsoColor('#D8E7E2','#688490','#364A53'));
+      // Colorized.downloadElongatedCube([CLASSIC, 'CLASSIC'], 1, 0.5, new IsoColor('#D8E7E2', '#688490', '#364A53'));
     });
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
@@ -87,6 +98,32 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
   }
 
+  downloadCubes(key) {
+    let colorsHex = {
+      blue_violet: ['#A88088', '#9B7C84', '#7C6C77', '#956573', '#5F4C60', '#464155'],
+      red: ['#FDE4E0', '#FED9D1', '#FFABA9', '#FEBAB1', '#FD7575', '#ED5756', '#9F3B3B', '#4F1E1A'],
+      violet: ['#FED0DD', '#FD85AE', '#F35BA3', '#A93C8D', '#742E76', '#341A49'],
+      blue: ['#E8F6FE', '#DAF0FD', '#D2E8FD', '#ADD4FD', '#99C8FB', '#5AA6FE', '#457BE7', '#245598', '#17294D'],
+      green: ['#C5DECD', '#9BC6A9', '#82BB95', '#79B288', '#5EA178', '#55966B', '#51926A', '#407853', '#2D6349', '#154841', '#0C3837', '#05282E'],
+      yellow: ['#D6E892', '#A8AE51', '#91813C', '#977838', '#886932', '#746431']
+    };
+
+    // draw triplets
+    let count = 0;
+    for (let iLight = 0; iLight < colorsHex[key].length - 2; iLight++) {
+      for (let iMedium = iLight + 1; iMedium < colorsHex[key].length - 1; iMedium++) {
+        for (let iDark = iMedium + 1; iDark < colorsHex[key].length; iDark++) {
+          if (this.doneCombi.indexOf('CLASSIC_' + key + '_' + iLight + ',' + iMedium + ',' + iDark) >= 0) continue;
+          console.log('CLASSIC_' + key + '_' + iLight + ',' + iMedium + ',' + iDark);
+          this.doneCombi.push('CLASSIC_' + key + '_' + iLight + ',' + iMedium + ',' + iDark);
+          Colorized.downloadCube([CLASSIC, 'CLASSIC_' + key + '_' + iLight + ',' + iMedium + ',' + iDark], new IsoColor(colorsHex[key][iLight], colorsHex[key][iMedium], colorsHex[key][iDark]))
+          count++;
+          if (count >= 10) return;
+        }
+      }
+    }
+
+  }
 
   update(time: number, delta: number) {
 
