@@ -96,10 +96,10 @@ export default class Renderer {
     buildUnderground() {
         let height=0.5;
         let z=-1;
-        let texture='cube_gray';
+        let texture='cube_gray_h0.5';
         this.mapManager.rooms.forEach((room) => {
             for(let t of room.getBorderTiles()) {
-                let addedTile=MapRenderer.setTileAt(t.x,t.y,z,texture);
+                let addedTile=MapRenderer.setTileAt(t.x,t.y,z+height/2,texture);
                 
             }
         });

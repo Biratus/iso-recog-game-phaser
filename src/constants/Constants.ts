@@ -29,9 +29,9 @@ export const GAME_CONFIG = {
     tile_size: 64,
     tile_height: 63,
     tile_scale:0.36,
-    scale: 0.5,
+    scale: 0.7,
     // scale: 0.22,
-    // player_scale:0.4,
+    // player_scale:0.4
     enablePhysics:false
 }
 

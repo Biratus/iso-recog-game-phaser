@@ -37,9 +37,9 @@ export default class RenderRoom {
                     if ((x == start_x || x == end_x - 1) && !this.isEntry(x, y)) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z + 1, RenderRoom.tileTexture));//sideX
                     else if ((y == start_y || y == end_y - 1) && !this.isEntry(x, y)) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z + 1, RenderRoom.tileTexture));//sideY
                 }
-                if (x == 0 && y == 0) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, 'cube_gray'));
+                // if (x == 0 && y == 0) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, 'cube_gray'));
                 // let z = this._position.z;
-                else this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, RenderRoom.tileTexture));
+                this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, RenderRoom.tileTexture));
             }
         }
     }
