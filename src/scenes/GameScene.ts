@@ -62,9 +62,7 @@ export default class GameScene extends Phaser.Scene {
     let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
     let ry = 0.5 * window.innerHeight / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
-    this.projectionText = 'CLASSIC';
-    console.log("classic", CLASSIC);
-    this.iso.projector.projectionAngle = CLASSIC;
+    this.iso.projector.projectionAngle = Math.atan(65/111);
 
     // GRAPHICS
     this.graphics = this.add.graphics({
@@ -73,61 +71,23 @@ export default class GameScene extends Phaser.Scene {
       fillStyle: { color: 0xffff00, alpha: 1 }
     });
 
-    this.input.once('pointerup', (pointer) => {
-      let factor = 0.5;
-      let cube = new Cube(0, 0, 0, window.innerWidth * factor, window.innerWidth * factor, window.innerWidth * factor);
-      let sides = [
-        [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
-      ];
-      console.log('cube', cube);
-      let corners = cube.getCorners();
-      console.log('corners', corners);
-      let canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      let graph = canvas.getContext('2d');
-      graph!.strokeStyle = "#000000";
-      graph!.lineWidth = 2;
-      for (let path of sides) {
-        let pt = this.iso.projector.project(corners[path[0]]);
-        graph!.moveTo(pt.x, pt.y);
-        for (let i = 1; i < path.length; i++) {
-          pt = this.iso.projector.project(corners[path[i]]);
-          graph!.lineTo(pt.x, pt.y);
-        }
-        graph!.stroke();
-      }
-      document.body.appendChild(canvas);
-      var a = document.createElement("a");
-      document.body.appendChild(a);
-      a.setAttribute('style', "display: none");
-      let img = new Image();
-      img.src = canvas.toDataURL();
-      // console.log('canvas',img.src.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
-      a.href = img.src;
-      a.download = this.projectionText + '.png';
-      a.click();
-      // window.URL.revokeObjectURL(url);
+    this.pauseBtn = this.add.sprite(50, 50, 'tileCube').setInteractive();
+    this.pauseBtn.on('pointerup', () => this.isPause ? this.resume() : this.pause());
 
-    });
+    this.info = this.add.text(10, 10, '', { font: '12px Arial', fill: '#ffffff' });
+    this.info2 = this.add.text(0.5 * window.innerWidth, 10,
+      "innerW: " + window.innerWidth + " gameW: " + this.sys.game.canvas.width +
+      "\ninnerH: " + window.innerHeight + " gameH: " + this.sys.game.canvas.height +
+      '\nScreen Size: ' + this._screenSize +
+      '\nFPS: ' + this.game.loop.actualFps + ' target: ' + this.game.loop.targetFps, { font: '12px Arial', fill: '#ffffff' });
+    this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
 
-    // this.pauseBtn = this.add.sprite(50, 50, 'tileCube').setInteractive();
-    // this.pauseBtn.on('pointerup', () => this.isPause ? this.resume() : this.pause());
+    //LEVEL
+    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test1').Level);
+    this.currentLevel.init();
+    renderer.renderLevel(this.currentLevel);
 
-    // this.info = this.add.text(10, 10, '', { font: '12px Arial', fill: '#ffffff' });
-    // this.info2 = this.add.text(0.5 * window.innerWidth, 10,
-    //   "innerW: " + window.innerWidth + " gameW: " + this.sys.game.canvas.width +
-    //   "\ninnerH: " + window.innerHeight + " gameH: " + this.sys.game.canvas.height +
-    //   '\nScreen Size: ' + this._screenSize +
-    //   '\nFPS: ' + this.game.loop.actualFps + ' target: ' + this.game.loop.targetFps, { font: '12px Arial', fill: '#ffffff' });
-    // this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-
-    // //LEVEL
-    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test1').Level);
-    // this.currentLevel.init();
-    // renderer.renderLevel(this.currentLevel);
-
-    // this.recogListener.disable();
+    this.recogListener.disable();
 
 
     console.log('iso', this.iso);
