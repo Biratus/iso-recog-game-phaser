@@ -41,7 +41,15 @@
         "terrain2/room_tiles/tile_07.png",
         "terrain2/room_tiles/tile_00.png",
         "en_sm_square.png",
-        "en_sm_circle.png"
+        "en_sm_circle.png",
+        "CLASSIC_blue_1,3,5.png",
+        "CLASSIC_blue_1,6,7.png",
+        "CLASSIC_blue_2,4,5.png",
+        "CLASSIC_blue_4,7,8.png",
+        "CLASSIC_blue_1,3,5_Elongated _w1_Z0.5.png",
+        "CLASSIC_blue_1,6,7_Elongated _w1_Z0.5.png",
+        "CLASSIC_blue_2,4,5_Elongated _w1_Z0.5.png",
+        "CLASSIC_blue_4,7,8_Elongated _w1_Z0.5.png"
     ],
     "json": [
         "level_big.json",
