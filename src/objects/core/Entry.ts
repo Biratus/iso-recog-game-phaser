@@ -18,6 +18,8 @@ export default class Entry {
 
     // enemies config
     nbEnSmall: number;
+    nbEnMed: number;
+    spawnEvtMed:any[]=[];
 
     constructor(location, destId, sign, diff) {
         this.location = location;
@@ -30,6 +32,8 @@ export default class Entry {
     initEnemyManager() {
         this.enemyManager = new EnemyManager(this);
         this.enemyManager.createMultiple(ENEMY_TYPE.SMALL, this.nbEnSmall);
+        for(let e of this.spawnEvtMed) this.enemyManager.createMultipleMed(1,e);
+        this.enemyManager.createMultiple(ENEMY_TYPE.MEDIUM,this.nbEnMed-this.spawnEvtMed.length);
 
     }
 

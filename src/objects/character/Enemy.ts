@@ -8,36 +8,56 @@ import { ENEMY_TYPE } from '../../constants/Enums';
 export default class Enemy {
     static _idCount = 0;
 
+    static ON_SPAWN='onSpawn';
+    static ON_DIE='onDie';
+
     // core
     _id: number;
+    _config: { x: number, y: number, z: number, texture: string, frame?: number };
     tween: Phaser.Tweens.Tween;
     sprite: IsoSprite;
-    spawnEvent;
+    spawningEvent;
     emitter: Phaser.Events.EventEmitter;
 
-    type:string;
+    type: string;
     speed: number;
-    isDead:boolean
+    isDead: boolean
 
-    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, frame?: number }, type:string,spawnEvent?) {
+    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, frame?: number }, type: string, onSpawnEvent,spawningEvent?) {
         this._id = Enemy._idCount++;
-        this.sprite = renderer.addCharacterLayer(spriteConfig.x, spriteConfig.y, spriteConfig.z, spriteConfig.texture, spriteConfig.frame);
-        this.sprite.scaleX*=ENEMY_CONFIG.scale;
-        this.sprite.scaleY*=ENEMY_CONFIG.scale;
-        this.sprite.isoZ+=this.sprite.isoBounds.height/2;
+        this._config = spriteConfig;
         this.speed = 10;
-        this.spawnEvent = spawnEvent;
-        this.type=type;
+        this.spawningEvent = spawningEvent;
+        this.type = type;
         this.emitter = new Phaser.Events.EventEmitter();
+        if (!this.spawningEvent) {
+            this.create();
+            onSpawnEvent(this);
+        }
+        else {
+            this.emitter.on(spawningEvent.name,(enMana) => {
+                this.create();
+                spawningEvent.run(this,enMana);
+            });
+        }
+        
     }
 
     get id() { return this._id; }
 
-    goToGoal = (x, y,onFinish): void => {
-        if ((this.tween && this.tween.isPlaying()) || this.speed<=0) return;
+    create() {
+        this.sprite = renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
+        this.sprite.scaleX *= ENEMY_CONFIG.scale;
+        this.sprite.scaleY *= ENEMY_CONFIG.scale;
+        this.sprite.isoZ += this.sprite.isoBounds.height / 2;
+        this.emitter.emit(Enemy.ON_SPAWN);
+    }
+
+    goToGoal = (x, y, onFinish): void => {
+        if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) return;
         this.tween = currentScene.tweens.add({
             targets: this.sprite,
-            onComplete:() => onFinish(this),
+            onComplete: () => onFinish(this),
             props: {
                 isoX: {
                     value: x * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
@@ -54,12 +74,12 @@ export default class Enemy {
     }
 
     takeHit() {
-        switch(this.type) {
+        switch (this.type) {
             case ENEMY_TYPE.SMALL:
-            console.log('ouch');
-            this.sprite.destroy();
-            this.isDead=true;
-            break;
+                console.log('ouch');
+                this.sprite.destroy();
+                this.isDead = true;
+                break;
         }
     }
 

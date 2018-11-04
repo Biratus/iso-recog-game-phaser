@@ -46,7 +46,8 @@
     "json": [
         "level_big.json",
         "level_test.json",
-        "level_test1.json"
+        "level_test1.json",
+        "level_test_prev_die_event.json"
     ],
     "spritesheet": {
         "cowboy.png": {

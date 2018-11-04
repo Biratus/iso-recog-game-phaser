@@ -1,0 +1,51 @@
+{
+    "Level": {
+        "rooms": [
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "TOP",
+                        "dest": 1,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 5,
+                            "events": [
+                                "PREVIOUS_DIE",
+                                "PREVIOUS_DIE",
+                                "PREVIOUS_DIE",
+                                "PREVIOUS_DIE"
+                            ]
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 0,
+                "id": 0
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "BOTTOM",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 1
+            }
+        ],
+        "start": 0,
+        "finish": 1
+    }
+}

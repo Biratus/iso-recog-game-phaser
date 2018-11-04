@@ -47,7 +47,7 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    // this.recogListener = new RecogListener();
+    this.recogListener = new RecogListener();
   }
 
   create = () => {
@@ -55,7 +55,7 @@ export default class GameScene extends Phaser.Scene {
     this.children.sortChildrenFlag = true;
     //EVENT
     // this.input.keyboard.createCursorKeys();
-    // this.initEvents();
+    this.initEvents();
 
     // ISO PLUGIN
     // this.isoPhysics.world.gravity.setTo(0, 0, -500);
@@ -83,9 +83,10 @@ export default class GameScene extends Phaser.Scene {
     this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
 
     //LEVEL
-    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test1').Level);
-    this.currentLevel.init();
+    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test_prev_die_event').Level);
+    this.currentLevel.preload();
     renderer.renderLevel(this.currentLevel);
+    this.currentLevel.create();
 
     this.recogListener.disable();
 
@@ -99,6 +100,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
+    this.currentLevel.update(time,delta);
 
   }
 
@@ -136,12 +138,12 @@ export default class GameScene extends Phaser.Scene {
       this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.once('pointerup', (pointer) => {
-      this.input.on('pointerup', (pointer) => {
-        if (this.isPause) return;
-        this.recogListener.emitter.emit('pointerup', pointer);
-      });
+      // this.input.on('pointerup', (pointer) => {
+      //   if (this.isPause) return;
+      //   this.recogListener.emitter.emit('pointerup', pointer);
+      // });
       this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
-      this.recogListener.enable();
+      // this.recogListener.enable();
 
     });
   }

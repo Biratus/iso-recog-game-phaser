@@ -1,3 +1,5 @@
+import { renderer } from "../objects/render/Renderer";
+
 export const LOCATION = Object.freeze({
     TOP: { x: 0, y: -1 },
     BOTTOM: { x: 0, y: 1 },
@@ -19,20 +21,32 @@ export const LOCATION = Object.freeze({
     } 
 });
 
-export const ENTRY_DIFF = Object.freeze({
-    LOW:0,
-    parse:(value) => {
-        for (let val in ENTRY_DIFF) {
-            if (value == val) return ENTRY_DIFF[val];
-        }
-    } 
-});
+export enum ENTRY_DIFF{
+    LOW
+};
 
-export const ENEMY_TYPE = Object.freeze({
-    SMALL:'sm',
-    parse:(value) => {
-        for (let val in ENEMY_TYPE) {
-            if (value == val) return ENEMY_TYPE[val];
-        }
-    } 
+export namespace ENTRY_DIFF {
+    export function parse(str):string {
+        return ENTRY_DIFF[str];
+    }
+}
+
+export const enum ENEMY_TYPE {
+    SMALL='sm',
+    MEDIUM='sm'
+};
+
+export const ENEMY_SPAWN_EVENT = Object.freeze({
+   PREVIOUS_DIE:{
+       name:'prevDie',
+       run:(enemy,enMana) => {
+        let c = renderer.getCenterXYOfRoom(enMana.entry.source);
+        enemy.goToGoal(c.x,c.y,(en) => enMana.killInstant(en,true))
+       }
+   },
+   parse: (str) => {
+    for (let val in ENEMY_SPAWN_EVENT) {
+        if (str == val) return ENEMY_SPAWN_EVENT[val];
+    }
+}
 });
