@@ -4,6 +4,11 @@ import Room from '../core/Room';
 import Tile from './Tile';
 
 export default class RenderRoom {
+
+    static tileTexture = 'CLASSIC_blue_1,3,5';
+    static entryTileTexture = 'abstractTile_09';
+    static originTexture = 'CLASSIC_red_4,5,6';
+
     room: Room;
     tileKey: string;
     tiles: Tile[] = [];
@@ -18,7 +23,7 @@ export default class RenderRoom {
         }
     }
 
-    build():void {
+    build(): void {
         if (this._isBuild) return;
         this._isBuild = true;
         //some variables
@@ -31,16 +36,17 @@ export default class RenderRoom {
         for (let x = start_x; x < end_x; x++) {
             for (let y = start_y; y < end_y; y++) {
                 if (this._drawSide) {
-                    if ((x == start_x || x == end_x - 1) && !this.isEntry(x, y)) MapRenderer.setTileAt(x, y, this._position.z + 1, 'abstractTile_02');//sideX
-                    else if ((y == start_y || y == end_y - 1) && !this.isEntry(x, y)) MapRenderer.setTileAt(x, y, this._position.z + 1, 'abstractTile_02');//SideY
+                    if ((x == start_x || x == end_x - 1) && !this.isEntry(x, y)) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z + 1, RenderRoom.tileTexture));//sideX
+                    else if ((y == start_y || y == end_y - 1) && !this.isEntry(x, y)) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z + 1, RenderRoom.tileTexture));//sideY
                 }
+                // if (x == 0 && y == 0) this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, 'cube_gray'));
                 // let z = this._position.z;
-                MapRenderer.setTileAt(x, y, this._position.z, this.tileKey);
+                this.tiles.push(MapRenderer.setTileAt(x, y, this._position.z, RenderRoom.tileTexture));
             }
         }
     }
 
-    isEntry(x:number, y:number):boolean {
+    isEntry(x: number, y: number): boolean {
         let hSize = Math.ceil(DEFAULT_ROOM_CONFIG.block_size / 2) - 1;
         let relX = (x - this._position.x) / hSize;
         let relY = (y - this._position.y) / hSize;
@@ -49,4 +55,12 @@ export default class RenderRoom {
         }
         return false;
     }
+    getBorderTiles = (): Tile[] => {
+        let size = DEFAULT_ROOM_CONFIG.block_size;
+        let end_x = this._position.x + Math.ceil(size / 2);
+        let end_y = this._position.y + Math.ceil(size / 2);
+        return this.tiles.filter((tile) => (tile.x == end_x - 1 || tile.y == end_y - 1));
+    }
+
+
 }

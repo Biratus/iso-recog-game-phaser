@@ -28,9 +28,11 @@ export const ENEMY_CONFIG = {
 export const GAME_CONFIG = {
     tile_size: 64,
     tile_height: 63,
-    scale: 0.5,
+    tile_scale:0.36,
+    scale: 0.7,
     // scale: 0.22,
     // player_scale:0.4
+    enablePhysics:false
 }
 
 export const DEFAULT_ROOM_CONFIG = {

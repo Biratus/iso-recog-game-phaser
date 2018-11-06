@@ -1,40 +1,40 @@
 import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
-import MapManager from "./MapRenderer";
+import MapManager, { MapRenderer } from "./MapRenderer";
 import { LOCATION } from "../../constants/Enums";
-import {IsoSprite} from 'phaser3-plugin-isometric';
+import { IsoSprite } from 'phaser3-plugin-isometric';
 import Level from "../core/Level";
 import Room from "../core/Room";
 import RenderRoom from "./RenderRoom";
 
-export var renderer:Renderer;
+export var renderer: Renderer;
 
 export default class Renderer {
     static _hasBeenInit = false;
-    children:IsoSprite[];
-    mapManager:MapManager;
+    children: IsoSprite[];
+    mapManager: MapManager;
     constructor() {
         this.children = [];
         this.mapManager = new MapManager(this);
     }
 
-    static init():void {
+    static init(): void {
         if (Renderer._hasBeenInit) return;
         Renderer._hasBeenInit = true;
         renderer = new Renderer();
     }
 
-    add = (x, y, z, texture,frame):IsoSprite => {
-        let sprite = currentScene.add.isoSprite(x, y, z, texture,frame);
+    add = (x, y, z, texture, frame): IsoSprite => {
+        let sprite = currentScene.add.isoSprite(x, y, z, texture, frame);
         sprite.scaleY = GAME_CONFIG.scale;
         sprite.scaleX = GAME_CONFIG.scale;
         this.children.push(sprite);
         return sprite;
     }
 
-    renderLevel = (level:Level):void => {
+    renderLevel = (level: Level): void => {
         let currLoc = { x: 0, y: 0, z: 0 };
-        let renderedRoom :number[]= [];
+        let renderedRoom: number[] = [];
 
         renderedRoom.push(level.start.id);
         this.mapManager.addRoom(currLoc.x, currLoc.y, currLoc.z, 'tile_0' + level.start.id, level.start);
@@ -47,9 +47,9 @@ export default class Renderer {
         this.mapManager.buildRooms();
     }
 
-    renderRoom = (rendered:number[], room:Room, loc:{x:number,y:number,z:number}):void => {
+    renderRoom = (rendered: number[], room: Room, loc: { x: number, y: number, z: number }): void => {
         rendered.push(room.id);
-        let r=this.mapManager.addRoom(loc.x, loc.y, loc.z, 'tile_0' + room.id, room);
+        let r = this.mapManager.addRoom(loc.x, loc.y, loc.z, 'tile_0' + room.id, room);
 
         if (room.entries.length <= 1) return;
 
@@ -61,31 +61,54 @@ export default class Renderer {
         }
     }
 
-    getCenterXYOfRoom(room:Room):{x:number,y:number} {
-        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
-        if(!r) console.error('Cannot find room '+[room.id],room);
+    getCenterXYOfRoom(room: Room): { x: number, y: number } {
+        let r = this.mapManager.rooms.filter((val) => val.room.id === room.id);
+        if (!r) console.error('Cannot find room ' + [room.id], room);
         return {
-            x:r[0]._position.x,
-            y:r[0]._position.y
+            x: r[0]._position.x,
+            y: r[0]._position.y
         }
     }
 
-    getCenterXYZOfRoom(room:Room):{x:number,y:number,z:number} {
-        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
-        if(!r) console.error('Cannot find room '+[room.id],room);
+    getCenterXYZOfRoom(room: Room): { x: number, y: number, z: number } {
+        let r = this.mapManager.rooms.filter((val) => val.room.id === room.id);
+        if (!r) console.error('Cannot find room ' + [room.id], room);
         return {
-            x:r[0]._position.x,
-            y:r[0]._position.y,
-            z:r[0]._position.z
+            x: r[0]._position.x,
+            y: r[0]._position.y,
+            z: r[0]._position.z
         }
     }
-    getRenderRoom(room:Room):RenderRoom | undefined {
-        let r = this.mapManager.rooms.filter((val) => val.room.id===room.id);
-        return r.length>0?r[0]:undefined;
+    getRenderRoom(room: Room): RenderRoom | undefined {
+        let r = this.mapManager.rooms.filter((val) => val.room.id === room.id);
+        return r.length > 0 ? r[0] : undefined;
     }
 
-    addGroundLayer = (x, y, z, texture,frame?):IsoSprite => this.add(x, y, z, texture,frame);
+    addGroundLayer(x, y, z, texture, frame?): IsoSprite {
+        let sprite = this.add(x, y, z, texture, frame);
+        sprite.scaleX *= GAME_CONFIG.tile_scale;
+        sprite.scaleY *= GAME_CONFIG.tile_scale;
+        return sprite;
+    }
 
-    addCharacterLayer = (x, y, z, texture,frame?):void => this.add(x, y, z + GAME_CONFIG.scale*GAME_CONFIG.tile_height/2, texture,frame);
+    addCharacterLayer(x, y, z, texture, frame?): void {
+        this.add(x, y, z + GAME_CONFIG.scale * GAME_CONFIG.tile_height / 2, texture, frame);
+    }
+    buildUnderground() {
+        let layers = [
+            { height: 0.5, texture: 'CLASSIC_blue_1,6,7_Elongated _w1_Z0.5' },
+            { height: 0.66, texture: 'CLASSIC_blue_4,7,8' },
+            { height: 1, texture: 'CLASSIC_blue_2,4,5' }
+        ];
+        let z = -1;
+        for (let layer of layers) {
+            this.mapManager.rooms.forEach((room) => {
+                for (let t of room.getBorderTiles()) {
+                    let addedTile = MapRenderer.setTileAt(t.x, t.y, z + layer.height / 2, layer.texture);
 
+                }
+            });
+            z -= layer.height;
+        }
+    }
 }

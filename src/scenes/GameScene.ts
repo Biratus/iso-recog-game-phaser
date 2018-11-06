@@ -62,7 +62,7 @@ export default class GameScene extends Phaser.Scene {
     let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
     let ry = 0.5 * window.innerHeight / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
-    this.iso.projector.projectionAngle = Math.atan(65/111);
+    this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
     this.graphics = this.add.graphics({
@@ -87,6 +87,7 @@ export default class GameScene extends Phaser.Scene {
     this.currentLevel.preload();
     renderer.renderLevel(this.currentLevel);
     this.currentLevel.create();
+    renderer.buildUnderground();
 
     this.recogListener.disable();
 
