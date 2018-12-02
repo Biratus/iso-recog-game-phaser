@@ -52,6 +52,7 @@ export default class Tile {
     }
 
     destroy() {
+        if(this.sprite.body) this.sprite.body.destroy();
         this.sprite.destroy();
     }
 }

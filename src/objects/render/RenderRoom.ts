@@ -2,6 +2,7 @@ import { MapRenderer } from './MapRenderer';
 import { DEFAULT_ROOM_CONFIG } from '../../constants/Constants';
 import Room from '../core/Room';
 import Tile from './Tile';
+import { LOCATION } from '../../constants/Enums';
 
 export default class RenderRoom {
 
@@ -27,11 +28,11 @@ export default class RenderRoom {
         if (this._isBuild) return;
         this._isBuild = true;
         //some variables
-        let size = DEFAULT_ROOM_CONFIG.block_size;
-        let start_x = this._position.x + Math.ceil(-size / 2);
-        let end_x = this._position.x + Math.ceil(size / 2);
-        let start_y = this._position.y + Math.ceil(-size / 2);
-        let end_y = this._position.y + Math.ceil(size / 2);
+        const size = DEFAULT_ROOM_CONFIG.block_size;
+        const start_x = this._position.x + Math.ceil(-size / 2);
+        const end_x = this._position.x + Math.ceil(size / 2);
+        const start_y = this._position.y + Math.ceil(-size / 2);
+        const end_y = this._position.y + Math.ceil(size / 2);
 
         for (let x = start_x; x < end_x; x++) {
             for (let y = start_y; y < end_y; y++) {
@@ -47,20 +48,40 @@ export default class RenderRoom {
     }
 
     isEntry(x: number, y: number): boolean {
-        let hSize = Math.ceil(DEFAULT_ROOM_CONFIG.block_size / 2) - 1;
-        let relX = (x - this._position.x) / hSize;
-        let relY = (y - this._position.y) / hSize;
+        const hSize = Math.ceil(DEFAULT_ROOM_CONFIG.block_size / 2) - 1;
+        const relX = (x - this._position.x) / hSize;
+        const relY = (y - this._position.y) / hSize;
         for (let entry of this.room.entries) {
             if (entry.location.x == relX && entry.location.y == -relY) return true;
         }
         return false;
     }
-    getBorderTiles = (): Tile[] => {
-        let size = DEFAULT_ROOM_CONFIG.block_size;
-        let end_x = this._position.x + Math.ceil(size / 2);
-        let end_y = this._position.y + Math.ceil(size / 2);
-        return this.tiles.filter((tile) => (tile.x == end_x - 1 || tile.y == end_y - 1));
+
+    getTileAtEntry(location):Tile {
+        const size = Math.floor(DEFAULT_ROOM_CONFIG.block_size/2);
+        const tilePos=LOCATION.multiply(LOCATION.add(location,this._position),size);
+        let tile;
+        for(let t of this.tiles) {
+            if(t.x==tilePos.x && t.y==tilePos.y) {
+                tile=t;
+                break;
+            }
+        }
+        return tile;
     }
 
+    getBorderTiles = (): Tile[] => {
+        const size = DEFAULT_ROOM_CONFIG.block_size;
+        const end_x = this._position.x + Math.ceil(size / 2);
+        const end_y = this._position.y + Math.ceil(size / 2);
+        return this.tiles.filter((tile) => (tile.x == end_x-1 || tile.y == end_y-1));
+    }
 
+    hide() {
+        this.tiles.forEach((tile) => tile.sprite.visible=false);
+    }
+    
+    show() {
+        this.tiles.forEach((tile) => tile.sprite.visible=true);
+    }
 }

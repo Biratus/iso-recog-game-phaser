@@ -91,24 +91,23 @@ export default class Renderer {
         return sprite;
     }
 
-    addCharacterLayer(x, y, z, texture, frame?): void {
-        this.add(x, y, z + GAME_CONFIG.scale * GAME_CONFIG.tile_height / 2, texture, frame);
-    }
-    buildUnderground() {
-        let layers = [
-            { height: 0.5, texture: 'CLASSIC_blue_1,6,7_Elongated _w1_Z0.5' },
-            { height: 0.66, texture: 'CLASSIC_blue_4,7,8' },
-            { height: 1, texture: 'CLASSIC_blue_2,4,5' }
-        ];
-        let z = -1;
-        for (let layer of layers) {
-            this.mapManager.rooms.forEach((room) => {
-                for (let t of room.getBorderTiles()) {
-                    let addedTile = MapRenderer.setTileAt(t.x, t.y, z + layer.height / 2, layer.texture);
+    addCharacterLayer = (x, y, z, texture, frame?): void => this.add(x, y, z + GAME_CONFIG.scale * GAME_CONFIG.tile_height / 2, texture, frame);
 
-                }
-            });
-            z -= layer.height;
-        }
+    buildUnderground() {
+        let height=0.5;
+        let z=-1;
+        let texture='cube_gray_h0.5';
+        this.mapManager.rooms.forEach((room) => {
+            for(let t of room.getBorderTiles()) {
+                let addedTile=MapRenderer.setTileAt(t.x,t.y,z+height/2,texture);
+                
+            }
+        });
+    }
+
+    hideRooms() {
+        this.mapManager.rooms.forEach((room)=> {
+            for(let t of room.tiles) t.sprite.visible=false;
+        })
     }
 }

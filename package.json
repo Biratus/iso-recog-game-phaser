@@ -22,7 +22,7 @@
     "html-webpack-plugin": "^3.2.0",
     "outlines": "^1.0.1",
     "phaser": "^3.15.1",
-    "phaser3-plugin-isometric": "0.0.6",
+    "phaser3-plugin-isometric": "git+https://github.com/Biratus/phaser3-plugin-isometric.git",
     "raw-loader": "^0.5.1",
     "typescript": "^2.8.3",
     "typescript-eslint-parser": "^15.0.0",

@@ -10,15 +10,16 @@ export const LOCATION = Object.freeze({
             if (str == val) return LOCATION[val];
         }
     },
-    add: (l1, l2) => ({ x: l1.x + l2.x, y: l1.y + l2.y,z:l1.z?l2.z:0+l2.z?l2.z:0}),
+    add: (l1, l2) => ({ x: l1.x + l2.x, y: l1.y + l2.y, z: l1.z ? l2.z : 0 + l2.z ? l2.z : 0 }),
     isOrigin: (loc) => loc.x === 0 && loc.y === 0,
-    equals:(l1,l2) => l1.x === l2.x && l1.y === l2.y,
-    opposite:(loc) => {
+    equals: (l1, l2) => l1.x === l2.x && l1.y === l2.y,
+    opposite: (loc) => {
         for (let val in LOCATION) {
-            if(LOCATION[val].x === undefined) continue;
-            if (LOCATION.equals({x:0,y:0},LOCATION.add(loc,LOCATION[val]))) return LOCATION[val];
+            if (LOCATION[val].x === undefined) continue;
+            if (LOCATION.equals({ x: 0, y: 0 }, LOCATION.add(loc, LOCATION[val]))) return LOCATION[val];
         }
-    } 
+    },
+    multiply: (l, number) => ({ x: l.x * number, y: l.y * number, z: l.z * number }),
 });
 
 export enum ENTRY_DIFF{

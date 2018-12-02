@@ -4,6 +4,9 @@
         "tileCube.png",
         "tile.png",
         "debug.png",
+        "cube_blue.png",
+        "cube_gray.png",
+        "cube_gray_h0.5.png",
         "terrain2/Abstract Tiles/abstractTile_02.png",
         "terrain2/Abstract Tiles/abstractTile_03.png",
         "terrain2/Abstract Tiles/abstractTile_04.png",
@@ -42,6 +45,7 @@
         "terrain2/room_tiles/tile_00.png",
         "en_sm_square.png",
         "en_sm_circle.png",
+<<<<<<< HEAD
         "CLASSIC_blue_1,3,5.png",
         "CLASSIC_blue_1,6,7.png",
         "CLASSIC_blue_2,4,5.png",
@@ -51,6 +55,48 @@
         "CLASSIC_blue_2,4,5_Elongated _w1_Z0.5.png",
         "CLASSIC_blue_4,7,8_Elongated _w1_Z0.5.png",
         "CLASSIC_red_4,5,6.png"
+=======
+        "floating/CLASSIC_3.png",
+        "floating/CLASSIC_4.png",
+        "floating/CLASSIC_5.png",
+        "floating/CLASSIC_6.png",
+        "floating/CLASSIC_7.png",
+        "floating/CLASSIC_8.png",
+        "floating/CLASSIC_9.png",
+        "floating/CLASSIC_10.png",
+        "floating/CLASSIC_11.png",
+        "floating/CLASSIC_12.png",
+        "floating/CLASSIC_13.png",
+        "floating/CLASSIC_14.png",
+        "floating/CLASSIC_15.png",
+        "floating/CLASSIC_16.png",
+        "floating/CLASSIC_17.png",
+        "floating/CLASSIC_18.png",
+        "floating/CLASSIC_19.png",
+        "floating/CLASSIC_20.png",
+        "floating/CLASSIC_21.png",
+        "floating/CLASSIC_22.png",
+        "floating/CLASSIC_23.png",
+        "floating/CLASSIC_24.png",
+        "floating/CLASSIC_25.png",
+        "floating/CLASSIC_26.png",
+        "floating/CLASSIC_27.png",
+        "floating/CLASSIC_28.png",
+        "floating/CLASSIC_29.png",
+        "floating/CLASSIC_30.png",
+        "floating/CLASSIC_31.png",
+        "floating/CLASSIC_32.png",
+        "floating/CLASSIC_33.png",
+        "floating/CLASSIC_34.png",
+        "floating/CLASSIC_35.png",
+        "floating/CLASSIC_36.png",
+        "floating/CLASSIC_37.png",
+        "floating/CLASSIC_38.png",
+        "floating/CLASSIC_39.png",
+        "floating/CLASSIC_40.png",
+        "CLASSIC_blue_0,3,5_bump_sm_left.png",
+        "CLASSIC_blue_0,3,5.png"
+>>>>>>> test-new-tile-classic
     ],
     "json": [
         "level_big.json",
@@ -62,6 +108,11 @@
         "cowboy.png": {
             "frameWidth": 128,
             "frameHeight": 128
+        },
+        "floating_blue_spritesheet.png": {
+            "frameWidth": 322,
+            "frameHeight": 341,
+            "endFrame":37
         }
     }
 }
