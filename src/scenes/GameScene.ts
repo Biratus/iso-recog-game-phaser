@@ -10,6 +10,7 @@ import RecogListener from '../objects/recognizer/RecogListener';
 import Loader from '../objects/utils/Loader';
 import { MapRenderer } from '../objects/render/MapRenderer';
 import Tile from '../objects/render/Tile';
+import { LOCATION } from '../constants/Enums';
 
 export var currentScene: GameScene;
 
@@ -77,22 +78,40 @@ export default class GameScene extends Phaser.Scene {
     // this.graphics.fillRect(0,0,window.innerWidth,window.innerHeight);//white screen
     renderer.renderLevel(this.currentLevel);
 
-    renderer.buildUnderground();
+    // renderer.buildUnderground();
     renderer.mapManager.rooms.forEach((room) => {
-      let nbTile = Math.round(1+Math.random()*10);
-      for(let i=0;i<=nbTile;i++) room.tiles[Math.floor(Math.random()*room.tiles.length)].destroy();
+      // let nbTile = Math.round(1 + Math.random() * 10);
+      // for (let i = 0; i <= nbTile; i++) room.tiles[Math.floor(Math.random() * room.tiles.length)].destroy();
+      // room.hide();
+      room.tiles[Math.floor(Math.random() * room.tiles.length)].sprite.setTexture('CLASSIC_blue_0,3,5_bump_sm_left');
     });
-    // renderer.hideRooms();
 
+    let entry = renderer.mapManager.rooms[0].getTileAtEntry(LOCATION.RIGHT);
+    let framesList: any[] = [];
+    for (let i = 0; i <= 20; i++) framesList.push({ key: 'floating_blue_spritesheet', frame: i });
+    this.anims.create({
+      key: 'floating_right',
+      frames: this.anims.generateFrameNumbers('floating_blue_spritesheet',{start:0,end:37,first:0}),
+      frameRate: 8,
+      repeat: -1
+    });
+    let tile = MapRenderer.setTileAt(entry.x + 1, entry.y, entry.z, 'floating_blue_spritesheet', 0);
+    tile.sprite.play('floating_right');
+    // entry = renderer.mapManager.rooms[0].getTileAtEntry(LOCATION.BOTTOM);
+    // tile = MapRenderer.setTileAt(entry.x + 1, entry.y, entry.z, 'floating_blue_spritesheet', 0);
+    // tile.sprite.play('floating_right');
+    
+    this.input.once('pointerup', (pointer) => {
+      //let tile = MapRenderer.getTileAt(entry.x + 1, entry.y, entry.z);
+      // this.anims.play('floating_right',tile!.sprite);
+    });
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
-let origin=MapRenderer.getTileAt(0,0,0);
-    console.log('origin tile',origin);
-
-    console.log('gap: '+(origin!._neighbours.north!.sprite.isoBounds.frontY-origin!.sprite.isoBounds.backY));
+    let origin = MapRenderer.getTileAt(0, 0, 0);
+    console.log('origin tile', origin);
 
 
     // this.buildAxes();
@@ -136,17 +155,17 @@ let origin=MapRenderer.getTileAt(0,0,0);
       this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.once('pointerup', (pointer) => {
-      MapRenderer.forEachTile((tile:Tile,x,y,z) => {
-        for(let loc in tile._neighbours) {
-          if(tile._neighbours[loc] !== null && this.isoPhysics.world.collide(tile._neighbours[loc].sprite.body,tile.sprite.body)) {
-            console.log(x+" "+" "+y+" "+z,tile);
-            console.log("neigh "+loc,tile._neighbours[loc]);
+      MapRenderer.forEachTile((tile: Tile, x, y, z) => {
+        for (let loc in tile._neighbours) {
+          if (tile._neighbours[loc] !== null && this.isoPhysics.world.collide(tile._neighbours[loc].sprite.body, tile.sprite.body)) {
+            console.log(x + " " + " " + y + " " + z, tile);
+            console.log("neigh " + loc, tile._neighbours[loc]);
             console.log('INTERSECT');
             return;
           }
         }
       });
-      
+
       console.log('done');
 
       // this.input.on('pointerup', (pointer) => {

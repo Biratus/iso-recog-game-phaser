@@ -15621,7 +15621,7 @@ declare namespace Phaser {
              * @param scene The Scene to which this Game Object Factory belongs.
              */
             constructor(scene: Phaser.Scene);
-            isoSprite(x: number, y: number, z: number, key?: any, frame?: any): Phaser.Plugins.Isometric.IsoSprite;
+            isoSprite(x: number, y: number, z: number, key?: any, group?:Phaser.GameObjects.Group,frame?: any): Phaser.Plugins.Isometric.IsoSprite;
             /**
              * Creates a new Path Object.
              * @param x The horizontal position of this Path.

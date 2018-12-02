@@ -25,7 +25,7 @@ export default class Renderer {
     }
 
     add(x, y, z, texture, frame): IsoSprite {
-        let sprite = currentScene.add.isoSprite(x, y, z, texture, frame);
+        let sprite = currentScene.add.isoSprite(x, y, z, texture, undefined,frame);
         sprite.scaleY = GAME_CONFIG.scale;
         sprite.scaleX = GAME_CONFIG.scale;
         this.children.push(sprite);

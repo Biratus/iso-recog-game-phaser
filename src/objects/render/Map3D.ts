@@ -13,7 +13,7 @@ export default class Map3D {
     this.scene = scene;
   }
   getTileAt (x, y, z): Tile | undefined { return this.isEmpty(x, y, z) ? undefined : this.map.get(x).get(y).get(z); }
-  setTileAt = (x, y, z, key): Tile => {
+  setTileAt = (x, y, z, key,frame?): Tile => {
     if (!this.isEmpty(x, y, z)) {
       this.getTileAt(x, y, z)!.destroy();
     }
@@ -21,7 +21,7 @@ export default class Map3D {
     if (!this.map.get(x).get(y)) this.map.get(x).set(y, new Phaser.Structs.Map([]));
     if (x == null || y == null || z == null || key == null) console.error("x y or z might not have been defined to set tile");
 
-    let t = renderer.addGroundLayer(x, y, z, key)
+    let t = renderer.addGroundLayer(x, y, z, key,frame);
 
     t.isoX *= GAME_CONFIG.scale * GAME_CONFIG.tile_size;//t.width;
     t.isoY *= GAME_CONFIG.scale * GAME_CONFIG.tile_size;//t.width;
