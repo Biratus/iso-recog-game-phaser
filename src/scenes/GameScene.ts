@@ -104,7 +104,7 @@ export default class GameScene extends Phaser.Scene {
       let color=colorsHex.blue;
       // color.splice(Math.floor(0.7*color.length),color.length);
       color=['#E8F6FE', '#DAF0FD', '#D2E8FD', '#ADD4FD', '#99C8FB'];
-      Colorized.downloadFloatingTiles([CLASSIC,'CLASSIC'],5, color);
+      Colorized.downloadElongatedCube([CLASSIC,'CLASSIC'],1,0.2,new IsoColor('#DAF0FD','#ADD4FD','#5AA6FE'));
       this.game.canvas.hidden=true;
     });
     console.log('iso', this.iso);

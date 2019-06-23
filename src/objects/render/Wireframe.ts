@@ -90,8 +90,11 @@ export default class Wireframe {
 
         // draw 1 cube
         let cube = new Cube(0, 0, 0, window.innerWidth * factor * width, window.innerWidth * factor * width, window.innerWidth * factor * sizeZ);
+        // let sides = [
+        //     [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+        // ];
         let sides = [
-            [3, 7, 6, 2, 3, 1, 5, 4, 6], [7, 5]
+            [1,3,7, 5]
         ];
         let corners = cube.getCorners();
         let canvas = document.createElement('canvas');

@@ -60,14 +60,14 @@ export default class Colorized {
             graph!.fillStyle = color[hue];
             const path = sides[hue];
             let pt = currentScene.iso.projector.project(corners[path[0]]);
-            graph!.moveTo(pt.x, pt.y);
             graph!.beginPath();
+            graph!.moveTo(pt.x, pt.y);
             for (let i = 1; i < path.length; i++) {
                 pt = currentScene.iso.projector.project(corners[path[i]]);
                 graph!.lineTo(pt.x, pt.y);
             }
-            graph!.fill();
             graph!.closePath();
+            graph!.fill();
         }
         document.body.appendChild(canvas);
         const a = document.createElement("a");
