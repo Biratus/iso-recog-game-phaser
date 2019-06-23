@@ -50,7 +50,8 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    this.recogListener = new RecogListener();
+    this.recogListener = new RecogListener();    
+    Renderer.init();
   }
 
   create = () => {
@@ -73,16 +74,14 @@ export default class GameScene extends Phaser.Scene {
       lineStyle: { color: 0xffffff, width: 10 },
       fillStyle: { color: 0xffffff, alpha: 1 }
     });
-    this.createAnimations();
     this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
-    let bg=this.add.image(window.innerWidth/2,window.innerHeight/2,'background8');
-    bg.depth=-999;
     //LEVEL
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
 
     // renderer.renderLevel(this.currentLevel);
     renderer.renderRoom(this.currentLevel.currentRoom);
+    renderer.renderPlayer();
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);

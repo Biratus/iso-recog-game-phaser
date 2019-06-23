@@ -38,6 +38,7 @@ class IsoGroup {
 export default class Renderer {
     static entryTexture = 'CLASSIC_blue_1,3,5';
     static roomTexture = 'CLASSIC_blue_1,3,5_Elongated _w1_Z0.5';
+    static playerTexture = 'plyer';
 
     group = new IsoGroup();
     currentRoomSprite: IsoSprite;
@@ -45,7 +46,13 @@ export default class Renderer {
     currentRoomTransitionSprite: IsoSprite;
     currentEntriesTransitionSprite: { [key: string]: IsoSprite };
 
-    constructor() {}
+    player: IsoSprite;
+    bg: IsoSprite;
+
+    constructor() {
+        this.bg=currentScene.add.image(window.innerWidth/2,window.innerHeight/2,'background8');
+        this.bg.depth=-999;
+    }
 
     renderRoom = (room: Room) => {
         this.initSprites();
@@ -197,5 +204,15 @@ export default class Renderer {
         for (let l of LOCATION.enum()) sprs.push(this.currentEntriesTransitionSprite[l]);
         return sprs;
     }
+
+    renderPlayer() {
+        this.player=currentScene.add.isoSprite(0,0,0,Renderer.playerTexture);
+        this.player.scaleY = GAME_CONFIG.scale;
+        this.player.scaleX = GAME_CONFIG.scale;
+        this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
+        this.player.texture.source.forEach(src => src.resolution = 10);
+    }
+
+    static init() { renderer=new Renderer(); }
 }
-export const renderer = new Renderer();
+export var renderer:Renderer;
