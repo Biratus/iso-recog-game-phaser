@@ -20,7 +20,7 @@ export default class Level {
         this.currentRoom = this.start;
         this.finish = this._finish ? this.rooms[this._finish] : null;
         for (let r of this.rooms.values()) {
-            for (let e of r.entries) {
+            for (let e of r.entries()) {
                 e.dest = this.rooms.get(e.destId);
                 if (!e.dest) console.error('[ERROR] undefined room with id (' + e.destId + ') for level', this);
             }
@@ -28,7 +28,7 @@ export default class Level {
     }
 
     create() {
-        for (let e of this.start.entries) {
+        for (let e of this.start.entries()) {
             e.initEnemyManager();
         }
     }

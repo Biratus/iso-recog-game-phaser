@@ -46,7 +46,7 @@ export default class Enemy {
     get id() { return this._id; }
 
     create() {
-        this.sprite = renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
+        this.sprite = null;//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
         this.sprite.scaleX *= ENEMY_CONFIG.scale;
         this.sprite.scaleY *= ENEMY_CONFIG.scale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;

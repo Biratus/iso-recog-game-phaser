@@ -5,22 +5,6 @@ export const SCENE_GAME = {
 }
 export const SCENE_LOAD = { key: 'load' }
 
-export const TILE_WIDTH = 50;
-export const TILE_CONFIG = {
-    wanted_TW: 50,
-    wanted_SH: 38.5,
-    default: {
-        height: 160, width: 150,
-        top_width: 90,
-        side_height: 69
-    },
-    rock_brown_fresh_herb_light: {
-        height: 164,
-        top_width: 85.5,
-
-    }
-}
-
 export const ENEMY_CONFIG = {
     scale:0.6
 }
@@ -28,9 +12,8 @@ export const ENEMY_CONFIG = {
 export const GAME_CONFIG = {
     tile_size: 64,
     tile_height: 63,
-    tile_scale:0.36,
-    scale: 0.7,
-    // scale: 0.22,
+    tile_scale:0.4,
+    scale: 0.5,
     // player_scale:0.4
     enablePhysics:false
 }
@@ -38,5 +21,5 @@ export const GAME_CONFIG = {
 export const DEFAULT_ROOM_CONFIG = {
     key: "abstractTile_01",
     // block_size: 17// /!\ IMPAIR /!\
-    block_size: 7// /!\ IMPAIR /!\
+    block_size: 13// /!\ IMPAIR /!\
 }

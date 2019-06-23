@@ -5,7 +5,7 @@ import { Cube } from 'phaser3-plugin-isometric/src/Cube';
 import { Point3 } from 'phaser3-plugin-isometric/src/Point3';
 import { ENEMY_TYPE, LOCATION, ENEMY_SPAWN_EVENT } from '../../constants/Enums';
 import { Timeout } from '../utils/Timeout';
-import { renderer } from '../render/Renderer';
+import Renderer, { renderer } from '../render/Renderer';
 
 export default class EnemyManager {
     entry: Entry;
@@ -44,8 +44,9 @@ export default class EnemyManager {
 
     getEnemyConfig(type) {
         let here = Cube
-        let opEntry = this.entry.dest.getEntry(LOCATION.opposite(this.entry.location));
-        let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
+        let opEntry = renderer.currentEntriesSprite[LOCATION.name(this.entry.location)!];
+        let position = {x:opEntry.isoX,y:opEntry.isoY};
+        // let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
         //TODO figure out z with level.currentRoom.z;
         return {
             x: position.x,
@@ -112,8 +113,8 @@ export default class EnemyManager {
 
             // start spawn med en
             let e = this.spawnType(ENEMY_TYPE.MEDIUM);
-            let c = renderer.getCenterXYOfRoom(this.entry.source);
-            e!.goToGoal(c.x, c.y, (en) => {
+            // let c = renderer.getCenterXYOfRoom(this.entry.source);
+            e!.goToGoal(0,0, (en) => {
                 this.killInstant(en,true);
             });
         }

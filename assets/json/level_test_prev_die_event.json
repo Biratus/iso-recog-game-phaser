@@ -10,13 +10,32 @@
                         "dest": 1,
                         "en_sm": 0,
                         "en_med": {
-                            "nb": 5,
-                            "events": [
-                                "PREVIOUS_DIE",
-                                "PREVIOUS_DIE",
-                                "PREVIOUS_DIE",
-                                "PREVIOUS_DIE"
-                            ]
+                            "nb": 10,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "BOTTOM",
+                        "dest": 2,
+                        "en_sm": 5,
+                        "en_med": {
+                            "nb": 3,
+                            "events": []
+                        },
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "V",
+                        "loc": "RIGHT",
+                        "dest": 3,
+                        "en_sm": 5,
+                        "en_med": {
+                            "nb": 2,
+                            "events": []
                         },
                         "en_big": {}
                     }
@@ -43,9 +62,47 @@
                 "specials": [],
                 "diff": 1,
                 "id": 1
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "TOP",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 2
+            },
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "LEFT",
+                        "dest": 0,
+                        "en_sm": 0,
+                        "en_med": {
+                            "nb": 0,
+                            "events": []
+                        },
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 1,
+                "id": 3
             }
         ],
         "start": 0,
-        "finish": 1
+        "finish": 3
     }
 }
