@@ -1,7 +1,7 @@
 import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
-import { LOCATION } from "../../constants/Enums";
+import { LOCATION, INTERACTION_EVENT } from "../../constants/Enums";
 import { IsoSprite } from 'phaser3-plugin-isometric';
 import Level from "../core/Level";
 import Room from "../core/Room";
@@ -12,6 +12,7 @@ import Entry from "../core/Entry";
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
     children: IsoSprite[] = [];
+    tween: Phaser.Tweens.Tween;
 
     constructor() { }
 
@@ -31,8 +32,8 @@ class IsoGroup {
         }
         this.prevY = val;
     }
-    get x() { return 0; }
-    get y() { return 0; }
+    get x() { this.prevX = undefined; return 0; }
+    get y() { this.prevY = undefined; return 0; }
 }
 
 export default class Renderer {
@@ -47,11 +48,16 @@ export default class Renderer {
     currentEntriesTransitionSprite: { [key: string]: IsoSprite };
 
     player: IsoSprite;
+    playerTween: Phaser.Tweens.Tween;
     bg: IsoSprite;
 
+    emitter = new Phaser.Events.EventEmitter();
+
+    debug = false;
+
     constructor() {
-        this.bg=currentScene.add.image(window.innerWidth/2,window.innerHeight/2,'background8');
-        this.bg.depth=-999;
+        this.bg = currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
+        this.bg.depth = -999;
     }
 
     renderRoom = (room: Room) => {
@@ -59,8 +65,15 @@ export default class Renderer {
         //render current room sprite with room texture
         for (let loc of LOCATION.enum()) {
             //render sprite with entry texture
-            if (room.getEntry(LOCATION[loc])) this.currentEntriesSprite[loc].visible = true;
-            else this.currentEntriesSprite[loc].visible = false;
+            let sprite = this.currentEntriesSprite[loc];
+            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
+            let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
+            tile_width = RenderUtils.spriteIsoWidth(sprite);
+
+            sprite.isoX = canvasLoc.x + (tile_width / 2) * LOCATION[loc].x;
+            sprite.isoY = canvasLoc.y + (tile_width / 2) * LOCATION[loc].y;
+            if (room.getEntry(LOCATION[loc])) sprite.visible = true;
+            else sprite.visible = false;
         }
 
     }
@@ -86,6 +99,8 @@ export default class Renderer {
                 sprite.isoX += (tile_width / 2) * LOCATION[loc].x;
                 sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
                 sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
+                sprite.setInteractive(currentScene.input.makePixelPerfect(100));
+                sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
                 this.currentEntriesSprite[loc] = sprite;
             }
         }
@@ -96,6 +111,7 @@ export default class Renderer {
             this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
             this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 10);
             this.currentRoomTransitionSprite.visible = false;
+            // this.currentRoomTransitionSprite.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
         }
         if (!this.currentEntriesTransitionSprite) {
             this.currentEntriesTransitionSprite = {};
@@ -111,13 +127,15 @@ export default class Renderer {
                 sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
                 sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
                 sprite.visible = false;
+                sprite.setInteractive(currentScene.input.makePixelPerfect(100));
+                sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
                 this.currentEntriesTransitionSprite[loc] = sprite;
             }
         }
         this.group.children = this.getAllSprites();
     }
 
-    renderTransition = (source: Room, dest: Room) => {
+    renderTransition = (source: Room, dest: Room, callback: Function) => {
         //check with source texture
         if (!this.currentRoomSprite || this.currentRoomSprite.key != Renderer.roomTexture) {
             this.renderRoom(source);
@@ -125,21 +143,16 @@ export default class Renderer {
         //TODO change all texture according to dest
         // this.currentRoomTransitionSprite.texture=
 
+        let entryExit = LevelUtils.entryBetween(source, dest);
 
-        let loc = this.getRoomLocAt(LevelUtils.entryBetween(source, dest));
-        if (!loc) return;
+        let loc = this.getRoomLocAt(entryExit);
+        if (!loc) {
+            console.error("No entry between " + source._id + " and " + dest._id);
+            return;
+        }
         this.renderRoomTransition(dest, loc);
 
-        currentScene.tweens.add({
-            targets: this.group,
-            x: -this.currentRoomTransitionSprite.isoX,
-            y: -this.currentRoomTransitionSprite.isoY,
-            duration: 4000,
-            ease: Phaser.Math.Easing.Quadratic.InOut,
-            delay: 0,
-            onComplete: () => renderer.animComplete()
-        });
-
+        this.startTransition(entryExit, callback);
     }
 
     private getRoomLocAt(entry?: Entry): { x: number, y: number } | undefined {
@@ -151,22 +164,55 @@ export default class Renderer {
     }
 
     private renderRoomTransition(room: Room, loc: { x: number, y: number }) {
-        this.getTransitionSpites().forEach(spr => spr.shouldAppear=false);
+        this.getTransitionSprites().forEach(spr => spr.shouldAppear = false);
         this.currentRoomTransitionSprite.isoX = loc.x;
         this.currentRoomTransitionSprite.isoY = loc.y;
-        this.currentRoomTransitionSprite.shouldAppear=true;
+        this.currentRoomTransitionSprite.shouldAppear = true;
         for (let entry of room.entries()) {
             let entrySpr = this.currentEntriesTransitionSprite[LOCATION.name(entry.location)!];
             let newLoc = LOCATION.add(loc,
                 LOCATION.multiply(entry.location, RenderUtils.spriteHalfIsoWidth(this.currentRoomTransitionSprite) + RenderUtils.spriteHalfIsoWidth(entrySpr)));
             entrySpr.isoX = newLoc.x;
             entrySpr.isoY = newLoc.y;
-            entrySpr.shouldAppear=true;
+            entrySpr.shouldAppear = true;
         }
-        setTimeout(() => this.getTransitionSpites().filter(spr => spr.shouldAppear).forEach(spr => spr.visible=true), 10);
+        setTimeout(() => this.getTransitionSprites().filter(spr => spr.shouldAppear).forEach(spr => spr.visible = true), 10);
     }
 
-    swap() {
+    private startTransition(entry?: Entry, callback?: Function) {
+        if (!entry) return;
+        if (this.playerTween) currentScene.tweens.remove(this.playerTween);
+        this.playerTween = currentScene.tweens.add({
+            targets: this.player,
+            isoX: this.currentEntriesSprite[LOCATION.name(entry.location)!].isoX,
+            isoY: this.currentEntriesSprite[LOCATION.name(entry.location)!].isoY,
+            duration: 1700,
+            ease: Phaser.Math.Easing.Linear.Linear,
+            delay: 0,
+            yoyo: true
+        });
+
+        setTimeout(() => {
+            let loc = LOCATION.multLoc({ x: -1, y: -1 },
+                {
+                    x: this.currentRoomTransitionSprite.isoX,
+                    y: this.currentRoomTransitionSprite.isoY
+                });
+            if (this.group.tween) currentScene.tweens.remove(this.group.tween);
+            this.group.tween = currentScene.tweens.add({
+                targets: this.group,
+                x: loc.x,
+                y: loc.y,
+                duration: 2400,
+                ease: Phaser.Math.Easing.Linear.Linear,
+                delay: 0,
+                onComplete: () => this.endTransition(callback!)
+            });
+
+        }, 990);
+    }
+
+    private swap() {
         let t = this.currentRoomSprite;
         this.currentRoomSprite = this.currentRoomTransitionSprite;
         this.currentRoomTransitionSprite = t;
@@ -175,15 +221,20 @@ export default class Renderer {
         this.currentEntriesTransitionSprite = i;
     }
 
-    animComplete() {
+    private endTransition(callback: Function) {
         this.swap();
+        callback();
         currentScene.add.tween({
-            targets: this.getTransitionSpites(),
+            targets: this.getTransitionSprites(),
             alpha: 0,
             duration: 2000,
             ease: Phaser.Math.Easing.Quadratic.In,
             delay: 0,
-            onComplete: (tween: Phaser.Tweens.Tween) => tween.targets.forEach((spr: IsoSprite) => { spr.alpha = 1; spr.visible = false; })
+            onComplete: () => {
+                this.getTransitionSprites().forEach(spr => {spr.alpha = 1;spr.visible=false;});
+                this.currentRoomSprite.isoX = 0;
+                this.currentRoomSprite.isoY = 0;
+            }
         });
     }
 
@@ -198,7 +249,7 @@ export default class Renderer {
         return sprs;
     }
 
-    getTransitionSpites(): IsoSprite[] {
+    getTransitionSprites(): IsoSprite[] {
         let sprs: IsoSprite[] = [];
         sprs.push(this.currentRoomTransitionSprite);
         for (let l of LOCATION.enum()) sprs.push(this.currentEntriesTransitionSprite[l]);
@@ -206,13 +257,13 @@ export default class Renderer {
     }
 
     renderPlayer() {
-        this.player=currentScene.add.isoSprite(0,0,0,Renderer.playerTexture);
+        this.player = currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
         this.player.scaleY = GAME_CONFIG.scale;
         this.player.scaleX = GAME_CONFIG.scale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
         this.player.texture.source.forEach(src => src.resolution = 10);
     }
 
-    static init() { renderer=new Renderer(); }
+    static init() { renderer = new Renderer(); }
 }
-export var renderer:Renderer;
+export var renderer: Renderer;

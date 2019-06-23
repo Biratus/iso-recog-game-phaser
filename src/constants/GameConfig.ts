@@ -7,7 +7,7 @@ export const gameConfig = {
   type: Phaser.WEBGL,
   parent: 'gameContainer',
   scene: [BootScene, LoadScene,GameScene],
-  physics:{
-    debug:true
-  }
+  // physics:{
+  //   debug:true
+  // }
 }

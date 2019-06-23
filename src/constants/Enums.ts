@@ -58,3 +58,7 @@ export const ENEMY_SPAWN_EVENT = Object.freeze({
         }
     }
 });
+
+export const INTERACTION_EVENT = Object.freeze({
+    ENTRY_CLICK: 'entry_click'
+});

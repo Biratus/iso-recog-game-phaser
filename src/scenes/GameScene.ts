@@ -10,7 +10,7 @@ import RecogListener from '../objects/recognizer/RecogListener';
 import Loader from '../objects/utils/Loader';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { LOCATION } from '../constants/Enums';
+import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
 
 export var currentScene: GameScene;
 
@@ -82,6 +82,14 @@ export default class GameScene extends Phaser.Scene {
     // renderer.renderLevel(this.currentLevel);
     renderer.renderRoom(this.currentLevel.currentRoom);
     renderer.renderPlayer();
+
+    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK,(location:string) => {
+      let r=this.currentLevel.currentRoom;
+      console.log('go to '+location+' from '+r._id);
+      let dest=r._entries[location].dest
+      console.log(dest);
+      renderer.renderTransition(r,dest,() => {console.log('callback');this.currentLevel.currentRoom=dest;});
+    });
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
