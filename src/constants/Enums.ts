@@ -5,7 +5,7 @@ export const LOCATION = Object.freeze({
     BOTTOM: { x: 0, y: 1 },
     RIGHT: { x: 1, y: 0 },
     LEFT: { x: -1, y: 0 },
-    enum: () => ['TOP', 'BOTTOM', 'RIGHT', 'LEFT'],
+    enum: ():string[] => ['TOP', 'BOTTOM', 'RIGHT', 'LEFT'],
     parse: (str) => {
         for (let val of LOCATION.enum()) {
             if (str == val) return LOCATION[val];

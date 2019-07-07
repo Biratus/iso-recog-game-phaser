@@ -2,11 +2,26 @@
     "image": [
         "plyer_debug.png",
         "plyer.png",
+        "plyer_noshadow.png",
         "en_sm_square.png",
         "en_sm_circle.png",
         "CLASSIC_blue_1,3,5.png",
+        "CLASSIC_blue_1,3,5_Elongated _w1_Z0.4.png",
         "CLASSIC_blue_1,3,5_Elongated _w1_Z0.5.png",
-        "background8.png"
+        "CLASSIC_blue_1,3,5_Elongated _w1_Z0.2.png",
+        "CLASSIC_blue_1,3,5_Elongated _w0.5_Z0.2.png",
+        "CLASSIC_blue_1,3,5_Elongated _w0.65_Z0.2.png",
+        "background8.png",
+        "small_bush.png",
+        "large_bush.png",
+        "small_tree.png",
+        "fat_tree.png",
+        "room0.png",
+        "room1.png",
+        "room2.png",
+        "room3.png",
+        "entry.png",
+        "topentry.png"
     ],
     "json": [
         "level_big.json",
