@@ -11,10 +11,15 @@ import Loader from '../objects/utils/Loader';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
 import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
+import { Game } from 'phaser';
 
 export var currentScene: GameScene;
 
 export default class GameScene extends Phaser.Scene {
+
+  static STATES={'RECOG':'RECOG','IDLE':'IDLE'};
+
+  private _activeState = GameScene.STATES.IDLE;
 
   graphics: Phaser.GameObjects.Graphics;
   currentLevel: Level;
@@ -58,7 +63,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.children.sortChildrenFlag = true;
     //EVENT
-    // this.input.keyboard.createCursorKeys();
+    this.input.keyboard.createCursorKeys();
     this.initEvents();
 
     // ISO PLUGIN
@@ -74,27 +79,37 @@ export default class GameScene extends Phaser.Scene {
       lineStyle: { color: 0xffffff, width: 10 },
       fillStyle: { color: 0xffffff, alpha: 1 }
     });
+    this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
     //LEVEL
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
+    this.currentLevel.create();
 
     // renderer.renderLevel(this.currentLevel);
     renderer.renderRoom(this.currentLevel.currentRoom);
     renderer.renderPlayer();
 
-    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK,(location:string) => {
-      let r=this.currentLevel.currentRoom;
-      console.log('go to '+location+' from '+r._id);
-      let dest=r._entries[location].dest
-      console.log(dest);
-      renderer.renderTransition(r,dest,() => {console.log('callback');this.currentLevel.currentRoom=dest;});
-    });
+    this.activeState = GameScene.STATES.RECOG;
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
+
+    let s=this.add.image(20,window.innerHeight*0.5,'plyer');
+    s.setInteractive(currentScene.input.makePixelPerfect(100));
+    s.on('pointerup', () => {
+      console.log('hey');
+      if(this.activeState==GameScene.STATES.IDLE) {
+        s.texture.manager.setTexture(s,'plyer');
+        this.activeState=GameScene.STATES.RECOG;
+      } else {
+        s.texture.manager.setTexture(s,'en_sm_square');
+        this.activeState=GameScene.STATES.IDLE;
+      }
+    });
+
   }
 
   update(time: number, delta: number) {
@@ -117,6 +132,10 @@ export default class GameScene extends Phaser.Scene {
 
   initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', (result) => {
+      if(!result || result.length==0) {
+        this.currentShape.setText("NO RESULTS");
+        return;
+      }
       console.log('results ' + result[0].Name + " " + result[0].Score, result);
 
       if (result[0].Score - result[1].Score > 0.15) {
@@ -135,6 +154,19 @@ export default class GameScene extends Phaser.Scene {
       if (this.isPause) return;
       this.recogListener.emitter.emit('pointermove', pointer);
     });
+    this.input.on('pointerup', (pointer) => {
+      if (this.isPause) return;
+      this.recogListener.emitter.emit('pointerup', pointer);
+    });
+    
+    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK,(location:string) => {
+      if(this.activeState !== GameScene.STATES.IDLE) return;
+      let r=this.currentLevel.currentRoom;
+      console.log('go to '+location+' from '+r._id);
+      let dest=r._entries[location].dest
+      console.log(dest);
+      renderer.renderTransition(r,dest,() => {console.log('callback');this.currentLevel.currentRoom=dest;});
+    });
   }
 
   drawPoints(points, color, clear) {
@@ -148,4 +180,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   get screenSize() { return this._screenSize; }
+
+  get activeState() {return this._activeState;}
+
+  set activeState(val) {
+    if(val === GameScene.STATES.RECOG) this.recogListener.enable();
+    else this.recogListener.disable();
+    this._activeState=val;
+  }
 }

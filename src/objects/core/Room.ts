@@ -30,7 +30,7 @@ export default class Room {
         this.getAllEnemiesManager().forEach((enMana) => enMana.getClosestWithSign(sign).forEach((en)=>en.takeHit()));
     }
 
-    entries():Entry[] {
+    entries():Entry[] {//Map to List
         let e:Entry[]=[];
         for(let l of LOCATION.enum()){
             let en = this._entries[l];

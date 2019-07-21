@@ -38,8 +38,15 @@ class IsoGroup {
 
 export default class Renderer {
     static entryTexture = 'CLASSIC_blue_1,3,5';
-    static roomTexture = 'CLASSIC_blue_1,3,5_Elongated _w1_Z0.5';
+    static entryTextures = {
+        'TOP': { texture: 'CLASSIC_w1_Z0.5_olighterdarker_out' },
+        'BOTTOM': { texture: 'CLASSIC_w1_Z0.5_olighterdarker_in' },
+        'LEFT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_out' },
+        'RIGHT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_in' },
+    }
+    static roomTexture = 'CLASSIC_Elongated _w1_Z1o_mediumdarker';
     static playerTexture = 'plyer';
+    static entryOffset = 4.5;
 
     group = new IsoGroup();
     currentRoomSprite: IsoSprite;
@@ -57,6 +64,8 @@ export default class Renderer {
 
     constructor() {
         this.bg = currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
+        this.bg.scaleX = window.innerWidth / this.bg.width;
+        this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
     }
 
@@ -69,9 +78,8 @@ export default class Renderer {
             let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
             let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
             tile_width = RenderUtils.spriteIsoWidth(sprite);
-
-            sprite.isoX = canvasLoc.x + (tile_width / 2) * LOCATION[loc].x;
-            sprite.isoY = canvasLoc.y + (tile_width / 2) * LOCATION[loc].y;
+            sprite.isoX = canvasLoc.x + (tile_width / 2) * LOCATION[loc].x - LOCATION[loc].x * Renderer.entryOffset * GAME_CONFIG.scale;
+            sprite.isoY = canvasLoc.y + (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * Renderer.entryOffset * GAME_CONFIG.scale;
             if (room.getEntry(LOCATION[loc])) sprite.visible = true;
             else sprite.visible = false;
         }
@@ -81,8 +89,8 @@ export default class Renderer {
     private initSprites = () => {
         if (!this.currentRoomSprite) {
             this.currentRoomSprite = currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-            this.currentRoomSprite.scaleY = GAME_CONFIG.scale;
-            this.currentRoomSprite.scaleX = GAME_CONFIG.scale;
+            this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+            this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
             this.currentRoomSprite.texture.source.forEach(src => src.resolution = 10);
         }
@@ -91,13 +99,13 @@ export default class Renderer {
             for (let loc of LOCATION.enum()) {
                 let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
                 let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTexture);
-                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.tile_scale;
-                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.tile_scale;
+                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.texture.source.forEach(src => src.resolution = 10);
                 tile_width = RenderUtils.spriteIsoWidth(sprite);
-                sprite.isoX += (tile_width / 2) * LOCATION[loc].x;
-                sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
+                sprite.isoX += (tile_width / 2) * LOCATION[loc].x - LOCATION[loc].x * 100;
+                sprite.isoY += (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * 100;
                 sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
                 sprite.setInteractive(currentScene.input.makePixelPerfect(100));
                 sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
@@ -106,8 +114,8 @@ export default class Renderer {
         }
         if (!this.currentRoomTransitionSprite) {
             this.currentRoomTransitionSprite = currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-            this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale;
-            this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale;
+            this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+            this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
             this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 10);
             this.currentRoomTransitionSprite.visible = false;
@@ -118,9 +126,9 @@ export default class Renderer {
             for (let loc of LOCATION.enum()) {
                 let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
                 let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTexture);
-                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.tile_scale;
-                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.tile_scale;
+                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.texture.source.forEach(src => src.resolution = 10);
                 tile_width = RenderUtils.spriteIsoWidth(sprite);
                 sprite.isoX += (tile_width / 2) * LOCATION[loc].x;
@@ -172,6 +180,7 @@ export default class Renderer {
             let entrySpr = this.currentEntriesTransitionSprite[LOCATION.name(entry.location)!];
             let newLoc = LOCATION.add(loc,
                 LOCATION.multiply(entry.location, RenderUtils.spriteHalfIsoWidth(this.currentRoomTransitionSprite) + RenderUtils.spriteHalfIsoWidth(entrySpr)));
+            newLoc = LOCATION.add(newLoc, LOCATION.multiply(entry.location, -1 * Renderer.entryOffset * GAME_CONFIG.scale));
             entrySpr.isoX = newLoc.x;
             entrySpr.isoY = newLoc.y;
             entrySpr.shouldAppear = true;
@@ -231,7 +240,7 @@ export default class Renderer {
             ease: Phaser.Math.Easing.Quadratic.In,
             delay: 0,
             onComplete: () => {
-                this.getTransitionSprites().forEach(spr => {spr.alpha = 1;spr.visible=false;});
+                this.getTransitionSprites().forEach(spr => { spr.alpha = 1; spr.visible = false; });
                 this.currentRoomSprite.isoX = 0;
                 this.currentRoomSprite.isoY = 0;
             }
@@ -258,8 +267,8 @@ export default class Renderer {
 
     renderPlayer() {
         this.player = currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
-        this.player.scaleY = GAME_CONFIG.scale;
-        this.player.scaleX = GAME_CONFIG.scale;
+        this.player.scaleY = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
+        this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
         this.player.texture.source.forEach(src => src.resolution = 10);
     }

@@ -10,10 +10,12 @@ export const ENEMY_CONFIG = {
 }
 
 export const GAME_CONFIG = {
+    scale: 1,
     tile_size: 64,
     tile_height: 63,
-    tile_scale:0.4,
-    scale: 0.7,
+    entryScale:0.4,
+    roomScale:1.2,
+    playerScale:0.2,
     // player_scale:0.4
     enablePhysics:false
 }

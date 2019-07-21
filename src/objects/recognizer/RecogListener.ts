@@ -1,6 +1,9 @@
 import { Point, Recognizer } from 'outlines';
 import 'phaser'
 import { currentScene } from '../../scenes/GameScene';
+import { Timeout } from '../utils/Timeout';
+import { RenderUtils } from '../utils/RenderUtils';
+import ArrayUtils from '../utils/ArrayUtils';
 
 export default class RecogListener {
     shapeCount = 0;
@@ -10,25 +13,34 @@ export default class RecogListener {
     _isDown: boolean;
     enabled: boolean;
 
+    shapeDrownTimeout: number;
+    opac:number;
+    shapeCenter:Point;
+
     constructor() {
         this.recognizer = new Recognizer();
         this.emitter = new Phaser.Events.EventEmitter();
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
+            this.points=[];
+            clearInterval(this.shapeDrownTimeout);
             currentScene.graphics.clear();
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 2);
+            currentScene.graphics.clearAlpha();
+            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointermove', (pointer) => {
             if (!this.enabled) return;
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 2);
+            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointerup', (pointer) => {
             if (!this.enabled) return;
             this._isDown = false;
-            currentScene.events.emit('shapeDrown', this.getShape());
+            let shape = this.getShape();
+            this.fadeOutShape();
+            currentScene.events.emit('shapeDrown', shape);
         });
     }
 
@@ -39,11 +51,9 @@ export default class RecogListener {
 
     getShape() {
         this.uniformizePoints();
-        if(this.points.length<10) return[];
-        currentScene.drawPoints(this.points, 0xff0000, false);
+        if (this.points.length < 10) return [];
         const shape = this.recognizer.Rank(this.points);
 
-        this.points = [];
         this.shapeCount++;
         return shape;
     }
@@ -146,4 +156,71 @@ export default class RecogListener {
     enable() { this.enabled = true; }
     disable() { this.enabled = false; }
 
+    fadeOutShape() {
+        let axisNb = 3;
+        let axis: any = [];
+        let loops = 0;
+        this.points.forEach(p => {p.x=p.X,p.y=p.Y;});
+        for (let i = 0; i < axisNb; i++) {
+            let flatMap = axis.flatMap(a => [a.v1, a.v2]);
+            let maxDist = ArrayUtils.of(axis).maxValue((a) => Math.dist(a.v1.x, a.v1.y, a.v2.x, a.v2.y));
+            let pos;
+            let turns = 0;
+            do {
+                turns++;
+                pos = this.points[Math.floor(Math.random() * this.points.length)];
+                if (turns > 1000) break;
+            } while (RenderUtils.posAreNear(pos, flatMap, maxDist));
+            let max = ArrayUtils.of(this.points).max((p) => Math.dist(pos.x, pos.y, p.x, p.y));
+            if (!max) continue;
+            if (RenderUtils.posAreNear(max, flatMap, maxDist)) {
+                loops++;
+                if (loops > 1000) break;
+                i--; continue;
+            }
+            axis.push({ v1: pos, v2: max });
+        }
+
+        let pts:Point[]= [];
+        for (let i = 0; i < axis.length; i++) {
+            for (let j = i + 1; j < axis.length; j++) {
+                pts.push(Math.lineIntersection(axis[i], axis[j]));
+            }
+        }
+        if (pts.length == 0) {
+            console.log('no interset');
+            return;
+        }
+
+        this.shapeCenter = Math.getCentroidPosition(pts);
+
+        for (let p of this.points) {
+            p.originDist = Math.dist(this.shapeCenter.x, this.shapeCenter.y, p.x, p.y);
+            p.dist = Math.dist(this.shapeCenter.x, this.shapeCenter.y, p.x, p.y);
+            let a = Math.angleBetweenPoints(this.shapeCenter.x, this.shapeCenter.y, p.x, p.y);
+            p.cos = Math.cos(a);
+            p.sin = Math.sin(a);
+        }
+        this.opac=1;
+        this.shapeDrownTimeout = setInterval(() => {
+            if (this.opac <= 0) {
+                currentScene.graphics.clear();
+                clearInterval(this.shapeDrownTimeout);
+                return;
+            }
+
+            this.points.forEach(p => {
+                p.dist += p.originDist * 0.01;
+                p.x = this.shapeCenter.x + p.cos * p.dist;
+                p.y = this.shapeCenter.y + p.sin * p.dist;
+            });
+            
+            currentScene.graphics.clear();
+            this.opac-=1/10;
+            this.opac=parseFloat(this.opac.toFixed(1));
+            currentScene.graphics.fillStyle(0xff0000,this.opac);           
+            this.points.forEach(p =>  currentScene.graphics.fillCircle(p.x, p.y, 3));
+        }, 50);
+    }
+        
 }
