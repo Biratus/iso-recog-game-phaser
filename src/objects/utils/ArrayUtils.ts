@@ -17,5 +17,11 @@ export default class ArrayUtils {
             if(maxStart<val) maxStart=val;
         }
         return maxStart;
+    };
+    reduce = (accumulate,startVal) => {
+        for(let index in this.items) {
+            startVal=accumulate(startVal,this.items[index]);
+        }
+        return startVal;
     }
 };

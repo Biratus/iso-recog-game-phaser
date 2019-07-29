@@ -53,6 +53,7 @@ export default class Renderer {
     currentEntriesSprite: { [key: string]: IsoSprite };
     currentRoomTransitionSprite: IsoSprite;
     currentEntriesTransitionSprite: { [key: string]: IsoSprite };
+    spritesContainer: Phaser.GameObjects.Container;
 
     player: IsoSprite;
     playerTween: Phaser.Tweens.Tween;
@@ -67,6 +68,7 @@ export default class Renderer {
         this.bg.scaleX = window.innerWidth / this.bg.width;
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
+        this.spritesContainer=currentScene.add.container(0,0);
     }
 
     renderRoom = (room: Room) => {
@@ -141,6 +143,7 @@ export default class Renderer {
             }
         }
         this.group.children = this.getAllSprites();
+        this.spritesContainer.add(this.group.children);
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
@@ -271,6 +274,22 @@ export default class Renderer {
         this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
         this.player.texture.source.forEach(src => src.resolution = 10);
+    }
+
+    getEntryTopLocationAt(loc):IsoSprite {
+        let e = renderer.currentEntriesSprite[loc];
+        return {
+            x:e.isoX,y:e.isoY,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+        };
+    }
+    
+    getEntryTopBackLocationAt(loc):IsoSprite {
+        let e = renderer.currentEntriesSprite[loc];
+        let locXY = LOCATION.parse(loc);
+        let sprIsoW = RenderUtils.spriteHalfIsoWidth(e);
+        return {
+            x:e.isoX+locXY.x*sprIsoW,y:e.isoY+locXY.y*sprIsoW,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+        };
     }
 
     static init() { renderer = new Renderer(); }

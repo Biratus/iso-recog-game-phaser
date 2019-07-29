@@ -46,9 +46,9 @@ export default class Enemy {
     get id() { return this._id; }
 
     create() {
-        this.sprite = null;//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
-        this.sprite.scaleX *= ENEMY_CONFIG.scale;
-        this.sprite.scaleY *= ENEMY_CONFIG.scale;
+        this.sprite = currentScene.add.isoSprite(this._config.x, this._config.y, 0,this._config.texture);//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
+        this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
+        this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;
         this.emitter.emit(Enemy.ON_SPAWN);
     }

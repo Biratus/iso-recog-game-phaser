@@ -1,0 +1,32 @@
+{
+    "Level": {
+        "rooms": [
+            {
+                "entries": [
+                    {
+                        "diff": "LOW",
+                        "sign": "SQUARE",
+                        "loc": "BOTTOM",
+                        "dest": 0,
+                        "en_sm": 2,
+                        "en_med": {},
+                        "en_big": {}
+                    },
+                    {
+                        "diff": "LOW",
+                        "sign": "CIRCLE",
+                        "loc": "RIGHT",
+                        "dest": 0,
+                        "en_sm": 2,
+                        "en_med": {},
+                        "en_big": {}
+                    }
+                ],
+                "specials": [],
+                "diff": 2,
+                "id": 0
+            }
+        ],
+        "start": 0
+    }
+}

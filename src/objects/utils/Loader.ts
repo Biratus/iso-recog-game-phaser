@@ -25,8 +25,10 @@ export default class Loader {
     static loadEntry = (jsonObj): Entry => {
         let e = new Entry(LOCATION.parse(jsonObj.loc), jsonObj.dest, jsonObj.sign, ENTRY_DIFF.parse(jsonObj.diff));//add other params
         e.nbEnSmall = jsonObj.en_sm;
-        e.nbEnMed = jsonObj.en_med.nb;
-        jsonObj.en_med.events.forEach((evt) => e.spawnEvtMed.push(ENEMY_SPAWN_EVENT.parse(evt)))
+        if(jsonObj.en_med.nb) {
+            e.nbEnMed = jsonObj.en_med.nb;
+            jsonObj.en_med.events.forEach((evt) => e.spawnEvtMed.push(ENEMY_SPAWN_EVENT.parse(evt)));
+        }
         return e;
     }
 }

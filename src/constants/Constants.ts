@@ -6,7 +6,7 @@ export const SCENE_GAME = {
 export const SCENE_LOAD = { key: 'load' }
 
 export const ENEMY_CONFIG = {
-    scale:0.6
+    scale:0.2
 }
 
 export const GAME_CONFIG = {
@@ -16,6 +16,7 @@ export const GAME_CONFIG = {
     entryScale:0.4,
     roomScale:1.2,
     playerScale:0.2,
+    enemyScale:0.2,
     // player_scale:0.4
     enablePhysics:false
 }

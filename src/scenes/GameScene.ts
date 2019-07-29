@@ -12,12 +12,15 @@ import Loader from '../objects/utils/Loader';
 // import Tile from '../objects/render/Tile';
 import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
 import { Game } from 'phaser';
+import ArrayUtils from '../objects/utils/ArrayUtils';
+import AnimationGraph from '../objects/render/AnimationGraph';
+import Tutorial from './Tutorial';
 
 export var currentScene: GameScene;
 
 export default class GameScene extends Phaser.Scene {
 
-  static STATES={'RECOG':'RECOG','IDLE':'IDLE'};
+  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' };
 
   private _activeState = GameScene.STATES.IDLE;
 
@@ -37,6 +40,8 @@ export default class GameScene extends Phaser.Scene {
 
   _screenSize: number;
 
+  animationGraph: AnimationGraph;
+
   constructor() {
     super(SCENE_GAME);
     currentScene = this;
@@ -55,7 +60,12 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    this.recogListener = new RecogListener();    
+    this.recogListener = new RecogListener();
+    this.animationGraph = new AnimationGraph(this.add.graphics({
+      x: 0, y: 0,
+      lineStyle: { color: 0xffffff, width: 10 },
+      fillStyle: { color: 0xffffff, alpha: 1 }
+    }));
     Renderer.init();
   }
 
@@ -74,46 +84,39 @@ export default class GameScene extends Phaser.Scene {
     this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
-    this.graphics = this.add.graphics({
-      x: 0, y: 0,
-      lineStyle: { color: 0xffffff, width: 10 },
-      fillStyle: { color: 0xffffff, alpha: 1 }
-    });
-    this.currentShape = this.add.text(window.innerWidth *0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+    this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
     //LEVEL
-    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
-    this.currentLevel.preload();
-    this.currentLevel.create();
+    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
+    // this.currentLevel.preload();
+    // this.currentLevel.create();
 
-    // renderer.renderLevel(this.currentLevel);
-    renderer.renderRoom(this.currentLevel.currentRoom);
-    renderer.renderPlayer();
-
-    this.activeState = GameScene.STATES.RECOG;
+    this.activeState = GameScene.STATES.IDLE;
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
 
-    let s=this.add.image(20,window.innerHeight*0.5,'plyer');
+    let s = this.add.image(20, window.innerHeight * 0.5, 'plyer');
     s.setInteractive(currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
-      console.log('hey');
-      if(this.activeState==GameScene.STATES.IDLE) {
-        s.texture.manager.setTexture(s,'plyer');
-        this.activeState=GameScene.STATES.RECOG;
+      if (this.activeState == GameScene.STATES.IDLE) {
+        s.texture.manager.setTexture(s, 'plyer');
+        this.activeState = GameScene.STATES.RECOG;
       } else {
-        s.texture.manager.setTexture(s,'en_sm_square');
-        this.activeState=GameScene.STATES.IDLE;
+        s.texture.manager.setTexture(s, 'en_sm_square');
+        this.activeState = GameScene.STATES.IDLE;
       }
     });
+    // let squareW=window.innerWidth*0.5;
+    // this.animationGraph.drawHollowRect(window.innerWidth*0.5-squareW/2,window.innerHeight*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
 
+    Tutorial.start();
   }
 
   update(time: number, delta: number) {
-    this.currentLevel.update(time,delta);
+    this.currentLevel.update(time, delta);
 
   }
 
@@ -131,19 +134,37 @@ export default class GameScene extends Phaser.Scene {
   }
 
   initEvents() {//Events should be down in room
-    this.events.addListener('shapeDrown', (result) => {
-      if(!result || result.length==0) {
-        this.currentShape.setText("NO RESULTS");
-        return;
+    this.events.addListener('shapeDrown', ({ result, list }) => {
+      // if(!result) {
+      //   this.currentShape.setText("NO RESULTS");
+      //   return;
+      // }
+      let ordered = {};
+      for (let shape of list) {
+        if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
+        else if (ArrayUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
+          ordered[shape.Shape] = [];
+          ordered[shape.Shape].push(shape.Score);
+        } else break;
       }
-      console.log('results ' + result[0].Name + " " + result[0].Score, result);
+      let cumul = 0;//cumul difference between 3 highest scores 
+      let prev;
+      for (let shape in ordered) {
+        ordered[shape] = ArrayUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
+        if(prev) cumul+=ordered[shape]-prev;
+        prev=ordered[shape]; 
+      }
+      console.log('cumul = '+cumul, ordered);
+      this.info.setText('Results :' + result.Name + " " + result.Score+"\ncumul: "+cumul);
+      console.log('results ' + result.Name + " " + result.Score, list);
+      if (result.Score < 0.9) {
+        this.currentShape.setText('Not Good Enough!');
+      } else this.currentShape.setText(result.Name);
 
-      if (result[0].Score - result[1].Score > 0.15) {
-        this.currentShape.setText(result[0].Name);
-        this.currentLevel.currentRoom.killEnemies(result[0].Name);
-      } else this.currentShape.setText("UNDEFINED");
-
-      this.info.setText('Results :' + _.reduce(result, (acc, elt) => acc + '\n' + elt.Name + " " + elt.Score, ''));
+      // if (result[0].Score - result[1].Score > 0.15) {
+      //   this.currentShape.setText(result[0].Name);
+      //   this.currentLevel.currentRoom.killEnemies(result[0].Name);
+      // } else this.currentShape.setText("UNDEFINED");
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
@@ -158,14 +179,14 @@ export default class GameScene extends Phaser.Scene {
       if (this.isPause) return;
       this.recogListener.emitter.emit('pointerup', pointer);
     });
-    
-    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK,(location:string) => {
-      if(this.activeState !== GameScene.STATES.IDLE) return;
-      let r=this.currentLevel.currentRoom;
-      console.log('go to '+location+' from '+r._id);
-      let dest=r._entries[location].dest
+
+    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
+      if (this.activeState !== GameScene.STATES.IDLE) return;
+      let r = this.currentLevel.currentRoom;
+      console.log('go to ' + location + ' from ' + r._id);
+      let dest = r._entries[location].dest
       console.log(dest);
-      renderer.renderTransition(r,dest,() => {console.log('callback');this.currentLevel.currentRoom=dest;});
+      renderer.renderTransition(r, dest, () => { console.log('callback'); this.currentLevel.currentRoom = dest; });
     });
   }
 
@@ -181,11 +202,11 @@ export default class GameScene extends Phaser.Scene {
 
   get screenSize() { return this._screenSize; }
 
-  get activeState() {return this._activeState;}
+  get activeState() { return this._activeState; }
 
   set activeState(val) {
-    if(val === GameScene.STATES.RECOG) this.recogListener.enable();
+    if (val === GameScene.STATES.RECOG) this.recogListener.enable();
     else this.recogListener.disable();
-    this._activeState=val;
+    this._activeState = val;
   }
 }

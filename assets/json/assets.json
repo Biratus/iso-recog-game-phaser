@@ -12,10 +12,14 @@
         "CLASSIC_w1_Z0.5_olighterdarker_out.png",
         "CLASSIC_w1_Z0.5_olightermedium_in.png",
         "CLASSIC_w1_Z0.5_olightermedium_out.png",
-        "CLASSIC_Elongated _w1_Z1o_mediumdarker.png"
+        "CLASSIC_Elongated _w1_Z1o_mediumdarker.png",
+        "light.png",
+        "mask7.png",
+        "mask8.png"
         
     ],
     "json": [
+        "tutorial.json",
         "level_big.json",
         "level_test.json",
         "level_test1.json",
