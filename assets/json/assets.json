@@ -17,6 +17,7 @@
         "mask7.png",
         "mask8.png",
         "p_white.png",
+        "p_yellow.png",
         "p_square.png",
         "p_circle.png"
         
@@ -38,5 +39,8 @@
             "frameHeight": 341,
             "endFrame":37
         }
-    }
+    },
+    "atlas":[
+        "p_bg"
+    ]
 }

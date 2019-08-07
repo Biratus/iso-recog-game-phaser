@@ -57,11 +57,11 @@ export default class Renderer {
 
     player: IsoSprite;
     playerTween: Phaser.Tweens.Tween;
-    bg: IsoSprite;
 
+    bg: IsoSprite;
     emitter = new Phaser.Events.EventEmitter();
 
-    bgParticles:Phaser.GameObjects.Particles.ParticleEmitter[] = [];
+    bgParticles: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
 
     debug = false;
 
@@ -72,36 +72,39 @@ export default class Renderer {
         this.bg.depth = -999;
         this.spritesContainer = currentScene.add.container(0, 0);
 
-        let assets = ['p_square', 'p_white', 'p_circle'];
-        let rect = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight);
-        let sizeFactor = 0.85;
-        let rectSource = new Phaser.Geom.Rectangle(window.innerWidth*(1-sizeFactor), window.innerHeight*(1-sizeFactor), window.innerWidth*sizeFactor, window.innerHeight*sizeFactor);
+        // let assets = ['p_white', 'p_yellow'];
+        // let sizeFactor = 0.85;
+        // let offsetY = 0;
+        // let rectSource = new Phaser.Geom.Rectangle(window.innerWidth*(1-sizeFactor), window.innerHeight*(1-sizeFactor-offsetY), window.innerWidth*sizeFactor, window.innerHeight*(sizeFactor-offsetY));
         // for (let a of assets) {
         //     let e = currentScene.add.particles(a).createEmitter({
         //         x: 0,
         //         y: 0,
         //         frequency: 400,
         //         angle: { max: 360, min: 0 },
-        //         speed: { min: 50, max: 100 },
-        //         scale: { min: 0.1, max: 0.3 },
+        //         speed: { min: 30, max: 70 },
+        //         scale: { min: 0.05, max: 0.1 },
         //         alpha: { start: 1, end: 0, ease: 'Linear' },
-        //         // deathZone: { type: 'onLeave', source: rect },
-        //         emitZone: {
-        //             type: 'random', source: {
-        //                 getRandomPoint: function (vec) {
-        //                     let p = rectSource.getRandomPoint();
-        //                     vec.x = p.x;
-        //                     vec.y = p.y;
-
-        //                     return vec;
-        //                 }
-        //             }
-        //         },
         //         blendMode: 'SCREEN'
         //     });
         //     e.scaleX.onUpdate = e.scaleX.defaultUpdate;
         //     this.bgParticles.push(e);
         // }
+
+        let e = currentScene.add.particles('p_bg').createEmitter({
+            frame: { frames: [ 'white', 'yellow' ], cycle: true, quantity: 2 },
+            x: 0,
+            y: 0,
+            frequency: 400,
+            angle: { max: 360, min: 0 },
+            speed: { min: 30, max: 70 },
+            scale: { min: 0.05, max: 0.1 },
+            alpha: { start: 1, end: 0, ease: 'Linear' },
+            blendMode: 'SCREEN'
+        });
+        e.scaleX.onUpdate = e.scaleX.defaultUpdate;
+        this.bgParticles.push(e);
+
     }
 
     renderRoom = (room: Room) => {
@@ -177,6 +180,23 @@ export default class Renderer {
         }
         this.group.children = this.getAllSprites();
         this.spritesContainer.add(this.group.children);
+
+        let deathZone = {
+            type: 'onEnter',
+            source: new Phaser.Geom.Rectangle(0, this.currentEntriesSprite.TOP.y-this.currentEntriesSprite.TOP.height/2, window.innerWidth, window.innerHeight)
+        };
+        let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y)
+        let emitZone = {
+            type: 'random', source: {
+                getRandomPoint: (vec) => {
+                    let p = validZone.getRandomPoint();
+                    vec.x = p.x;
+                    vec.y = p.y;
+                    return vec;
+                }
+            }
+        }
+        this.bgParticles.forEach(e => { e.setDeathZone(deathZone); e.setEmitZone(emitZone); });
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
