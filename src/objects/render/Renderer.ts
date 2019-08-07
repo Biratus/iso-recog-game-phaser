@@ -61,6 +61,8 @@ export default class Renderer {
 
     emitter = new Phaser.Events.EventEmitter();
 
+    bgParticles:Phaser.GameObjects.Particles.ParticleEmitter[] = [];
+
     debug = false;
 
     constructor() {
@@ -68,7 +70,38 @@ export default class Renderer {
         this.bg.scaleX = window.innerWidth / this.bg.width;
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
-        this.spritesContainer=currentScene.add.container(0,0);
+        this.spritesContainer = currentScene.add.container(0, 0);
+
+        let assets = ['p_square', 'p_white', 'p_circle'];
+        let rect = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight);
+        let sizeFactor = 0.85;
+        let rectSource = new Phaser.Geom.Rectangle(window.innerWidth*(1-sizeFactor), window.innerHeight*(1-sizeFactor), window.innerWidth*sizeFactor, window.innerHeight*sizeFactor);
+        // for (let a of assets) {
+        //     let e = currentScene.add.particles(a).createEmitter({
+        //         x: 0,
+        //         y: 0,
+        //         frequency: 400,
+        //         angle: { max: 360, min: 0 },
+        //         speed: { min: 50, max: 100 },
+        //         scale: { min: 0.1, max: 0.3 },
+        //         alpha: { start: 1, end: 0, ease: 'Linear' },
+        //         // deathZone: { type: 'onLeave', source: rect },
+        //         emitZone: {
+        //             type: 'random', source: {
+        //                 getRandomPoint: function (vec) {
+        //                     let p = rectSource.getRandomPoint();
+        //                     vec.x = p.x;
+        //                     vec.y = p.y;
+
+        //                     return vec;
+        //                 }
+        //             }
+        //         },
+        //         blendMode: 'SCREEN'
+        //     });
+        //     e.scaleX.onUpdate = e.scaleX.defaultUpdate;
+        //     this.bgParticles.push(e);
+        // }
     }
 
     renderRoom = (room: Room) => {
@@ -276,19 +309,19 @@ export default class Renderer {
         this.player.texture.source.forEach(src => src.resolution = 10);
     }
 
-    getEntryTopLocationAt(loc):IsoSprite {
+    getEntryTopLocationAt(loc): IsoSprite {
         let e = renderer.currentEntriesSprite[loc];
         return {
-            x:e.isoX,y:e.isoY,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+            x: e.isoX, y: e.isoY, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
     }
-    
-    getEntryTopBackLocationAt(loc):IsoSprite {
+
+    getEntryTopBackLocationAt(loc): IsoSprite {
         let e = renderer.currentEntriesSprite[loc];
         let locXY = LOCATION.parse(loc);
         let sprIsoW = RenderUtils.spriteHalfIsoWidth(e);
         return {
-            x:e.isoX+locXY.x*sprIsoW,y:e.isoY+locXY.y*sprIsoW,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+            x: e.isoX + locXY.x * sprIsoW, y: e.isoY + locXY.y * sprIsoW, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
     }
 

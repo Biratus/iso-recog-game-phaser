@@ -117,7 +117,7 @@ export default class GameScene extends Phaser.Scene {
 
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
-
+    this.info.setText("Active particle "+renderer.bgParticles.reduce((acc,elt:Phaser.GameObjects.Particles.ParticleEmitter) => acc+=elt.getAliveParticleCount(),0))
   }
 
   pause() {
