@@ -14,6 +14,7 @@
         "CLASSIC_w1_Z0.5_olightermedium_out.png",
         "CLASSIC_Elongated _w1_Z1o_mediumdarker.png",
         "light.png",
+        "mask1.png",
         "mask7.png",
         "mask8.png",
         "p_white.png",
@@ -41,6 +42,8 @@
         }
     },
     "atlas":[
-        "p_bg"
+        "p_bg",
+        "p_bg2",
+        "p_bg_square"
     ]
 }

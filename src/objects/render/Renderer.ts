@@ -71,6 +71,7 @@ export default class Renderer {
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
         this.spritesContainer = currentScene.add.container(0, 0);
+        this.spritesContainer.depth = 999;
 
         // let assets = ['p_white', 'p_yellow'];
         // let sizeFactor = 0.85;
@@ -92,14 +93,15 @@ export default class Renderer {
         // }
 
         let e = currentScene.add.particles('p_bg').createEmitter({
-            frame: { frames: [ 'white', 'yellow' ], cycle: true, quantity: 2 },
+            frame: { frames: ['white','yellow'], cycle: true, quantity: 2 },
             x: 0,
             y: 0,
             frequency: 400,
+            lifespan:2000,
             angle: { max: 360, min: 0 },
-            speed: { min: 30, max: 70 },
+            speed: { min: 20, max: 50 },
             scale: { min: 0.05, max: 0.1 },
-            alpha: { start: 1, end: 0, ease: 'Linear' },
+            alpha: { start: 1, end: 0 },
             blendMode: 'SCREEN'
         });
         e.scaleX.onUpdate = e.scaleX.defaultUpdate;
@@ -180,12 +182,13 @@ export default class Renderer {
         }
         this.group.children = this.getAllSprites();
         this.spritesContainer.add(this.group.children);
-
+        console.log(this.spritesContainer);
         let deathZone = {
             type: 'onEnter',
-            source: new Phaser.Geom.Rectangle(0, this.currentEntriesSprite.TOP.y-this.currentEntriesSprite.TOP.height/2, window.innerWidth, window.innerHeight)
+            source: new Phaser.Geom.Rectangle(0, this.currentEntriesSprite.TOP.y - 3*this.currentEntriesSprite.TOP.height / 4, window.innerWidth, window.innerHeight)
         };
         let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y)
+        // let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight);
         let emitZone = {
             type: 'random', source: {
                 getRandomPoint: (vec) => {
@@ -196,7 +199,10 @@ export default class Renderer {
                 }
             }
         }
-        this.bgParticles.forEach(e => { e.setDeathZone(deathZone); e.setEmitZone(emitZone); });
+        this.bgParticles.forEach(e => {
+            // e.setDeathZone(deathZone);
+            e.setEmitZone(emitZone);
+        });
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
