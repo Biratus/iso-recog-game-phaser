@@ -3,6 +3,10 @@ export const SCENE_GAME = {
     key: 'game',
     mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' }
 }
+export const SCENE_TUTORIAL = {
+    key: 'tutorial',
+    mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' }
+}
 export const SCENE_LOAD = { key: 'load' }
 
 export const ENEMY_CONFIG = {

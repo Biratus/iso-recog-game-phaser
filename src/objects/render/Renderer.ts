@@ -1,4 +1,3 @@
-import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
 import { LOCATION, INTERACTION_EVENT } from "../../constants/Enums";
@@ -8,6 +7,7 @@ import Room from "../core/Room";
 import { RenderUtils } from "../utils/RenderUtils";
 import { LevelUtils } from "../utils/LevelUtils";
 import Entry from "../core/Entry";
+import { currentScene } from "../../scenes/TutorialScene";
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
@@ -283,7 +283,7 @@ export default class Renderer {
         };
     }
     
-    getEntryTopBackLocationAt(loc):IsoSprite {
+    getEntryTopBackLocationAt(loc):{x:number,y:number,z:number} {
         let e = renderer.currentEntriesSprite[loc];
         let locXY = LOCATION.parse(loc);
         let sprIsoW = RenderUtils.spriteHalfIsoWidth(e);

@@ -1,9 +1,8 @@
-import { GAME_CONFIG, ENEMY_CONFIG } from '../../constants/Constants'
-import { currentScene } from '../../scenes/GameScene';
-import { renderer } from '../render/Renderer';
-import IsoPlugin, { IsoSprite, IsoPhysics } from 'phaser3-plugin-isometric'
+import { GAME_CONFIG, ENEMY_CONFIG } from '../../constants/Constants';
+import  { IsoSprite } from 'phaser3-plugin-isometric'
 import 'phaser';
 import { ENEMY_TYPE } from '../../constants/Enums';
+import { currentScene } from '../../scenes/TutorialScene';
 
 export default class Enemy {
     static _idCount = 0;
@@ -13,22 +12,24 @@ export default class Enemy {
 
     // core
     _id: number;
-    _config: { x: number, y: number, z: number, texture: string, frame?: number };
+    _config: { x: number, y: number, z: number, texture: string, sign:string, frame?: number };
     tween: Phaser.Tweens.Tween;
     sprite: IsoSprite;
     spawningEvent;
     emitter: Phaser.Events.EventEmitter;
 
     type: string;
+    sign: string;
     speed: number;
     isDead: boolean
 
-    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, frame?: number }, type: string, onSpawnEvent,spawningEvent?) {
+    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, sign:string,frame?: number }, type: string, onSpawnEvent,spawningEvent?) {
         this._id = Enemy._idCount++;
         this._config = spriteConfig;
         this.speed = 10;
         this.spawningEvent = spawningEvent;
         this.type = type;
+        this.sign = this._config.sign;
         this.emitter = new Phaser.Events.EventEmitter();
         if (!this.spawningEvent) {
             this.create();

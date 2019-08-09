@@ -6,6 +6,7 @@ import { Point3 } from 'phaser3-plugin-isometric/src/Point3';
 import { ENEMY_TYPE, LOCATION, ENEMY_SPAWN_EVENT } from '../../constants/Enums';
 import { Timeout } from '../utils/Timeout';
 import Renderer, { renderer } from '../render/Renderer';
+import { currentScene } from '../../scenes/TutorialScene';
 
 export default class EnemyManager {
     entry: Entry;
@@ -43,15 +44,15 @@ export default class EnemyManager {
     }
 
     getEnemyConfig(type) {
-        let here = Cube
-        let opEntry = renderer.currentEntriesSprite[LOCATION.name(this.entry.location)!];
-        let position = {x:opEntry.isoX,y:opEntry.isoY};
+        let opEntry = renderer.getEntryTopBackLocationAt(LOCATION.name(this.entry.location)!);
+        let position = {x:opEntry.x,y:opEntry.y};
         // let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
         //TODO figure out z with level.currentRoom.z;
         return {
             x: position.x,
             y: position.y,
             z: 0,
+            sign:this.entry.sign,
             texture: 'en_' + type + '_' + this.entry.sign.toLowerCase()
         }
 
@@ -100,23 +101,23 @@ export default class EnemyManager {
             this.timeout.resume();
         } else {
             // start spawn small en
-            // this.timeout = new Timeout(() => {
-            //     let e = this.spawnType(ENEMY_TYPE.SMALL);
-            //     let c = renderer.getCenterXYOfRoom(this.entry.source);
-            //     if (e) {
-            //         e.goToGoal(c.x, c.y,(en) => {
-            //             en.sprite.destroy();
-            //             this.alive.delete(en.id);
-            //         });
-            //     } else this.timeout.destroy();
-            // }, true, 15 * 100, true);
+            this.timeout = new Timeout(() => {
+                let e = this.spawnType(ENEMY_TYPE.SMALL);
+                if (e) {
+                    e.goToGoal(0,0,(en) => {
+                        en.sprite.destroy();
+                        this.alive.delete(en.id);
+                    });
+                    currentScene.events.emit(Enemy.ON_SPAWN,e);
+                } else this.timeout.destroy();
+            }, true, 15 * 100, true);
 
             // start spawn med en
-            let e = this.spawnType(ENEMY_TYPE.MEDIUM);
+            // let e = this.spawnType(ENEMY_TYPE.MEDIUM);
             // let c = renderer.getCenterXYOfRoom(this.entry.source);
-            e!.goToGoal(0,0, (en) => {
-                this.killInstant(en,true);
-            });
+            // e!.goToGoal(0,0, (en) => {
+            //     this.killInstant(en,true);
+            // });
         }
 
     }

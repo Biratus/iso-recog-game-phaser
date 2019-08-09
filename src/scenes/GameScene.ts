@@ -14,9 +14,8 @@ import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
 import { Game } from 'phaser';
 import ArrayUtils from '../objects/utils/ArrayUtils';
 import AnimationGraph from '../objects/render/AnimationGraph';
-import Tutorial from './Tutorial';
+import { currentScene } from './TutorialScene';
 
-export var currentScene: GameScene;
 
 export default class GameScene extends Phaser.Scene {
 
@@ -44,7 +43,7 @@ export default class GameScene extends Phaser.Scene {
 
   constructor() {
     super(SCENE_GAME);
-    currentScene = this;
+    // currentScene = this;
   }
 
   preload = () => {
@@ -97,7 +96,7 @@ export default class GameScene extends Phaser.Scene {
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
-
+ 
     let s = this.add.image(20, window.innerHeight * 0.5, 'plyer');
     s.setInteractive(currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
@@ -111,8 +110,6 @@ export default class GameScene extends Phaser.Scene {
     });
     // let squareW=window.innerWidth*0.5;
     // this.animationGraph.drawHollowRect(window.innerWidth*0.5-squareW/2,window.innerHeight*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
-
-    Tutorial.start();
   }
 
   update(time: number, delta: number) {

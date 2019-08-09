@@ -1,9 +1,9 @@
 import { Point, DollarRecognizer } from 'outlines';
 import 'phaser'
-import { currentScene } from '../../scenes/GameScene';
 import { Timeout } from '../utils/Timeout';
 import { RenderUtils } from '../utils/RenderUtils';
 import ArrayUtils from '../utils/ArrayUtils';
+import TutorialScene, { currentScene } from '../../scenes/TutorialScene';
 
 export default class RecogListener {
     points: Point[] = [];
@@ -16,29 +16,36 @@ export default class RecogListener {
     opac:number;
     shapeCenter:Point;
 
+    graphics: Phaser.GameObjects.Graphics;
+
     constructor() {
-        this.recognizer = new DollarRecognizer();
+        // this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
+        this.graphics=currentScene.add.graphics({
+            x: 0, y: 0,
+            lineStyle: { color: 0xffffff, width: 10 },
+            fillStyle: { color: 0xffffff, alpha: 1 }
+          })
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
             this.points=[];
             clearInterval(this.shapeDrownTimeout);
-            currentScene.graphics.clear();
-            currentScene.graphics.clearAlpha();
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
+            this.graphics.clear();
+            this.graphics.clearAlpha();
+            this.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointermove', (pointer) => {
             if (!this.enabled) return;
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
+            this.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointerup', (pointer) => {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            currentScene.animationGraph.fadeOutShape(this.points);
+            (<TutorialScene>currentScene).animationGraph.fadeOutShape(this.points);
             currentScene.events.emit('shapeDrown', shape);
         });
     }

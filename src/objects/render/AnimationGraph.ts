@@ -1,9 +1,9 @@
 import ArrayUtils from "../utils/ArrayUtils";
 import { RenderUtils } from "../utils/RenderUtils";
 import { Point } from 'outlines';
-import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
 import { renderer } from "./Renderer";
+import { currentScene } from "../../scenes/TutorialScene";
 
 export default class AnimationGraph {
     timeouts: any = {};
