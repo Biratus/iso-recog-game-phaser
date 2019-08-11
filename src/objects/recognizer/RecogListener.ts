@@ -12,14 +12,14 @@ export default class RecogListener {
     _isDown: boolean;
     enabled: boolean;
 
+    graphics: Phaser.GameObjects.Graphics;
+
     shapeDrownTimeout: number;
     opac:number;
     shapeCenter:Point;
 
-    graphics: Phaser.GameObjects.Graphics;
-
-    constructor() {
-        // this.recognizer = new DollarRecognizer();
+    constructor(shapeDrownListener) {
+        this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
         this.graphics=currentScene.add.graphics({
             x: 0, y: 0,
@@ -28,6 +28,11 @@ export default class RecogListener {
           })
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
+            this.graphics = this.graphics || currentScene.animationGraph.getGraph('recog',{
+                x: 0, y: 0,
+                lineStyle: { color: 0xffffff, width: 10 },
+                fillStyle: { color: 0xffffff, alpha: 0.95 }
+            });
             this._isDown = true;
             this.points=[];
             clearInterval(this.shapeDrownTimeout);

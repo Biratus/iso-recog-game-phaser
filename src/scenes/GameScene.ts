@@ -19,7 +19,7 @@ import { currentScene } from './TutorialScene';
 
 export default class GameScene extends Phaser.Scene {
 
-  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' };
+  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' ,'TUTORIAL':'TUTORIAL'};
 
   private _activeState = GameScene.STATES.IDLE;
 
@@ -59,7 +59,7 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    this.recogListener = new RecogListener();
+    this.recogListener = new RecogListener(this.events);
     this.animationGraph = new AnimationGraph(this.add.graphics({
       x: 0, y: 0,
       lineStyle: { color: 0xffffff, width: 10 },
@@ -114,6 +114,7 @@ export default class GameScene extends Phaser.Scene {
 
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
+    this.animationGraph.update(time,delta);
 
   }
 
@@ -165,16 +166,19 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointerdown', pointer);
+      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerDown(pointer);
+      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });
     this.input.on('pointermove', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointermove', pointer);
+      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerMove(pointer);
+      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.on('pointerup', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointerup', pointer);
+      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerUp(pointer);
+      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
     renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
