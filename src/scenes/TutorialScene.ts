@@ -10,6 +10,7 @@ import RecogListener from "../objects/recognizer/RecogListener";
 import AnimationGraph from "../objects/render/AnimationGraph";
 import Enemy from "../objects/character/Enemy";
 import ArrayUtils from "../objects/utils/ArrayUtils";
+import { RenderUtils } from "../objects/utils/RenderUtils";
 
 export var currentScene: Phaser.Scene;
 
@@ -22,12 +23,14 @@ export default class TutorialScene extends Phaser.Scene {
     animationGraph: AnimationGraph;
     info: Phaser.GameObjects.Text;
     info2: Phaser.GameObjects.Text;
-    currentShape: Phaser.GameObjects.Text;
+    currentShapeTxt: Phaser.GameObjects.Text;
 
     isPause = false;
 
+    currentShape: { shape: string, data: any };
+
     projectionText: string = "NONE";
-    enemyQueue:Enemy[] = [];
+    enemyQueue: Enemy[] = [];
     // steps = [
     //     {
     //         currentEvt:0,
@@ -56,7 +59,7 @@ export default class TutorialScene extends Phaser.Scene {
             sceneKey: 'isoPhysics'
         });
         this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-        this.recogListener = new RecogListener();
+        this.recogListener = new RecogListener(this.events);
         this.animationGraph = new AnimationGraph(this.add.graphics({
             x: 0, y: 0,
             lineStyle: { color: 0xffffff, width: 10 },
@@ -74,14 +77,15 @@ export default class TutorialScene extends Phaser.Scene {
         this.iso.projector.projectionAngle = CLASSIC;
 
         // GRAPHICS
-        this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+        this.currentShapeTxt = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
         this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
 
         let startBtn = this.add.image(50, 100, 'button');
         startBtn.setInteractive(currentScene.input.makePixelPerfect(100));
         startBtn.once('pointerup', () => {
             // start level            
-            this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+            this.animationGraph.drawDashedHollowCircle({x:200,y:300,rad:100,holeRad:50,dashSize:20,dashGap:20,color:0xffffff,alpha:0.5,dashColor:0xffffff,dashAlpha:1});
+            // this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
         });
 
         this.currentLevel = Loader.loadLevel(currentScene.cache.json.get('tutorial').Level);
@@ -122,7 +126,7 @@ export default class TutorialScene extends Phaser.Scene {
         let totH = window.innerHeight;
         let size = 0.4 * totW;
         let holeSize = size * 0.6;
-        switch (shape) {
+        switch (shape.toUpperCase()) {
             case 'SQUARE':
                 let clearSquare = 1.2;
                 // currentScene.animationGraph.clearSquareSpace((totW - size*clearSquare) / 2,(totH - size*clearSquare) / 2,clearSquare,clearSquare);
@@ -135,8 +139,17 @@ export default class TutorialScene extends Phaser.Scene {
                     rectColor: 0xffffff, rectAlpha: 0.8,
                     strokeColor: 0xffffff, strokeAlpha: 0.5
                 });
+                this.currentShape = {
+                    shape: shape,
+                    data: {
+                        x: (totW - size) / 2, y: (totH - size) / 2, size: size, holeSize: holeSize
+                    }
+                };
                 break;
-                default: console.log("CANNOT FIND CORRESPONDING SHAPE : "+shape);
+            case 'CIRCLE':
+
+                break;
+            default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }
 
     }
@@ -161,23 +174,22 @@ export default class TutorialScene extends Phaser.Scene {
 
     initEvents() {
 
-        this.events.on(Enemy.ON_SPAWN, (en:Enemy) => {
-            if(this.awaitingDrawing) {
+        this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
+            if (this.awaitingDrawing) {
                 this.enemyQueue.push(en);
                 return;
             }
             this.recogListener.enable();
-            this.animationGraph.focusLight(en.sprite, 'sq1');
+            this.animationGraph.focusLight(en.sprite, 'enLight');
             this.userInputShape(en.sign);
             this.awaitingDrawing = true;
             this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
         });
         this.events.addListener('shapeDrown', ({ result, list }) => {
             // if(!result) {
-            //   this.currentShape.setText("NO RESULTS");
+            //   this.currentShapeTxt.setText("NO RESULTS");
             //   return;
             // }
-            debugger;
             let ordered = {};
             for (let shape of list) {
                 if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
@@ -193,19 +205,36 @@ export default class TutorialScene extends Phaser.Scene {
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
+            let data = this.currentShape.data;
+            switch (this.currentShape.shape) {
+                case 'SQUARE':
+                    let inBig = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x, y: data.y, w: data.size, h: data.size });
+                    let inSmall = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x + (data.size - data.holeSize) / 2, y: data.y + (data.size - data.holeSize) / 2, w: data.holeSize, h: data.holeSize });
+                    if (inBig && !inSmall) {
+                        this.animationGraph.clearMain();
+                        this.animationGraph.emitter.emit('enLight');
+                        this.currentLevel.currentRoom.killEnemies('square');
+                        if (this.awaitingDrawing) {
+                            let en = this.enemyQueue.splice(0, 1)[0];
+                            this.animationGraph.focusLight(en.sprite, 'enLight');
+                            this.userInputShape(en.sign);
+                            this.awaitingDrawing = this.enemyQueue.length > 0;
+                        } else this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+                    } else console.log('outside');
+                    break;
+            }
             this.info.setText('Results :' + result.Name + " " + result.Score + "\ncumul: " + cumul);
             if (result.Score < 0.9) {
-                this.currentShape.setText('Not Good Enough!');
-            } else this.currentShape.setText(result.Name);
+                this.currentShapeTxt.setText('Not Good Enough!');
+            } else this.currentShapeTxt.setText(result.Name);
 
             // if (result[0].Score - result[1].Score > 0.15) {
-            //   this.currentShape.setText(result[0].Name);
+            //   this.currentShapeTxt.setText(result[0].Name);
             //   this.currentLevel.currentRoom.killEnemies(result[0].Name);
-            // } else this.currentShape.setText("UNDEFINED");
+            // } else this.currentShapeTxt.setText("UNDEFINED");
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);
-
         });
         this.input.on('pointermove', (pointer) => {
             this.recogListener.emitter.emit('pointermove', pointer);

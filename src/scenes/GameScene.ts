@@ -166,19 +166,16 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerDown(pointer);
-      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });
     this.input.on('pointermove', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerMove(pointer);
-      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.on('pointerup', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.TUTORIAL) Tutorial.pointerUp(pointer);
-      else if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
     renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {

@@ -18,7 +18,7 @@ export default class RecogListener {
     opac:number;
     shapeCenter:Point;
 
-    constructor(shapeDrownListener) {
+    constructor(shapeDrownListener:Phaser.Events.EventEmitter) {
         this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
         this.graphics=currentScene.add.graphics({
@@ -28,11 +28,6 @@ export default class RecogListener {
           })
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
-            this.graphics = this.graphics || currentScene.animationGraph.getGraph('recog',{
-                x: 0, y: 0,
-                lineStyle: { color: 0xffffff, width: 10 },
-                fillStyle: { color: 0xffffff, alpha: 0.95 }
-            });
             this._isDown = true;
             this.points=[];
             clearInterval(this.shapeDrownTimeout);
@@ -50,8 +45,9 @@ export default class RecogListener {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            (<TutorialScene>currentScene).animationGraph.fadeOutShape(this.points);
-            currentScene.events.emit('shapeDrown', shape);
+            (<TutorialScene>currentScene).animationGraph.fadeOutShape(shape.result.Name,this.points);
+            shapeDrownListener.emit('shapeDrown', shape);
+            this.graphics.clear();
         });
     }
 

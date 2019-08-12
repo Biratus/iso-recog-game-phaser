@@ -1,3 +1,5 @@
+import ArrayUtils from "./ArrayUtils";
+import { currentScene } from "../../scenes/TutorialScene";
 
 export module GameModule  {
      export function normalizePointName(points):{x:number,y:number}[] {
@@ -10,5 +12,8 @@ export module GameModule  {
             });
         }
         return npoints;
+    }
+    export function topZIndex() {
+        return ArrayUtils.of(currentScene.children.list).maxValue((c) => c.depth)+1;
     }
 }

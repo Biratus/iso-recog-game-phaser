@@ -138,10 +138,7 @@ export default class EnemyManager {
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {
-        let ordered = this.alive.values().filter((en) => {
-            //TODO in the future get with current sign is @param sign
-            return true;
-        }).sort((en1, en2) => Phaser.Math.Distance.Between(0, 0, en1.sprite.isoX, en1.sprite.isoY) - Phaser.Math.Distance.Between(0, 0, en2.sprite.isoX, en2.sprite.isoY));
+        let ordered = this.alive.values().filter((en) => en.sign.toLowerCase() === sign.toLowerCase()).sort((en1, en2) => Phaser.Math.Distance.Between(0, 0, en1.sprite.isoX, en1.sprite.isoY) - Phaser.Math.Distance.Between(0, 0, en2.sprite.isoX, en2.sprite.isoY));
         return ordered.splice(0, nb ? nb : 1);
     }
 

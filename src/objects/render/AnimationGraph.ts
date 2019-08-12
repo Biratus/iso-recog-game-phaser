@@ -4,6 +4,7 @@ import { Point } from 'outlines';
 import { GAME_CONFIG } from "../../constants/Constants";
 import { renderer } from "./Renderer";
 import { currentScene } from "../../scenes/TutorialScene";
+import { GameModule } from "../utils/GameUtils";
 
 export default class AnimationGraph {
     intervals: any = {};
@@ -12,7 +13,7 @@ export default class AnimationGraph {
 
     graphics: { [key: string]: Phaser.GameObjects.Graphics } = {};
     updates: { [key: string]: Function } = {};
-
+    particles: {[key:string]:Phaser.GameObjects.Particles.ParticleEmitter} = {};
     emitter = new Phaser.Events.EventEmitter();
 
     constructor(private mainGraphics: Phaser.GameObjects.Graphics) {
@@ -28,74 +29,54 @@ export default class AnimationGraph {
         for (let i in this.updates) this.updates[i](time, delta);
     }
 
-    fadeOutShape(points) {
-        this.mainGraphics.clear();
-        clearInterval(this.intervals.shape);
-        let axisNb = 3;
-        let axis: any = [];
-        let loops = 0;
-        points.forEach(p => { p.x = p.X, p.y = p.Y; });
-        for (let i = 0; i < axisNb; i++) {
-            let flatMap = axis.flatMap(a => [a.v1, a.v2]);
-            let maxDist = ArrayUtils.of(axis).maxValue((a) => Math.dist(a.v1.x, a.v1.y, a.v2.x, a.v2.y));
-            let pos;
-            let turns = 0;
-            do {
-                turns++;
-                pos = points[Math.floor(Math.random() * points.length)];
-                if (turns > 1000) break;
-            } while (RenderUtils.posAreNear(pos, flatMap, maxDist));
-            let max = ArrayUtils.of(points).max((p) => Math.dist(pos.x, pos.y, p.x, p.y));
-            if (!max) continue;
-            if (RenderUtils.posAreNear(max, flatMap, maxDist)) {
-                loops++;
-                if (loops > 1000) break;
-                i--; continue;
-            }
-            axis.push({ v1: pos, v2: max });
+    fadeOutShape(shape,points) {
+        if(!shape) return;
+        points = GameModule.normalizePointName(points);
+        switch(shape.toUpperCase()) {
+            case 'SQUARE':
+                let shapeCenter = RenderUtils.getCentroidOfPoints(points);
+                let sortX = points.sort((p1,p2) => p1.x-p2.x);
+                let size = sortX[sortX.length-1].x-sortX[0].x
+                let square = new Phaser.Geom.Rectangle(0,0,size,size);
+                this.particles.fadeOutShape = this.particles.fadeOutShape || currentScene.add.particles('blue').createEmitter({
+                    x: 0,
+                    y: 0,
+                    blendMode: 'SCREEN',
+                    scale: { start: 0.2, end: 0 },
+                    speed: { min: -50, max: 50 },
+                    quantity: 50
+                });
+                this.particles.fadeOutShape.stop();
+                this.particles.fadeOutShape.setEmitZone({source:square,type:'edge',quantity:50});
+                this.particles.fadeOutShape.explode(50,shapeCenter!.x-size/2,shapeCenter!.y-size/2);
+                break;
         }
 
-        let pts: Point[] = [];
-        for (let i = 0; i < axis.length; i++) {
-            for (let j = i + 1; j < axis.length; j++) {
-                pts.push(Math.lineIntersection(axis[i], axis[j]));
-            }
-        }
-        if (pts.length == 0) {
-            console.log('no interset');
-            return;
-        }
+        // this.mainGraphics.clear();
+        // clearInterval(this.intervals.shape);
+        // let shapeCenter = RenderUtils.getCentroidOfPoints(points);
+        // let opac = 1;
+        // this.intervals.shape = setInterval(() => {
+        //     if (opac <= 0) {
+        //         this.mainGraphics.clear();
+        //         clearInterval(this.intervals.shape);
+        //         return;
+        //     }
 
-        let shapeCenter = Math.getCentroidPosition(pts);
+        //     points.forEach(p => {
+        //         p.dist += p.originDist * 0.01;
+        //         p.x = shapeCenter.x + p.cos * p.dist;
+        //         p.y = shapeCenter.y + p.sin * p.dist;
+        //     });
 
-        for (let p of points) {
-            p.originDist = Math.dist(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            p.dist = Math.dist(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            let a = Math.angleBetweenPoints(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            p.cos = Math.cos(a);
-            p.sin = Math.sin(a);
-        }
-        let opac = 1;
-        this.intervals.shape = setInterval(() => {
-            if (opac <= 0) {
-                this.mainGraphics.clear();
-                clearInterval(this.intervals.shape);
-                return;
-            }
-
-            points.forEach(p => {
-                p.dist += p.originDist * 0.01;
-                p.x = shapeCenter.x + p.cos * p.dist;
-                p.y = shapeCenter.y + p.sin * p.dist;
-            });
-
-            this.mainGraphics.clear();
-            opac -= 1 / 10;
-            opac = parseFloat(opac.toFixed(1));
-            this.mainGraphics.fillStyle(0xff0000, opac);
-            points.forEach(p => this.mainGraphics.fillCircle(p.x, p.y, 3));
-        }, 50);
+        //     this.mainGraphics.clear();
+        //     opac -= 1 / 10;
+        //     opac = parseFloat(opac.toFixed(1));
+        //     this.mainGraphics.fillStyle(0xff0000, opac);
+        //     points.forEach(p => this.mainGraphics.fillCircle(p.x, p.y, 3));
+        // }, 50);
     }
+
     drawDashedHollowRect(config: { x: number, y: number, w: number, h: number, holeW: number, holeH: number, rectColor: number, rectAlpha: number, dashSize: number, dashGap: number, strokeColor: number, strokeAlpha: number }) {
         this.drawHollowRect(config.x, config.y, config.w, config.h, config.holeW, config.holeH, config.rectColor, config.rectAlpha);
 
@@ -105,6 +86,37 @@ export default class AnimationGraph {
         this.dashedRect(config.x, config.y, config.w, config.h, config.dashSize, config.dashGap, config.strokeColor, config.strokeAlpha, 0x000000, 0);
         this.dashedRect(config.x + factX, config.y + factY, config.w - 2 * factX, config.h - 2 * factY, config.dashSize, config.dashGap, config.strokeColor, config.strokeAlpha, 0x000000, 0);
     }
+
+    drawDashedHollowCircle(config:{x:number,y:number,rad:number,holeRad:number,color:number,alpha:number,dashSize:number,dashGap:number,dashColor:number,dashAlpha:number}) {
+        // this.mainGraphics.fillStyle(config.color,config.alpha);
+        // this.mainGraphics.fillCircle(config.x,config.y,config.rad);
+        // this.mainGraphics.fillStyle(0x000000,0);
+        // this.mainGraphics.fillCircle(config.x,config.y,config.holeRad);
+        this.mainGraphics.clear();
+        this.mainGraphics.lineStyle(config.rad-config.holeRad,config.color,config.alpha);
+
+        this.mainGraphics.beginPath();
+        this.mainGraphics.arc(config.x,config.y,(config.rad+config.holeRad)/2,0,Math.PI*2,false,0.1);
+        this.mainGraphics.strokePath();
+
+        // this.mainGraphics.strokeCircle(config.x,config.y,(config.rad+config.holeRad)/2);
+
+        // this.dashCircle(config.x,config.y,config.rad,config.dashSize,config.dashGap,config.dashColor,config.dashAlpha);
+        // this.dashCircle(config.x,config.y,config.holeRad,config.dashSize,config.dashGap,config.dashColor,config.dashAlpha);
+        
+    }
+
+    dashCircle(x,y,rad,dashSize,dashGap,color,alpha) {
+        this.mainGraphics.lineStyle(3,color,alpha);
+        let steps = (2*rad*Math.PI)/(dashSize+dashGap);
+        let dashAngle = dashSize/rad;
+        for(let a = 0;a+dashAngle<Math.PI*2;a+=2*Math.PI/steps) {
+            this.mainGraphics.beginPath();
+            this.mainGraphics.arc(x,y,rad,a,a+dashAngle);
+            this.mainGraphics.closePath();
+        }
+    }
+
     drawHollowRect(x, y, w, h, holeW, holeH, fillColor, alpha?) {
         this.mainGraphics.fillStyle(fillColor, alpha);
 
@@ -129,6 +141,9 @@ export default class AnimationGraph {
 
     rect(x, y, w, h) {
         this.mainGraphics.fillRect(x, y, w, h);
+    }
+    clearMain() {
+        this.mainGraphics.clear();
     }
 
     line(x, y, x1, y1) {
@@ -177,11 +192,12 @@ export default class AnimationGraph {
         let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
         mask.invertAlpha = true;
         renderer.spritesContainer.setMask(mask);
+        this.lightSource.alpha=0.8;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
         this.lightSourceTween = currentScene.tweens.add({
             targets: this.lightSource,
-            alpha: 0.8,
+            alpha: 0.6,
             duration: 1000,
             ease: 'Sine.easeInOut',
             loop: -1,

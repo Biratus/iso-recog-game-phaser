@@ -1,6 +1,7 @@
 import { IsoSprite } from 'phaser3-plugin-isometric';
-import Entry from '../core/Entry';
+import { Point } from 'outlines';
 import { GameModule } from './GameUtils';
+import ArrayUtils from './ArrayUtils';
 
 export module RenderUtils {
     export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }
@@ -17,13 +18,50 @@ export module RenderUtils {
 
     }
     export function pointsInRect(points, rect: { x: number, y: number, w: number, h: number }) {
-        let i = 0;
         points = GameModule.normalizePointName(points);
         for (let p of points) {
-            i++
             if ((p.x < rect.x || p.x > rect.x + rect.w) || (p.y < rect.y || p.y > rect.y + rect.h)) return false;
         }
-        console.log("out at " + i + " / " + points.length);
         return true;
+    }
+
+    export function getCentroidOfPoints(points) {
+        let axisNb = 3;
+        let axis: any = [];
+        let loops = 0;
+        points = GameModule.normalizePointName(points);
+        for (let i = 0; i < axisNb; i++) {
+            let flatMap = axis.flatMap(a => [a.v1, a.v2]);
+            let maxDist = ArrayUtils.of(axis).maxValue((a) => Math.dist(a.v1.x, a.v1.y, a.v2.x, a.v2.y));
+            let pos;
+            let turns = 0;
+            do {
+                turns++;
+                pos = points[Math.floor(Math.random() * points.length)];
+                if (turns > 1000) break;
+            } while (RenderUtils.posAreNear(pos, flatMap, maxDist));
+            let max = ArrayUtils.of(points).max((p) => Math.dist(pos.x, pos.y, p.x, p.y));
+            if (!max) continue;
+            if (RenderUtils.posAreNear(max, flatMap, maxDist)) {
+                loops++;
+                if (loops > 1000) break;
+                i--; continue;
+            }
+            axis.push({ v1: pos, v2: max });
+        }
+
+        let pts: Point[] = [];
+        for (let i = 0; i < axis.length; i++) {
+            for (let j = i + 1; j < axis.length; j++) {
+                pts.push(Math.lineIntersection(axis[i], axis[j]));
+            }
+        }
+        if (pts.length == 0) {
+            console.log('no interset');
+            return;
+        }
+
+        return Math.getCentroidPosition(pts);
+
     }
 }
