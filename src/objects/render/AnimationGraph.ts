@@ -11,7 +11,7 @@ export default class AnimationGraph {
 
     graphics: { [key: string]: Phaser.GameObjects.Graphics } = {};
     updates: { [key: string]: Function } = {};
-    particles: {[key:string]:Phaser.GameObjects.Particles.ParticleEmitter} = {};
+    particles: { [key: string]: Phaser.GameObjects.Particles.ParticleEmitter } = {};
     emitter = new Phaser.Events.EventEmitter();
 
     constructor(private mainGraphics: Phaser.GameObjects.Graphics) {
@@ -27,15 +27,15 @@ export default class AnimationGraph {
         for (let i in this.updates) this.updates[i](time, delta);
     }
 
-    fadeOutShape(shape,points) {
-        if(!shape) return;
+    fadeOutShape(shape, points) {
+        if (!shape) return;
         points = GameModule.normalizePointName(points);
-        switch(shape.toUpperCase()) {
+        switch (shape.toUpperCase()) {
             case 'SQUARE':
                 let shapeCenter = RenderUtils.getCentroidOfPoints(points);
-                let sortX = points.sort((p1,p2) => p1.x-p2.x);
-                let size = sortX[sortX.length-1].x-sortX[0].x
-                let square = new Phaser.Geom.Rectangle(0,0,size,size);
+                let sortX = points.sort((p1, p2) => p1.x - p2.x);
+                let size = sortX[sortX.length - 1].x - sortX[0].x
+                let square = new Phaser.Geom.Rectangle(0, 0, size, size);
                 this.particles.fadeOutShape = this.particles.fadeOutShape || currentScene.add.particles('blue').createEmitter({
                     x: 0,
                     y: 0,
@@ -45,8 +45,8 @@ export default class AnimationGraph {
                     quantity: 50
                 });
                 this.particles.fadeOutShape.stop();
-                this.particles.fadeOutShape.setEmitZone({source:square,type:'edge',quantity:50});
-                this.particles.fadeOutShape.explode(50,shapeCenter!.x-size/2,shapeCenter!.y-size/2);
+                this.particles.fadeOutShape.setEmitZone({ source: square, type: 'edge', quantity: 50 });
+                this.particles.fadeOutShape.explode(50, shapeCenter!.x - size / 2, shapeCenter!.y - size / 2);
                 break;
         }
 
@@ -159,13 +159,13 @@ export default class AnimationGraph {
         this.lightSource.scale = GAME_CONFIG.scale;
         let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
         renderer.spritesContainer.setMask(mask);
-        this.lightSource.alpha=0.6;
+        this.lightSource.alpha=0.8;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
         this.lightSourceTween = currentScene.tweens.add({
             targets: this.lightSource,
-            alpha: 0.3,
-            scale:0.5,
+            alpha: 0.5,
+            scale:0.8,
             duration: 2000,
             ease: 'Sine.easeInOut',
             loop: -1,
@@ -200,14 +200,14 @@ export default class AnimationGraph {
                     g.lineBetween(x, startY, x, endY);
                     console.log('alpha')
                 } else {*/
-                    delete this.updates.fadeDownCircle;
+                delete this.updates.fadeDownCircle;
 
-                    this.intervals.fadeDownCircle = setTimeout(() => {
-                        this.animateFadeDownCircle(x, startY, endY, color, size, duration, repeat, stopEvent);
-                    }, 1000);
+                this.intervals.fadeDownCircle = setTimeout(() => {
+                    this.animateFadeDownCircle(x, startY, endY, color, size, duration, repeat, stopEvent);
+                }, 1000);
                 // }
             } else {
-            g.clear();
+                g.clear();
                 g.lineBetween(x, startY, x, startY + lineLength * (now - startTime) / duration);
             }
 
@@ -292,12 +292,12 @@ export default class AnimationGraph {
 */
     }
 
-    getGraph(name,config):Phaser.GameObjects.Graphics {
+    getGraph(name, config): Phaser.GameObjects.Graphics {
         this.graphics[name] = this.graphics[name] || currentScene.add.graphics(config);
         return this.graphics[name];
     }
     destroyGraph(name) {
-        if(!this.graphics[name]) return;
+        if (!this.graphics[name]) return;
         this.graphics[name].destroy();
         delete this.graphics[name];
     }

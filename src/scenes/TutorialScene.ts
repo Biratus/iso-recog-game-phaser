@@ -11,6 +11,7 @@ import AnimationGraph from "../objects/render/AnimationGraph";
 import Enemy from "../objects/character/Enemy";
 import ArrayUtils from "../objects/utils/ArrayUtils";
 import { RenderUtils } from "../objects/utils/RenderUtils";
+import { GameModule } from "../objects/utils/GameUtils";
 
 export var currentScene: Phaser.Scene;
 
@@ -27,7 +28,7 @@ export default class TutorialScene extends Phaser.Scene {
 
     isPause = false;
 
-    currentShape: { shape: string, data: any, img?: Phaser.GameObjects.Image };
+    currentShape: { shape: string, isInShape: Function, img?: Phaser.GameObjects.Image };
 
     projectionText: string = "NONE";
     enemyQueue: Enemy[] = [];
@@ -125,13 +126,16 @@ export default class TutorialScene extends Phaser.Scene {
         let totH = window.innerHeight;
         let size = 0.4 * totW;
         let holeSize = size * 0.6;
+        let x, y;
         switch (shape.toUpperCase()) {
             case 'SQUARE':
                 let clearSquare = 1.2;
+                x = (totW - size) / 2;
+                y = (totH - size) / 2;
                 // currentScene.animationGraph.clearSquareSpace((totW - size*clearSquare) / 2,(totH - size*clearSquare) / 2,clearSquare,clearSquare);
                 this.animationGraph.drawDashedHollowRect({
-                    x: (totW - size) / 2,
-                    y: (totH - size) / 2,
+                    x: x,
+                    y: y,
                     w: size, h: size,
                     dashGap: totW * 0.01, dashSize: totW * 0.02,
                     holeW: holeSize, holeH: holeSize,
@@ -140,18 +144,21 @@ export default class TutorialScene extends Phaser.Scene {
                 });
                 this.currentShape = {
                     shape: shape,
-                    data: {
-                        x: (totW - size) / 2, y: (totH - size) / 2, size: size, holeSize: holeSize
-                    }
-                };
+                    isInShape: (points) => points.find((p) => RenderUtils.pointInRect(p, { x, y, w: size, h: size })
+                        && !RenderUtils.pointInRect(p, { x: x + (size - holeSize) / 2, y: y + (size - holeSize) / 2, w: holeSize, h: holeSize }))
+
+                }
                 break;
             case 'CIRCLE':
-                let img = this.add.image(totW / 2, totH / 2, 'hollowcircle').setScale(0.8);
+                x = totW / 2; y = totH / 2;
+                let img = this.add.image(x, y, 'hollowcircle').setScale(0.8);
+                let rad = img.width * 0.47;
+                let holeRad = img.width * 0.3;
                 this.currentShape = {
                     img: img,
                     shape: shape,
-                    data: {
-                        x: totW / 2, y: totH / 2, rad: img.width * 0.47, holeRad: img.width * 0.3
+                    isInShape: (points) => {
+                        points.find((p) => RenderUtils.pointInCircle(p, { x, y, rad }) && !RenderUtils.pointInCircle(p, { x, y, rad: holeRad }))
                     }
                 };
                 break;
@@ -181,7 +188,7 @@ export default class TutorialScene extends Phaser.Scene {
     initEvents() {
 
         this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
-            console.log('spawn '+en.sign);
+            console.log('spawn ' + en.sign);
             if (this.awaitingDrawing) {
                 this.enemyQueue.push(en);
                 return;
@@ -197,6 +204,7 @@ export default class TutorialScene extends Phaser.Scene {
             //   this.currentShapeTxt.setText("NO RESULTS");
             //   return;
             // }
+            list = list  ||[];
             let ordered = {};
             for (let shape of list) {
                 if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
@@ -212,32 +220,38 @@ export default class TutorialScene extends Phaser.Scene {
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
-            console.log('shapeDrawn');
-            let data = this.currentShape.data;
-            switch (this.currentShape.shape) {
-                case 'SQUARE':
-                    debugger;
-                    let inBig = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x, y: data.y, w: data.size, h: data.size });
-                    let inSmall = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x + (data.size - data.holeSize) / 2, y: data.y + (data.size - data.holeSize) / 2, w: data.holeSize, h: data.holeSize });
-                    if (inBig && !inSmall) {
-                        this.animationGraph.clearMain();
-                        this.animationGraph.emitter.emit('enLight');
-                        this.currentLevel.currentRoom.killEnemies('square');
-                        this.awaitingDrawing = false;
-                        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
-                    } else console.log('outside');
-                    break;
-                case 'CIRCLE':
-                    if (RenderUtils.pointsInCircle(this.recogListener.points, { x: data.x, y: data.y, rad: data.rad })
-                        && !RenderUtils.pointsInCircle(this.recogListener.points, { x: data.x, y: data.y, rad: data.holeRad })) {
-                        // this.animationGraph.clearMain();
-                        this.currentShape.img!.destroy();
-                        this.animationGraph.emitter.emit('enLight');
-                        this.currentLevel.currentRoom.killEnemies('circle');
-                        this.awaitingDrawing = false;
-                        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
-                    }
-                    break;
+
+            if (this.currentShape.isInShape(GameModule.normalizePointName(this.recogListener.points))) {
+                console.log('in');
+                this.animationGraph.clearMain();
+                this.animationGraph.emitter.emit('enLight');
+                this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
+                this.awaitingDrawing = false;
+                this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
+                this.animationGraph.fadeOutShape(this.currentShape.shape, this.recogListener.points);
+                this.recogListener.addUserShape(this.currentShape.shape);
+            } else {
+                console.log('ouside');
+                let p = this.add.particles('red');
+                p.createEmitter({
+                    scale:0.1,
+                    speed:{min:-10,max:10},
+                    alpha: { start: 1, end: 0 },
+                    blendMode:'SCREEN',
+                    on:false
+                });
+                GameModule.normalizePointName(this.recogListener.points).forEach((pt) => p.emitParticleAt(pt.x,pt.y));
+                // let imgs: Phaser.GameObjects.Image[] = [];
+                // for (let p of GameModule.normalizePointName(this.recogListener.points)) {
+                //     imgs.push(this.add.image(p.x, p.y, 'red').setScale(0.2));
+                // }
+                // let tw = this.add.tween({
+                //     targets: imgs,
+                //     alpha: 0,
+                //     duration: 1500,
+                //     ease: 'Cubic.Out',
+                //     onComplete: () => imgs.forEach((img) => img.destroy())
+                // });
             }
             this.info.setText('Results :' + result.Name + " " + result.Score + "\ncumul: " + cumul);
             if (result.Score < 0.9) {

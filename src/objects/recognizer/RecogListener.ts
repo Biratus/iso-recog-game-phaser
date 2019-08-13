@@ -42,7 +42,6 @@ export default class RecogListener {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            (<TutorialScene>currentScene).animationGraph.fadeOutShape(shape.result!.Name,this.points);
             shapeDrownListener.emit('shapeDrown', shape);
             this.graphics.clear();
         });
@@ -59,6 +58,10 @@ export default class RecogListener {
         const shape = this.recognizer.Recognize(this.points,false);
         
         return shape;
+    }
+
+    addUserShape(shapeName) {
+        this.recognizer.AddGesture(shapeName.toLowerCase(),this.points);
     }
 
     uniformizePoints() {
