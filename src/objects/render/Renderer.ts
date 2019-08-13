@@ -69,6 +69,7 @@ export default class Renderer {
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
         this.spritesContainer=currentScene.add.container(0,0);
+        this.spritesContainer.add(this.bg);
     }
 
     renderRoom = (room: Room) => {
@@ -274,6 +275,7 @@ export default class Renderer {
         this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
         this.player.texture.source.forEach(src => src.resolution = 10);
+        this.spritesContainer.add(this.player);
     }
 
     getEntryTopLocationAt(loc):IsoSprite {

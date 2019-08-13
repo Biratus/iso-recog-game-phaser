@@ -25,6 +25,15 @@ export module RenderUtils {
         return true;
     }
 
+    export function pointsInCircle(points,circle:{x:number,y:number,rad:number}) {
+        points = GameModule.normalizePointName(points);
+        for (let p of points) {
+            if (Math.dist(circle.x,circle.y,p.x,p.y)>circle.rad) return false;
+        }
+        return true;
+
+    }
+
     export function getCentroidOfPoints(points) {
         let axisNb = 3;
         let axis: any = [];

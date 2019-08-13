@@ -72555,8 +72555,3 @@ interface Math {
     getCentroidPosition(pts:{x:number,y:number}[]):{x:number,y:number};
     lineIntersection(l1:{v1:{x:number,y:number},v2:{x:number,y:number}},l2:{v1:{x:number,y:number},v2:{x:number,y:number}});
 }
-
-interface Array<T> {
-    max(getMax:Function,maxStart?):T;
-    maxValue(getMax:Function,maxStart?);
-}

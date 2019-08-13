@@ -15,10 +15,11 @@
         "CLASSIC_Elongated _w1_Z1o_mediumdarker.png",
         "light.png",
         "mask2.png",
-        "mask7.png",
+        "mask1.png",
         "mask8.png",
         "blue.png",
-        "button.png"
+        "button.png",
+        "hollowcircle.png"
         
     ],
     "json": [

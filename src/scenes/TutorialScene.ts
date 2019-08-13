@@ -27,7 +27,7 @@ export default class TutorialScene extends Phaser.Scene {
 
     isPause = false;
 
-    currentShape: { shape: string, data: any };
+    currentShape: { shape: string, data: any, img?: Phaser.GameObjects.Image };
 
     projectionText: string = "NONE";
     enemyQueue: Enemy[] = [];
@@ -84,8 +84,7 @@ export default class TutorialScene extends Phaser.Scene {
         startBtn.setInteractive(currentScene.input.makePixelPerfect(100));
         startBtn.once('pointerup', () => {
             // start level            
-            this.animationGraph.drawDashedHollowCircle({x:200,y:300,rad:100,holeRad:50,dashSize:20,dashGap:20,color:0xffffff,alpha:0.5,dashColor:0xffffff,dashAlpha:1});
-            // this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+            this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
         });
 
         this.currentLevel = Loader.loadLevel(currentScene.cache.json.get('tutorial').Level);
@@ -147,7 +146,14 @@ export default class TutorialScene extends Phaser.Scene {
                 };
                 break;
             case 'CIRCLE':
-
+                let img = this.add.image(totW / 2, totH / 2, 'hollowcircle').setScale(0.8);
+                this.currentShape = {
+                    img: img,
+                    shape: shape,
+                    data: {
+                        x: totW / 2, y: totH / 2, rad: img.width * 0.47, holeRad: img.width * 0.3
+                    }
+                };
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }
@@ -175,6 +181,7 @@ export default class TutorialScene extends Phaser.Scene {
     initEvents() {
 
         this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
+            console.log('spawn '+en.sign);
             if (this.awaitingDrawing) {
                 this.enemyQueue.push(en);
                 return;
@@ -205,22 +212,31 @@ export default class TutorialScene extends Phaser.Scene {
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
+            console.log('shapeDrawn');
             let data = this.currentShape.data;
             switch (this.currentShape.shape) {
                 case 'SQUARE':
+                    debugger;
                     let inBig = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x, y: data.y, w: data.size, h: data.size });
                     let inSmall = RenderUtils.pointsInRect(this.recogListener.points, { x: data.x + (data.size - data.holeSize) / 2, y: data.y + (data.size - data.holeSize) / 2, w: data.holeSize, h: data.holeSize });
                     if (inBig && !inSmall) {
                         this.animationGraph.clearMain();
                         this.animationGraph.emitter.emit('enLight');
                         this.currentLevel.currentRoom.killEnemies('square');
-                        if (this.awaitingDrawing) {
-                            let en = this.enemyQueue.splice(0, 1)[0];
-                            this.animationGraph.focusLight(en.sprite, 'enLight');
-                            this.userInputShape(en.sign);
-                            this.awaitingDrawing = this.enemyQueue.length > 0;
-                        } else this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+                        this.awaitingDrawing = false;
+                        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
                     } else console.log('outside');
+                    break;
+                case 'CIRCLE':
+                    if (RenderUtils.pointsInCircle(this.recogListener.points, { x: data.x, y: data.y, rad: data.rad })
+                        && !RenderUtils.pointsInCircle(this.recogListener.points, { x: data.x, y: data.y, rad: data.holeRad })) {
+                        // this.animationGraph.clearMain();
+                        this.currentShape.img!.destroy();
+                        this.animationGraph.emitter.emit('enLight');
+                        this.currentLevel.currentRoom.killEnemies('circle');
+                        this.awaitingDrawing = false;
+                        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
+                    }
                     break;
             }
             this.info.setText('Results :' + result.Name + " " + result.Score + "\ncumul: " + cumul);

@@ -63,6 +63,7 @@ export default class EnemyManager {
     }
 
     createMultiple(type, nb) {
+        if(isNaN(nb)) nb=0;
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 this.nbEnSmall = nb;
@@ -96,12 +97,13 @@ export default class EnemyManager {
     }
 
     start() {
+        console.log('start en manag '+this.entry.sign,this);
         if (this.timeout) {
             this.makeAllDo((en) => en.resume());
             this.timeout.resume();
         } else {
             // start spawn small en
-            this.timeout = new Timeout(() => {
+            this.timeout = Timeout.every(15 * 100).do(() => {
                 let e = this.spawnType(ENEMY_TYPE.SMALL);
                 if (e) {
                     e.goToGoal(0,0,(en) => {
@@ -110,7 +112,7 @@ export default class EnemyManager {
                     });
                     currentScene.events.emit(Enemy.ON_SPAWN,e);
                 } else this.timeout.destroy();
-            }, true, 15 * 100, true);
+            }).start();
 
             // start spawn med en
             // let e = this.spawnType(ENEMY_TYPE.MEDIUM);
@@ -133,8 +135,15 @@ export default class EnemyManager {
     }
 
     pause() {
+        console.log('pause en manag '+this.entry.sign);
         this.makeAllDo((en) => en.pause())
         this.timeout.pause();
+    }
+
+    resume() {
+        console.log('resume en manag '+this.entry.sign);
+        this.makeAllDo((en) => en.resume());
+        this.timeout.resume();
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {

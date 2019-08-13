@@ -41,7 +41,7 @@ export namespace ENTRY_DIFF {
 
 export const enum ENEMY_TYPE {
     SMALL = 'sm',
-    MEDIUM = 'sm'
+    MEDIUM = 'med'
 };
 
 export const ENEMY_SPAWN_EVENT = Object.freeze({

@@ -1,8 +1,5 @@
 import { Point, DollarRecognizer } from 'outlines';
-import 'phaser'
-import { Timeout } from '../utils/Timeout';
-import { RenderUtils } from '../utils/RenderUtils';
-import ArrayUtils from '../utils/ArrayUtils';
+import 'phaser';
 import TutorialScene, { currentScene } from '../../scenes/TutorialScene';
 
 export default class RecogListener {
@@ -45,7 +42,7 @@ export default class RecogListener {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            (<TutorialScene>currentScene).animationGraph.fadeOutShape(shape.result.Name,this.points);
+            (<TutorialScene>currentScene).animationGraph.fadeOutShape(shape.result!.Name,this.points);
             shapeDrownListener.emit('shapeDrown', shape);
             this.graphics.clear();
         });

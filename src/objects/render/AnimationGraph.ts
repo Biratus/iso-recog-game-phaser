@@ -1,6 +1,4 @@
-import ArrayUtils from "../utils/ArrayUtils";
 import { RenderUtils } from "../utils/RenderUtils";
-import { Point } from 'outlines';
 import { GAME_CONFIG } from "../../constants/Constants";
 import { renderer } from "./Renderer";
 import { currentScene } from "../../scenes/TutorialScene";
@@ -87,36 +85,6 @@ export default class AnimationGraph {
         this.dashedRect(config.x + factX, config.y + factY, config.w - 2 * factX, config.h - 2 * factY, config.dashSize, config.dashGap, config.strokeColor, config.strokeAlpha, 0x000000, 0);
     }
 
-    drawDashedHollowCircle(config:{x:number,y:number,rad:number,holeRad:number,color:number,alpha:number,dashSize:number,dashGap:number,dashColor:number,dashAlpha:number}) {
-        // this.mainGraphics.fillStyle(config.color,config.alpha);
-        // this.mainGraphics.fillCircle(config.x,config.y,config.rad);
-        // this.mainGraphics.fillStyle(0x000000,0);
-        // this.mainGraphics.fillCircle(config.x,config.y,config.holeRad);
-        this.mainGraphics.clear();
-        this.mainGraphics.lineStyle(config.rad-config.holeRad,config.color,config.alpha);
-
-        this.mainGraphics.beginPath();
-        this.mainGraphics.arc(config.x,config.y,(config.rad+config.holeRad)/2,0,Math.PI*2,false,0.1);
-        this.mainGraphics.strokePath();
-
-        // this.mainGraphics.strokeCircle(config.x,config.y,(config.rad+config.holeRad)/2);
-
-        // this.dashCircle(config.x,config.y,config.rad,config.dashSize,config.dashGap,config.dashColor,config.dashAlpha);
-        // this.dashCircle(config.x,config.y,config.holeRad,config.dashSize,config.dashGap,config.dashColor,config.dashAlpha);
-        
-    }
-
-    dashCircle(x,y,rad,dashSize,dashGap,color,alpha) {
-        this.mainGraphics.lineStyle(3,color,alpha);
-        let steps = (2*rad*Math.PI)/(dashSize+dashGap);
-        let dashAngle = dashSize/rad;
-        for(let a = 0;a+dashAngle<Math.PI*2;a+=2*Math.PI/steps) {
-            this.mainGraphics.beginPath();
-            this.mainGraphics.arc(x,y,rad,a,a+dashAngle);
-            this.mainGraphics.closePath();
-        }
-    }
-
     drawHollowRect(x, y, w, h, holeW, holeH, fillColor, alpha?) {
         this.mainGraphics.fillStyle(fillColor, alpha);
 
@@ -184,28 +152,29 @@ export default class AnimationGraph {
     focusLight(sprite, endEvent) {
         this.lightSource = currentScene.make.sprite({
             x: sprite.isoBounds.centerX,
-            y: sprite.y - sprite.height / 2,
-            key: 'mask8',
-            add: true
+            y: sprite.y - sprite.height*0.75,
+            key: 'mask1',
+            add: false
         }).setScale(0.5);
         this.lightSource.scale = GAME_CONFIG.scale;
         let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
-        mask.invertAlpha = true;
         renderer.spritesContainer.setMask(mask);
-        this.lightSource.alpha=0.8;
+        this.lightSource.alpha=0.6;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
         this.lightSourceTween = currentScene.tweens.add({
             targets: this.lightSource,
-            alpha: 0.6,
-            duration: 1000,
+            alpha: 0.3,
+            scale:0.5,
+            duration: 2000,
             ease: 'Sine.easeInOut',
             loop: -1,
             yoyo: true
         });
         this.emitter.on(endEvent, () => {
+            renderer.spritesContainer.clearMask();
+            this.lightSource.destroy();
             this.lightSourceTween.stop();
-            currentScene.cameras.main.clearMask();
         });
     }
 
