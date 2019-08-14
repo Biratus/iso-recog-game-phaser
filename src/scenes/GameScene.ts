@@ -117,7 +117,6 @@ export default class GameScene extends Phaser.Scene {
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
     this.animationGraph.update(time,delta);
-
   }
 
   pause() {
@@ -135,10 +134,10 @@ export default class GameScene extends Phaser.Scene {
 
   initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', ({ result, list }) => {
-      // if(!result) {
-      //   this.currentShape.setText("NO RESULTS");
-      //   return;
-      // }
+      if(!result || !list) {
+        this.currentShape.setText("NO RESULTS");
+        return;
+      }
       let ordered = {};
       for (let shape of list) {
         if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);

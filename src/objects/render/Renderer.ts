@@ -90,6 +90,7 @@ export default class Renderer {
     }
 
     private initSprites = () => {
+        debugger;
         if (!this.currentRoomSprite) {
             this.currentRoomSprite = currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
             this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;

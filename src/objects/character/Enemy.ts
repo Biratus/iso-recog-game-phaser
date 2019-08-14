@@ -80,6 +80,7 @@ export default class Enemy {
         switch (this.type) {
             case ENEMY_TYPE.SMALL:
                 console.log('ouch');
+                this.tween.stop();
                 this.sprite.destroy();
                 this.isDead = true;
                 break;

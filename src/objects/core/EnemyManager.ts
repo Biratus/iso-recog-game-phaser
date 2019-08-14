@@ -143,6 +143,7 @@ export default class EnemyManager {
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {
+        //TODO changer distance from 0,0 to GameModule getCenterOfGame ?
         let ordered = this.alive.values().filter((en) => en.sign.toLowerCase() === sign.toLowerCase()).sort((en1, en2) => Phaser.Math.Distance.Between(0, 0, en1.sprite.isoX, en1.sprite.isoY) - Phaser.Math.Distance.Between(0, 0, en2.sprite.isoX, en2.sprite.isoY));
         return ordered.splice(0, nb ? nb : 1);
     }

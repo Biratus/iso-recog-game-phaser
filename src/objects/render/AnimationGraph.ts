@@ -22,7 +22,7 @@ export default class AnimationGraph {
         if (this.lightSourceTween) this.lightSourceTween.stop();
         if (this.lightSource) this.lightSource.destroy();
         for (let i in this.graphics) this.graphics[i].destroy();
-        for (let i in this.particles) this.particles[i].killAll();
+        for (let i in this.particles) this.particles[i].stop();
     }
 
     update(time, delta) {
@@ -51,30 +51,19 @@ export default class AnimationGraph {
                 this.particles.fadeOutShape.explode(50, shapeCenter!.x - size / 2, shapeCenter!.y - size / 2);
                 break;
         }
+    }
 
-        // this.mainGraphics.clear();
-        // clearInterval(this.intervals.shape);
-        // let shapeCenter = RenderUtils.getCentroidOfPoints(points);
-        // let opac = 1;
-        // this.intervals.shape = setInterval(() => {
-        //     if (opac <= 0) {
-        //         this.mainGraphics.clear();
-        //         clearInterval(this.intervals.shape);
-        //         return;
-        //     }
-
-        //     points.forEach(p => {
-        //         p.dist += p.originDist * 0.01;
-        //         p.x = shapeCenter.x + p.cos * p.dist;
-        //         p.y = shapeCenter.y + p.sin * p.dist;
-        //     });
-
-        //     this.mainGraphics.clear();
-        //     opac -= 1 / 10;
-        //     opac = parseFloat(opac.toFixed(1));
-        //     this.mainGraphics.fillStyle(0xff0000, opac);
-        //     points.forEach(p => this.mainGraphics.fillCircle(p.x, p.y, 3));
-        // }, 50);
+    fadeOutPoints(points,texture,speed,onFinishCallback?) {
+        let p = currentScene.add.particles(texture);
+        let emit = p.createEmitter({
+            scale: 0.1,
+            speed: { min: -1*speed, max: speed },
+            alpha: { start: 1, end: 0 },
+            blendMode: 'SCREEN',
+            on: false
+        })
+        if(onFinishCallback) emit.onParticleDeath(() => { if (emit.getAliveParticleCount() <= 0) onFinishCallback(); });
+        GameModule.normalizePointName(points).forEach((pt) => p.emitParticleAt(pt.x, pt.y));
     }
 
     drawDashedHollowRect(config: { x: number, y: number, w: number, h: number, holeW: number, holeH: number, rectColor: number, rectAlpha: number, dashSize: number, dashGap: number, strokeColor: number, strokeAlpha: number }) {
@@ -180,118 +169,23 @@ export default class AnimationGraph {
         });
     }
 
-    animateFadeDownCircle(x, startY, endY, color, size, duration, repeat, stopEvent) {
-
-        let g = this.graphics.fadeDownCircle || currentScene.add.graphics({
-            x: 0, y: 0,
-            lineStyle: { color: color, width: 5 },
-            fillStyle: { color: 0xffffff, alpha: 0.1 }
-        });
-
-        g.clear();
-        let lineLength = endY - startY;
-        let startTime = new Date().getTime();
-        let a = 1;
-        this.updates.fadeDownCircle = (time, delta) => {
-            let now = new Date().getTime();
-            if ((now - startTime) > duration) {
-                /*let diff = now - (duration + startTime);
-                if (diff < duration * 0.3) {
-                    a -= 0.1;
-                    g.lineStyle(5, color, a);
-                    g.lineBetween(x, startY, x, endY);
-                    console.log('alpha')
-                } else {*/
-                delete this.updates.fadeDownCircle;
-
-                this.intervals.fadeDownCircle = setTimeout(() => {
-                    this.animateFadeDownCircle(x, startY, endY, color, size, duration, repeat, stopEvent);
-                }, 1000);
-                // }
-            } else {
-                g.clear();
-                g.lineBetween(x, startY, x, startY + lineLength * (now - startTime) / duration);
-            }
-
+    shapeClue(path, destroyEvt) {
+        if (this.particles.hasOwnProperty(destroyEvt)) {
+            this.particles[destroyEvt].killAll();
+            delete this.particles[destroyEvt];
         }
-
-        this.emitter.on(stopEvent, () => {
-            g.clear();
-            g.destroy();
-            delete this.updates.fadeDownCircle;
-            delete this.graphics.fadeDownCircle;
+        let p = currentScene.add.particles('blue');
+        this.particles[destroyEvt] = p.createEmitter({
+            scale: { start: 0.5, end: 0 },
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            frequency: 30,
+            emitZone: { type: 'edge', source: path, quantity: 175, yoyo: false }
         });
-        this.graphics.fadeDownCircle = g;
-
-        /*for(let i=0;i<3;i++) {
-        let img = currentScene.add.image(x, startY, 'mask2');
-        img.setScale(size / img.width);
-        img.setTint(color);
-        debugger;
-        if(i>0) img.visible=true;
-        currentScene.add.tween({
-            targets: img,
-            duration: duration,
-            props: { alpha: 0, y: endY},
-            ease: Phaser.Math.Easing.Sine.In,
-            delay: i*100,
-            repeat: 999,
-            reapeatDelay: 750,
-            onUpdate: function (tween) {
-                var tint = Phaser.Display.Color.Interpolate.ColorWithColor(
-                    Phaser.Display.Color.IntegerToColor(0xffffff),
-                    Phaser.Display.Color.IntegerToColor(color),
-                    1,
-                    tween.getValue()
-                );
-                img.setTint(Phaser.Display.Color.GetColor(tint.r,tint.g,tint.b));
-
-            },
-            onStart: () => { img.visible = true },
-            onComplete: () => {
-                debugger;
-
-            }
+        this.emitter.once(destroyEvt, () => {
+            if(this.particles[destroyEvt]) this.particles[destroyEvt].stop();
+            delete this.particles[destroyEvt];
         });
-        this.emitter.on(stopEvent, () => {
-            debugger;
-            img.destroy();
-            currentScene.tweens.killTweensOf(img);
-        });
-        }*/
-
-
-
-
-
-        /*
-        let g = this.graphics.fadeDownCircle || currentScene.add.graphics({
-            x: 0, y: 0,
-            lineStyle: { color: 0xffffff, width: 10 },
-            fillStyle: { color: color, alpha: 0.95 }
-        });
-        g.fillCircle(x,startY,size);
-        debugger;
-        currentScene.add.tween({
-            targets:g,
-            duration:duration,
-            props:{alpha:0.1,y:Math.abs(startY-endY),},
-            ease: Phaser.Math.Easing.Sine.In,
-            delay: 0,
-            repeat:999,
-            reapeatDelay:750,
-            onComplete:() => {
-                debugger;
-                this.graphics.fadeDownCircle.clear();
-            }
-        });
-        this.emitter.on(stopEvent,() => {
-            debugger;
-            currentScene.tweens.killTweensOf(this.graphics.fadeDownCircle);
-        });
-
-        this.graphics.fadeDownCircle = g;
-*/
     }
 
     getGraph(name, config): Phaser.GameObjects.Graphics {
