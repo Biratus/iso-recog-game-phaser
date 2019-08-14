@@ -4,7 +4,7 @@ import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
 import EnemyManager from "../objects/core/EnemyManager";
 import Renderer, { renderer } from "../objects/render/Renderer";
 import { LOCATION, ENEMY_TYPE } from "../constants/Enums";
-import { SCENE_TUTORIAL } from "../constants/Constants";
+import { SCENE_TUTORIAL, SCENE_GAME } from "../constants/Constants";
 import Level from "../objects/core/Level";
 import RecogListener from "../objects/recognizer/RecogListener";
 import AnimationGraph from "../objects/render/AnimationGraph";
@@ -12,6 +12,7 @@ import Enemy from "../objects/character/Enemy";
 import ArrayUtils from "../objects/utils/ArrayUtils";
 import { RenderUtils } from "../objects/utils/RenderUtils";
 import { GameModule } from "../objects/utils/GameUtils";
+import { Timeout } from "../objects/utils/Timeout";
 
 export var currentScene: Phaser.Scene;
 
@@ -32,6 +33,7 @@ export default class TutorialScene extends Phaser.Scene {
 
     projectionText: string = "NONE";
     enemyQueue: Enemy[] = [];
+    shapeDrawTimeout: Timeout;
     // steps = [
     //     {
     //         currentEvt:0,
@@ -81,12 +83,16 @@ export default class TutorialScene extends Phaser.Scene {
         this.currentShapeTxt = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
         this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
 
-        let startBtn = this.add.image(50, 100, 'button');
+        let startBtn = this.add.image(50, 100, 'button_green');
         startBtn.setInteractive(currentScene.input.makePixelPerfect(100));
         startBtn.once('pointerup', () => {
-            // start level            
             this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
-        });
+            startBtn.once('pointerup', () => {
+                this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
+                this.goToNextScene();
+            });
+        }
+        );
 
         this.currentLevel = Loader.loadLevel(currentScene.cache.json.get('tutorial').Level);
         this.currentLevel.preload();
@@ -95,30 +101,6 @@ export default class TutorialScene extends Phaser.Scene {
         renderer.renderPlayer();
 
         this.initEvents();
-
-        /*let e = this.currentLevel.currentRoom.entries()[0];
-        e.enemyManager = new EnemyManager(e);
-        let re = renderer.getEntryTopBackLocationAt(LOCATION.name(e.location));
-        re.texture = 'en_sm_' + e.sign.toLocaleLowerCase();
-
-        let en = e.enemyManager.createEnemy(re, ENEMY_TYPE.SMALL, {
-            name: 'sq1', run: (en, enMana) => {
-                en.sprite.isoX = re.x;
-                en.sprite.isoY = re.y;
-                this.animationGraph.focusLight(en.sprite, 'sq1');
-                this.userInputShape(e.sign);
-            }
-        });
-
-        en.emitter.emit('sq1', e.enemyManager);
-        console.log('Entry loc: ' + LOCATION.name(e.location));
-        console.log('Enemy', en);*/
-
-        // currentScene.input.on('pointerup', (evt) => {
-        //     this.steps[this.currentStep].next();
-        // });
-
-
     }
 
     userInputShape(shape) {
@@ -129,10 +111,8 @@ export default class TutorialScene extends Phaser.Scene {
         let x, y;
         switch (shape.toUpperCase()) {
             case 'SQUARE':
-                let clearSquare = 1.2;
                 x = (totW - size) / 2;
                 y = (totH - size) / 2;
-                // currentScene.animationGraph.clearSquareSpace((totW - size*clearSquare) / 2,(totH - size*clearSquare) / 2,clearSquare,clearSquare);
                 this.animationGraph.drawDashedHollowRect({
                     x: x,
                     y: y,
@@ -144,22 +124,20 @@ export default class TutorialScene extends Phaser.Scene {
                 });
                 this.currentShape = {
                     shape: shape,
-                    isInShape: (points) => points.find((p) => RenderUtils.pointInRect(p, { x, y, w: size, h: size })
+                    isInShape: (points) => points.every((p) => RenderUtils.pointInRect(p, { x, y, w: size, h: size })
                         && !RenderUtils.pointInRect(p, { x: x + (size - holeSize) / 2, y: y + (size - holeSize) / 2, w: holeSize, h: holeSize }))
 
-                }
+                };
                 break;
             case 'CIRCLE':
                 x = totW / 2; y = totH / 2;
                 let img = this.add.image(x, y, 'hollowcircle').setScale(0.8);
-                let rad = img.width * 0.47;
-                let holeRad = img.width * 0.3;
+                let rad = img.displayWidth * 0.47;
+                let holeRad = img.displayWidth * 0.3;
                 this.currentShape = {
                     img: img,
                     shape: shape,
-                    isInShape: (points) => {
-                        points.find((p) => RenderUtils.pointInCircle(p, { x, y, rad }) && !RenderUtils.pointInCircle(p, { x, y, rad: holeRad }))
-                    }
+                    isInShape: (points) => points.every((p) => RenderUtils.pointInCircle(p, { x, y, rad }) && !RenderUtils.pointInCircle(p, { x, y, rad: holeRad }))
                 };
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
@@ -181,30 +159,23 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number) {
-        this.currentLevel.update(time, delta);
-
     }
 
     initEvents() {
 
         this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
-            console.log('spawn ' + en.sign);
-            if (this.awaitingDrawing) {
-                this.enemyQueue.push(en);
-                return;
-            }
-            this.recogListener.enable();
-            this.animationGraph.focusLight(en.sprite, 'enLight');
-            this.userInputShape(en.sign);
-            this.awaitingDrawing = true;
-            this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
+            this.currentLevel.currentRoom.getAllEnemiesManager().filter((enMana) => !enMana.alive.has(en.id)).forEach((enMana) => enMana.pause());
+            this.shapeDrawTimeout = Timeout.in(750).do(() => {
+                this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
+                this.awaitingDrawing = true;
+                this.recogListener.enable();
+                this.animationGraph.focusLight(en.sprite, 'enLight');
+                this.userInputShape(en.sign);
+            }).start();
         });
         this.events.addListener('shapeDrown', ({ result, list }) => {
-            // if(!result) {
-            //   this.currentShapeTxt.setText("NO RESULTS");
-            //   return;
-            // }
-            list = list  ||[];
+            result = result || { Name: undefined, Score: 0 };
+            list = list || [];
             let ordered = {};
             for (let shape of list) {
                 if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
@@ -220,9 +191,7 @@ export default class TutorialScene extends Phaser.Scene {
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
-
-            if (this.currentShape.isInShape(GameModule.normalizePointName(this.recogListener.points))) {
-                console.log('in');
+            if (this.currentShape.isInShape(GameModule.normalizePointName(this.recogListener.points)) && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase()) {
                 this.animationGraph.clearMain();
                 this.animationGraph.emitter.emit('enLight');
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
@@ -230,38 +199,24 @@ export default class TutorialScene extends Phaser.Scene {
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
                 this.animationGraph.fadeOutShape(this.currentShape.shape, this.recogListener.points);
                 this.recogListener.addUserShape(this.currentShape.shape);
+                if (this.currentShape.img) this.currentShape.img.destroy();
             } else {
-                console.log('ouside');
                 let p = this.add.particles('red');
                 p.createEmitter({
-                    scale:0.1,
-                    speed:{min:-10,max:10},
+                    scale: 0.1,
+                    speed: { min: -10, max: 10 },
                     alpha: { start: 1, end: 0 },
-                    blendMode:'SCREEN',
-                    on:false
+                    blendMode: 'SCREEN',
+                    on: false
                 });
-                GameModule.normalizePointName(this.recogListener.points).forEach((pt) => p.emitParticleAt(pt.x,pt.y));
-                // let imgs: Phaser.GameObjects.Image[] = [];
-                // for (let p of GameModule.normalizePointName(this.recogListener.points)) {
-                //     imgs.push(this.add.image(p.x, p.y, 'red').setScale(0.2));
-                // }
-                // let tw = this.add.tween({
-                //     targets: imgs,
-                //     alpha: 0,
-                //     duration: 1500,
-                //     ease: 'Cubic.Out',
-                //     onComplete: () => imgs.forEach((img) => img.destroy())
-                // });
+                GameModule.normalizePointName(this.recogListener.points).forEach((pt) => p.emitParticleAt(pt.x, pt.y));
             }
             this.info.setText('Results :' + result.Name + " " + result.Score + "\ncumul: " + cumul);
             if (result.Score < 0.9) {
                 this.currentShapeTxt.setText('Not Good Enough!');
             } else this.currentShapeTxt.setText(result.Name);
 
-            // if (result[0].Score - result[1].Score > 0.15) {
-            //   this.currentShapeTxt.setText(result[0].Name);
-            //   this.currentLevel.currentRoom.killEnemies(result[0].Name);
-            // } else this.currentShapeTxt.setText("UNDEFINED");
+            if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) this.goToNextScene();
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);
@@ -273,5 +228,10 @@ export default class TutorialScene extends Phaser.Scene {
             this.recogListener.emitter.emit('pointerup', pointer);
         });
 
+    }
+
+    goToNextScene() {
+        this.animationGraph.deleteAll();
+        this.scene.start(SCENE_GAME.key);
     }
 }

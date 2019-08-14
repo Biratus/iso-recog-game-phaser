@@ -15,12 +15,14 @@ export default class AnimationGraph {
     emitter = new Phaser.Events.EventEmitter();
 
     constructor(private mainGraphics: Phaser.GameObjects.Graphics) {
-        // this.lightSource = currentScene.make.sprite({
-        //     x: 0,
-        //     y: 0,
-        //     key: 'mask1',
-        //     add: false
-        // });
+    }
+
+    deleteAll() {
+        this.mainGraphics.destroy();
+        if (this.lightSourceTween) this.lightSourceTween.stop();
+        if (this.lightSource) this.lightSource.destroy();
+        for (let i in this.graphics) this.graphics[i].destroy();
+        for (let i in this.particles) this.particles[i].killAll();
     }
 
     update(time, delta) {
@@ -41,7 +43,7 @@ export default class AnimationGraph {
                     y: 0,
                     blendMode: 'SCREEN',
                     scale: { start: 0.2, end: 0 },
-                    speed: { min: -50, max: 50 },
+                    speed: { min: -30, max: 30 },
                     quantity: 50
                 });
                 this.particles.fadeOutShape.stop();
@@ -152,20 +154,20 @@ export default class AnimationGraph {
     focusLight(sprite, endEvent) {
         this.lightSource = currentScene.make.sprite({
             x: sprite.isoBounds.centerX,
-            y: sprite.y - sprite.height*0.75,
+            y: sprite.y - sprite.height * 0.75,
             key: 'mask1',
             add: false
         }).setScale(0.5);
         this.lightSource.scale = GAME_CONFIG.scale;
         let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
         renderer.spritesContainer.setMask(mask);
-        this.lightSource.alpha=0.8;
+        this.lightSource.alpha = 0.8;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
         this.lightSourceTween = currentScene.tweens.add({
             targets: this.lightSource,
             alpha: 0.5,
-            scale:0.8,
+            scale: 0.8,
             duration: 2000,
             ease: 'Sine.easeInOut',
             loop: -1,

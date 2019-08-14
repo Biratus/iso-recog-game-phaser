@@ -14,10 +14,9 @@ export default class EnemyManager {
     timeout: Timeout;
 
     // config var
-    nbEnSmall: number;
-    nbRndMed: number;
+    nbEnSmall = 0;
+    nbRndMed = 0;
     spawnEventsEnemies: Phaser.Structs.Map<number, Enemy>;
-
 
     constructor(entry) {
         this.entry = entry;
@@ -32,27 +31,28 @@ export default class EnemyManager {
                 if (this.nbEnSmall <= 0) return;
                 this.nbEnSmall--;
                 e = this.createEnemy(this.getEnemyConfig(type), type);
-
                 this.alive.set(e.id, e);
                 break;
             case ENEMY_TYPE.MEDIUM:
                 if (this.nbRndMed <= 0) return;
                 this.nbRndMed--;
                 e = this.createEnemy(this.getEnemyConfig(type), type);
+                this.alive.set(e.id, e);
+                break;
         }
         return e;
     }
 
     getEnemyConfig(type) {
         let opEntry = renderer.getEntryTopBackLocationAt(LOCATION.name(this.entry.location)!);
-        let position = {x:opEntry.x,y:opEntry.y};
+        let position = { x: opEntry.x, y: opEntry.y };
         // let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
         //TODO figure out z with level.currentRoom.z;
         return {
             x: position.x,
             y: position.y,
             z: 0,
-            sign:this.entry.sign,
+            sign: this.entry.sign,
             texture: 'en_' + type + '_' + this.entry.sign.toLowerCase()
         }
 
@@ -63,7 +63,7 @@ export default class EnemyManager {
     }
 
     createMultiple(type, nb) {
-        if(isNaN(nb)) nb=0;
+        if (isNaN(nb)) nb = 0;
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 this.nbEnSmall = nb;
@@ -79,6 +79,7 @@ export default class EnemyManager {
     }
 
     createEnemy(config, type, event?) {
+        // console.log('create Enemy enMana '+this.entry.sign);
         let e = new Enemy(config, type, (en) => {
             this.alive.set(en.id, en);
             this.spawnEventsEnemies.delete(en.id);
@@ -97,30 +98,25 @@ export default class EnemyManager {
     }
 
     start() {
-        console.log('start en manag '+this.entry.sign,this);
-        if (this.timeout) {
-            this.makeAllDo((en) => en.resume());
-            this.timeout.resume();
-        } else {
-            // start spawn small en
-            this.timeout = Timeout.every(15 * 100).do(() => {
-                let e = this.spawnType(ENEMY_TYPE.SMALL);
-                if (e) {
-                    e.goToGoal(0,0,(en) => {
-                        en.sprite.destroy();
-                        this.alive.delete(en.id);
-                    });
-                    currentScene.events.emit(Enemy.ON_SPAWN,e);
-                } else this.timeout.destroy();
-            }).start();
+        // console.log('start enMana ' + this.entry.sign);
+        this.timeout = Timeout.every(15 * 100).do(() => {
+            let e = this.spawnType(ENEMY_TYPE.SMALL);
+            if (e) {
+                e.goToGoal(0, 0, (en) => {
+                    en.sprite.destroy();
+                    this.alive.delete(en.id);
+                });
+                currentScene.events.emit(Enemy.ON_SPAWN, e);
+            } else this.timeout.destroy();
+        }).start();
 
-            // start spawn med en
-            // let e = this.spawnType(ENEMY_TYPE.MEDIUM);
-            // let c = renderer.getCenterXYOfRoom(this.entry.source);
-            // e!.goToGoal(0,0, (en) => {
-            //     this.killInstant(en,true);
-            // });
-        }
+        // start spawn med en
+        // let e = this.spawnType(ENEMY_TYPE.MEDIUM);
+        // let c = renderer.getCenterXYOfRoom(this.entry.source);
+        // e!.goToGoal(0,0, (en) => {
+        //     this.killInstant(en,true);
+        // });
+
 
     }
 
@@ -128,22 +124,22 @@ export default class EnemyManager {
         for (let eId of this.alive.keys()) {
             if (this.alive.get(eId).isDead) {
                 let rndE = this.spawnEventsEnemies.values()[Math.floor(Math.random() * this.spawnEventsEnemies.size)];
-                if(this.spawnEventsEnemies.size>0) rndE.emitter.emit(ENEMY_SPAWN_EVENT.PREVIOUS_DIE.name,this);
+                if (this.spawnEventsEnemies.size > 0) rndE.emitter.emit(ENEMY_SPAWN_EVENT.PREVIOUS_DIE.name, this);
                 this.alive.delete(eId);
             }
         }
     }
 
     pause() {
-        console.log('pause en manag '+this.entry.sign);
+        // console.log('pause enMana ' + this.entry.sign);
         this.makeAllDo((en) => en.pause())
-        this.timeout.pause();
+        if (this.timeout) this.timeout.pause();
     }
 
     resume() {
-        console.log('resume en manag '+this.entry.sign);
+        // console.log('resume enMana ' + this.entry.sign);
         this.makeAllDo((en) => en.resume());
-        this.timeout.resume();
+        if (this.timeout) this.timeout.resume();
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {
@@ -152,10 +148,13 @@ export default class EnemyManager {
     }
 
     killInstant(enemy: Enemy, playEvent = false) {
-        console.log('killInstant');
         if (!playEvent) this.alive.delete(enemy.id);
         enemy.isDead = true;
         enemy.sprite.destroy();
         enemy.emitter.emit(Enemy.ON_DIE);
+    }
+
+    isOver() {
+        return this.nbEnSmall <= 0;
     }
 }

@@ -86,5 +86,9 @@ export module RenderUtils {
         console.assert(!RenderUtils.pointInRect({x:60,y:20},{x:0,y:0,w:50,h:50}),'!pointInRect({x:60,y:20},{x:0,y:0,w:50,h:50} ');
         console.assert(!RenderUtils.pointInRect({x:20,y:60},{x:0,y:0,w:50,h:50}),'!pointInRect({x:20,y:60},{x:0,y:0,w:50,h:50} ');
         console.assert(!RenderUtils.pointInRect({x:60,y:60},{x:0,y:0,w:50,h:50}),'!pointInRect({x:60,y:26},{x:0,y:0,w:50,h:50} ');
+        console.assert(RenderUtils.pointInCircle({x:20,y:20},{x:0,y:0,rad:50}),' pointInCircle({x:20,y:20},{x:0,y:0,rad:50})');
+        console.assert(!RenderUtils.pointInCircle({x:20,y:20},{x:0,y:0,rad:10}),' !pointInCircle({x:20,y:20},{x:0,y:0,rad:10})');
+        console.assert(!RenderUtils.pointInCircle({x:30,y:20},{x:0,y:0,rad:20}),' !pointInCircle({x:30,y:20},{x:0,y:0,rad:20})');
+        console.assert(!RenderUtils.pointInCircle({x:20,y:30},{x:0,y:0,rad:20}),' !pointInCircle({x:20,y:30},{x:0,y:0,rad:20})');
     }
 }

@@ -19,8 +19,8 @@ export const GAME_CONFIG = {
     tile_height: 63,
     entryScale:0.4,
     roomScale:1.2,
-    playerScale:0.2,
-    enemyScale:0.2,
+    playerScale:0.1,
+    enemyScale:0.1,
     // player_scale:0.4
     enablePhysics:false
 }

@@ -12,21 +12,21 @@ export default class RecogListener {
     graphics: Phaser.GameObjects.Graphics;
 
     shapeDrownTimeout: number;
-    opac:number;
-    shapeCenter:Point;
+    opac: number;
+    shapeCenter: Point;
 
-    constructor(shapeDrownListener:Phaser.Events.EventEmitter) {
+    constructor(shapeDrownListener: Phaser.Events.EventEmitter) {
         this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
-        this.graphics=currentScene.add.graphics({
+        this.graphics = currentScene.add.graphics({
             x: 0, y: 0,
             lineStyle: { color: 0xffffff, width: 10 },
             fillStyle: { color: 0xffffff, alpha: 1 }
-          })
+        })
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
-            this.points=[];
+            this.points = [];
             clearInterval(this.shapeDrownTimeout);
             this.graphics.clear();
             this.graphics.clearAlpha();
@@ -55,13 +55,13 @@ export default class RecogListener {
     getShape() {
         // this.uniformizePoints();
         if (this.points.length < 10) return [];
-        const shape = this.recognizer.Recognize(this.points,false);
-        
+        const shape = this.recognizer.Recognize(this.points, false);
+
         return shape;
     }
 
     addUserShape(shapeName) {
-        this.recognizer.AddGesture(shapeName.toLowerCase(),this.points);
+        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points);
     }
 
     uniformizePoints() {

@@ -86,9 +86,11 @@ export default class GameScene extends Phaser.Scene {
     this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
     //LEVEL
-    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
-    // this.currentLevel.preload();
-    // this.currentLevel.create();
+    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
+    this.currentLevel.preload();
+    this.currentLevel.create();
+    renderer.renderRoom(this.currentLevel.currentRoom);
+    renderer.renderPlayer();
 
     this.activeState = GameScene.STATES.IDLE;
 
@@ -97,14 +99,14 @@ export default class GameScene extends Phaser.Scene {
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
  
-    let s = this.add.image(20, window.innerHeight * 0.5, 'plyer');
+    let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
     s.setInteractive(currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
       if (this.activeState == GameScene.STATES.IDLE) {
-        s.texture.manager.setTexture(s, 'plyer');
+        s.texture.manager.setTexture(s, 'button_red');
         this.activeState = GameScene.STATES.RECOG;
       } else {
-        s.texture.manager.setTexture(s, 'en_sm_square');
+        s.texture.manager.setTexture(s, 'button_green');
         this.activeState = GameScene.STATES.IDLE;
       }
     });

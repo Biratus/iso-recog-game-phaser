@@ -68,7 +68,7 @@ export default class Renderer {
         this.bg.scaleX = window.innerWidth / this.bg.width;
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
-        this.spritesContainer=currentScene.add.container(0,0);
+        this.spritesContainer = currentScene.add.container(0, 0);
         this.spritesContainer.add(this.bg);
     }
 
@@ -278,19 +278,19 @@ export default class Renderer {
         this.spritesContainer.add(this.player);
     }
 
-    getEntryTopLocationAt(loc):IsoSprite {
+    getEntryTopLocationAt(loc): IsoSprite {
         let e = renderer.currentEntriesSprite[loc];
         return {
-            x:e.isoX,y:e.isoY,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+            x: e.isoX, y: e.isoY, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
     }
-    
-    getEntryTopBackLocationAt(loc):{x:number,y:number,z:number} {
+
+    getEntryTopBackLocationAt(loc): { x: number, y: number, z: number } {
         let e = renderer.currentEntriesSprite[loc];
         let locXY = LOCATION.parse(loc);
         let sprIsoW = RenderUtils.spriteHalfIsoWidth(e);
         return {
-            x:e.isoX+locXY.x*sprIsoW,y:e.isoY+locXY.y*sprIsoW,z:e.isoZ+RenderUtils.spriteHalfIsoHeight(e)
+            x: e.isoX + locXY.x * sprIsoW, y: e.isoY + locXY.y * sprIsoW, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
     }
 

@@ -56,18 +56,20 @@ export default class Enemy {
 
     goToGoal = (x, y, onFinish): void => {
         if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) return;
+        // console.log('dx='+Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)/this.speed);
+        // console.log('dy = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)+'ty = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed);
         this.tween = currentScene.tweens.add({
             targets: this.sprite,
             onComplete: () => onFinish(this),
             props: {
                 isoX: {
                     value: x * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
-                    duration: 1000 - this.speed,
+                    duration: Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed,
                     ease: 'Linear'
                 },
                 isoY: {
                     value: y * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
-                    duration: 1000 - this.speed,
+                    duration: Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300 / this.speed,
                     ease: 'Linear'
                 }
             },
