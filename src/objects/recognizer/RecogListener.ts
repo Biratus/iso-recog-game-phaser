@@ -54,9 +54,20 @@ export default class RecogListener {
                     this.recognizer.AddGesture(type, pts.slice().reverse());
                 });
         }
-		var line = [Point(0, 0), Point(100, 0)];
+        var line = [Point(0, 0), Point(100, 0)];
         this.recognizer.AddGesture('line', line);
         this.recognizer.AddGesture('line', line.slice().reverse());
+        if (localStorage.getItem('userShapes')) {
+            let userShapes = JSON.parse(<string>localStorage.getItem('userShapes'));
+            for (let type in userShapes) {
+                if (userShapes.hasOwnProperty(type)) {
+                    userShapes[type].forEach((pts) => {
+                        this.recognizer.AddGesture(type, pts);
+                        this.recognizer.AddGesture(type, pts.slice().reverse());
+                    });
+                }
+            }
+        }
         this.recognizer.NumUnistrokes = this.recognizer.Unistrokes.length;
     }
 
@@ -74,8 +85,14 @@ export default class RecogListener {
     }
 
     addUserShape(shapeName) {
-        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points);
-        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points.slice().reverse());
+        shapeName = shapeName.toLowerCase();
+        this.recognizer.AddGesture(shapeName, this.points);
+        this.recognizer.AddGesture(shapeName, this.points.slice().reverse());
+        let userShapes = localStorage.getItem('userShapes') ? JSON.parse(<string>localStorage.getItem('userShapes')) : {};
+        userShapes[shapeName] = userShapes[shapeName] || [];
+        userShapes[shapeName].push(this.points);
+
+        localStorage.setItem('userShapes', JSON.stringify(userShapes));
     }
 
     uniformizePoints() {
