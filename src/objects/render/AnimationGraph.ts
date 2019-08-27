@@ -150,7 +150,7 @@ export default class AnimationGraph {
             x: sprite.isoBounds.centerX,
             y: sprite.y - sprite.height * 0.75,
             key: 'mask1',
-            add: false
+            add: true
         }).setScale(0.5);
         this.lightSource.scale = GAME_CONFIG.scale;
         let mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);

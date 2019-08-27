@@ -163,6 +163,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
             this.currentLevel.currentRoom.getAllEnemiesManager().filter((enMana) => !enMana.alive.has(en.id)).forEach((enMana) => enMana.pause());
             this.shapeDrawTimeout = Timeout.in(750).do(() => {
+                renderer.pauseBackgroundParticles();
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
                 this.awaitingDrawing = true;
                 this.recogListener.enable();
@@ -192,6 +193,7 @@ export default class TutorialScene extends Phaser.Scene {
             let threshold = debug ? 0.8 : 0.96;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
+                renderer.resumeBackgroundParticles();
                 this.animationGraph.emitter.emit('enLight');
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
                 this.awaitingDrawing = false;

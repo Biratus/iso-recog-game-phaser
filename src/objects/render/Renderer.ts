@@ -56,9 +56,11 @@ export default class Renderer {
 
     player: IsoSprite;
     playerTween: Phaser.Tweens.Tween;
-    bg: IsoSprite;
 
+    bg: IsoSprite;
     emitter = new Phaser.Events.EventEmitter();
+
+    bgParticles: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
 
     debug = false;
 
@@ -69,6 +71,42 @@ export default class Renderer {
         this.bg.depth = -999;
         this.spritesContainer = GameModule.currentScene.add.container(0, 0);
         this.spritesContainer.add(this.bg);
+
+        // let assets = ['p_white', 'p_yellow'];
+        // let sizeFactor = 0.85;
+        // let offsetY = 0;
+        // let rectSource = new Phaser.Geom.Rectangle(window.innerWidth*(1-sizeFactor), window.innerHeight*(1-sizeFactor-offsetY), window.innerWidth*sizeFactor, window.innerHeight*(sizeFactor-offsetY));
+        // for (let a of assets) {
+        //     let e = currentScene.add.particles(a).createEmitter({
+        //         x: 0,
+        //         y: 0,
+        //         frequency: 400,
+        //         angle: { max: 360, min: 0 },
+        //         speed: { min: 30, max: 70 },
+        //         scale: { min: 0.05, max: 0.1 },
+        //         alpha: { start: 1, end: 0, ease: 'Linear' },
+        //         blendMode: 'SCREEN'
+        //     });
+        //     e.scaleX.onUpdate = e.scaleX.defaultUpdate;
+        //     this.bgParticles.push(e);
+        // }
+        let e = GameModule.currentScene.add.particles('p_bg_square').createEmitter({
+            frame: { frames: ['stroke','fill'], cycle: true, quantity: 2 },
+            x: 0,
+            y: 0,
+            frequency: 500,
+            lifespan:2000,
+            angle: { max: 360, min: 0,steps:10 },
+            speed: { min: 20, max: 30,steps:1 },
+            scale: { min: 0.05, max: 0.1 },
+            rotate: {min:0,max:360,steps:10},
+            alpha: { onEmit:(p) => p.alpha=0,onUpdate:(p,key,t,value)=> p.alpha = t<0.5?t:1-t},
+            blendMode: 'SCREEN'
+        });
+        e.scaleX.onUpdate = e.scaleX.defaultUpdate;
+        this.bgParticles.push(e);
+
+        // this.spritesContainer.depth = 999;
     }
 
     renderRoom = (room: Room) => {
@@ -144,7 +182,27 @@ export default class Renderer {
         }
         this.group.children = this.getAllSprites();
         this.spritesContainer.add(this.group.children);
-        // debugger;
+        console.log(this.spritesContainer);
+        let deathZone = {
+            type: 'onEnter',
+            source: new Phaser.Geom.Rectangle(0, this.currentEntriesSprite.TOP.y - 3*this.currentEntriesSprite.TOP.height / 4, window.innerWidth, window.innerHeight)
+        };
+        let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y)
+        // let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight);
+        let emitZone = {
+            type: 'random', source: {
+                getRandomPoint: (vec) => {
+                    let p = validZone.getRandomPoint();
+                    vec.x = p.x;
+                    vec.y = p.y;
+                    return vec;
+                }
+            }
+        }
+        this.bgParticles.forEach(e => {
+            // e.setDeathZone(deathZone);
+            e.setEmitZone(emitZone);
+        });
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
@@ -292,6 +350,15 @@ export default class Renderer {
         return {
             x: e.isoX + locXY.x * sprIsoW, y: e.isoY + locXY.y * sprIsoW, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
+    }
+
+    pauseBackgroundParticles() {
+        this.bgParticles.forEach(p => p.killAll());
+        this.bgParticles.forEach(p => p.pause());
+    }
+    
+    resumeBackgroundParticles() {
+        this.bgParticles.forEach(p => p.resume());
     }
 
     static init() { renderer = new Renderer(); }

@@ -14,8 +14,12 @@
         "CLASSIC_w1_Z0.5_olightermedium_out.png",
         "CLASSIC_Elongated _w1_Z1o_mediumdarker.png",
         "light.png",
-        "mask2.png",
         "mask1.png",
+        "mask7.png",
+        "p_white.png",
+        "p_yellow.png",
+        "p_square.png",
+        "p_circle.png",
         "mask8.png",
         "blue.png",
         "red.png",
@@ -41,5 +45,10 @@
             "frameHeight": 341,
             "endFrame":37
         }
-    }
+    },
+    "atlas":[
+        "p_bg",
+        "p_bg2",
+        "p_bg_square"
+    ]
 }
