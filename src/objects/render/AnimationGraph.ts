@@ -1,7 +1,6 @@
 import { RenderUtils } from "../utils/RenderUtils";
 import { GAME_CONFIG } from "../../constants/Constants";
 import { renderer } from "./Renderer";
-import { currentScene } from "../../scenes/TutorialScene";
 import { GameModule } from "../utils/GameUtils";
 
 export default class AnimationGraph {
@@ -38,7 +37,7 @@ export default class AnimationGraph {
                 let sortX = points.sort((p1, p2) => p1.x - p2.x);
                 let size = sortX[sortX.length - 1].x - sortX[0].x
                 let square = new Phaser.Geom.Rectangle(0, 0, size, size);
-                this.particles.fadeOutShape = this.particles.fadeOutShape || currentScene.add.particles('blue').createEmitter({
+                this.particles.fadeOutShape = this.particles.fadeOutShape || GameModule.currentScene.add.particles('blue').createEmitter({
                     x: 0,
                     y: 0,
                     blendMode: 'SCREEN',
@@ -54,7 +53,7 @@ export default class AnimationGraph {
     }
 
     fadeOutPoints(points,texture,speed,onFinishCallback?) {
-        let p = currentScene.add.particles(texture);
+        let p = GameModule.currentScene.add.particles(texture);
         let emit = p.createEmitter({
             scale: 0.1,
             speed: { min: -1*speed, max: speed },
@@ -141,19 +140,19 @@ export default class AnimationGraph {
     }
 
     focusLight(sprite, endEvent) {
-        this.lightSource = currentScene.make.sprite({
+        this.lightSource = GameModule.currentScene.make.sprite({
             x: sprite.isoBounds.centerX,
             y: sprite.y - sprite.height * 0.75,
             key: 'mask1',
             add: false
         }).setScale(0.5);
         this.lightSource.scale = GAME_CONFIG.scale;
-        let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
+        let mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);
         renderer.spritesContainer.setMask(mask);
         this.lightSource.alpha = 0.8;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
-        this.lightSourceTween = currentScene.tweens.add({
+        this.lightSourceTween = GameModule.currentScene.tweens.add({
             targets: this.lightSource,
             alpha: 0.5,
             scale: 0.8,
@@ -174,7 +173,7 @@ export default class AnimationGraph {
             this.particles[destroyEvt].killAll();
             delete this.particles[destroyEvt];
         }
-        let p = currentScene.add.particles('blue');
+        let p = GameModule.currentScene.add.particles('blue');
         this.particles[destroyEvt] = p.createEmitter({
             scale: { start: 0.5, end: 0 },
             blendMode: 'SCREEN',
@@ -189,7 +188,7 @@ export default class AnimationGraph {
     }
 
     getGraph(name, config): Phaser.GameObjects.Graphics {
-        this.graphics[name] = this.graphics[name] || currentScene.add.graphics(config);
+        this.graphics[name] = this.graphics[name] || GameModule.currentScene.add.graphics(config);
         return this.graphics[name];
     }
     destroyGraph(name) {

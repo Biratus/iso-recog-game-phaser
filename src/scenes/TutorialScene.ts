@@ -14,8 +14,6 @@ import { RenderUtils } from "../objects/utils/RenderUtils";
 import { GameModule } from "../objects/utils/GameUtils";
 import { Timeout } from "../objects/utils/Timeout";
 
-export var currentScene: Phaser.Scene;
-
 export default class TutorialScene extends Phaser.Scene {
 
     awaitingDrawing = false;
@@ -47,9 +45,9 @@ export default class TutorialScene extends Phaser.Scene {
 
     constructor() {
         super(SCENE_TUTORIAL);
-        currentScene = this;
     }
     preload = () => {
+        GameModule.currentScene = this;
         // PLUGIN
         this.load.scenePlugin({
             key: 'IsoPlugin',
@@ -84,7 +82,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
 
         let startBtn = this.add.image(50, 100, 'button_green');
-        startBtn.setInteractive(currentScene.input.makePixelPerfect(100));
+        startBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
         startBtn.once('pointerup', () => {
             this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
             startBtn.once('pointerup', () => {
@@ -94,7 +92,7 @@ export default class TutorialScene extends Phaser.Scene {
         }
         );
 
-        this.currentLevel = Loader.loadLevel(currentScene.cache.json.get('tutorial').Level);
+        this.currentLevel = Loader.loadLevel(GameModule.currentScene.cache.json.get('tutorial').Level);
         this.currentLevel.preload();
         this.currentLevel.create();
         renderer.renderRoom(this.currentLevel.currentRoom);

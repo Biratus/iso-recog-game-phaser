@@ -7,7 +7,7 @@ import Room from "../core/Room";
 import { RenderUtils } from "../utils/RenderUtils";
 import { LevelUtils } from "../utils/LevelUtils";
 import Entry from "../core/Entry";
-import { currentScene } from "../../scenes/TutorialScene";
+import { GameModule } from "../utils/GameUtils";
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
@@ -64,11 +64,11 @@ export default class Renderer {
     debug = false;
 
     constructor() {
-        this.bg = currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
+        this.bg = GameModule.currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
         this.bg.scaleX = window.innerWidth / this.bg.width;
         this.bg.scaleY = window.innerHeight / this.bg.height;
         this.bg.depth = -999;
-        this.spritesContainer = currentScene.add.container(0, 0);
+        this.spritesContainer = GameModule.currentScene.add.container(0, 0);
         this.spritesContainer.add(this.bg);
     }
 
@@ -90,9 +90,8 @@ export default class Renderer {
     }
 
     private initSprites = () => {
-        debugger;
         if (!this.currentRoomSprite) {
-            this.currentRoomSprite = currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
+            this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
             this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
@@ -103,7 +102,7 @@ export default class Renderer {
             for (let loc of LOCATION.enum()) {
                 let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
                 let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+                let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
                 sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.texture.source.forEach(src => src.resolution = 10);
@@ -111,13 +110,13 @@ export default class Renderer {
                 sprite.isoX += (tile_width / 2) * LOCATION[loc].x - LOCATION[loc].x * 100;
                 sprite.isoY += (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * 100;
                 sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
-                sprite.setInteractive(currentScene.input.makePixelPerfect(100));
+                sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
                 sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
                 this.currentEntriesSprite[loc] = sprite;
             }
         }
         if (!this.currentRoomTransitionSprite) {
-            this.currentRoomTransitionSprite = currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
+            this.currentRoomTransitionSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
             this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
             this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
@@ -130,7 +129,7 @@ export default class Renderer {
             for (let loc of LOCATION.enum()) {
                 let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
                 let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+                let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
                 sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
                 sprite.texture.source.forEach(src => src.resolution = 10);
@@ -139,13 +138,14 @@ export default class Renderer {
                 sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
                 sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
                 sprite.visible = false;
-                sprite.setInteractive(currentScene.input.makePixelPerfect(100));
+                sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
                 sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
                 this.currentEntriesTransitionSprite[loc] = sprite;
             }
         }
         this.group.children = this.getAllSprites();
         this.spritesContainer.add(this.group.children);
+        // debugger;
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
@@ -195,8 +195,8 @@ export default class Renderer {
 
     private startTransition(entry?: Entry, callback?: Function) {
         if (!entry) return;
-        if (this.playerTween) currentScene.tweens.remove(this.playerTween);
-        this.playerTween = currentScene.tweens.add({
+        if (this.playerTween) GameModule.currentScene.tweens.remove(this.playerTween);
+        this.playerTween = GameModule.currentScene.tweens.add({
             targets: this.player,
             isoX: this.currentEntriesSprite[LOCATION.name(entry.location)!].isoX,
             isoY: this.currentEntriesSprite[LOCATION.name(entry.location)!].isoY,
@@ -212,8 +212,8 @@ export default class Renderer {
                     x: this.currentRoomTransitionSprite.isoX,
                     y: this.currentRoomTransitionSprite.isoY
                 });
-            if (this.group.tween) currentScene.tweens.remove(this.group.tween);
-            this.group.tween = currentScene.tweens.add({
+            if (this.group.tween) GameModule.currentScene.tweens.remove(this.group.tween);
+            this.group.tween = GameModule.currentScene.tweens.add({
                 targets: this.group,
                 x: loc.x,
                 y: loc.y,
@@ -238,7 +238,7 @@ export default class Renderer {
     private endTransition(callback: Function) {
         this.swap();
         callback();
-        currentScene.add.tween({
+        GameModule.currentScene.add.tween({
             targets: this.getTransitionSprites(),
             alpha: 0,
             duration: 2000,
@@ -271,7 +271,7 @@ export default class Renderer {
     }
 
     renderPlayer() {
-        this.player = currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
+        this.player = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
         this.player.scaleY = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;

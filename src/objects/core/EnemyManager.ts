@@ -6,7 +6,7 @@ import { Point3 } from 'phaser3-plugin-isometric/src/Point3';
 import { ENEMY_TYPE, LOCATION, ENEMY_SPAWN_EVENT } from '../../constants/Enums';
 import { Timeout } from '../utils/Timeout';
 import Renderer, { renderer } from '../render/Renderer';
-import { currentScene } from '../../scenes/TutorialScene';
+import { GameModule } from '../utils/GameUtils';
 
 export default class EnemyManager {
     entry: Entry;
@@ -106,7 +106,7 @@ export default class EnemyManager {
                     en.sprite.destroy();
                     this.alive.delete(en.id);
                 });
-                currentScene.events.emit(Enemy.ON_SPAWN, e);
+                GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
             } else this.timeout.destroy();
         }).start();
 

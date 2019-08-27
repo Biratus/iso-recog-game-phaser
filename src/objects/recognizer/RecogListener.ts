@@ -1,6 +1,6 @@
 import { Point, DollarRecognizer } from 'outlines';
 import 'phaser';
-import TutorialScene, { currentScene } from '../../scenes/TutorialScene';
+import { GameModule } from '../utils/GameUtils';
 
 export default class RecogListener {
     points: Point[] = [];
@@ -18,11 +18,12 @@ export default class RecogListener {
     constructor(shapeDrownListener: Phaser.Events.EventEmitter) {
         this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
-        this.graphics = currentScene.add.graphics({
+        this.graphics = GameModule.currentScene.add.graphics({
             x: 0, y: 0,
             lineStyle: { color: 0xffffff, width: 10 },
             fillStyle: { color: 0xffffff, alpha: 1 }
-        })
+        });
+        this.graphics.setDepth(GameModule.topZIndex());
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
@@ -148,7 +149,7 @@ export default class RecogListener {
         return max;
     }
     minDistanceBetweenPoints(): number {
-        let min = Phaser.Math.Distance.Between(0, 0, currentScene.game.canvas.width, currentScene.game.canvas.height);
+        let min = Phaser.Math.Distance.Between(0, 0, GameModule.currentScene.game.canvas.width, GameModule.currentScene.game.canvas.height);
         let current, next;
         for (let i = 0; i < this.points.length - 1; i++) {
             current = this.points[i];

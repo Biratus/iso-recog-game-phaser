@@ -1,20 +1,17 @@
-import 'phaser'
-import { SCENE_GAME } from '../constants/Constants'
-import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric'
+import 'phaser';
+import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import Cube from 'phaser3-plugin-isometric/src/Cube';
-import Level from '../objects/core/Level';
-import Renderer, { renderer } from '../objects/render/Renderer';
-import { _ } from 'underscore';
-import RecogListener from '../objects/recognizer/RecogListener';
-import Loader from '../objects/utils/Loader';
+import { SCENE_GAME } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
-import { Game } from 'phaser';
-import ArrayUtils from '../objects/utils/ArrayUtils';
+import { INTERACTION_EVENT } from '../constants/Enums';
+import Level from '../objects/core/Level';
+import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
-import { currentScene } from './TutorialScene';
+import Renderer, { renderer } from '../objects/render/Renderer';
+import ArrayUtils from '../objects/utils/ArrayUtils';
+import { GameModule } from '../objects/utils/GameUtils';
+import Loader from '../objects/utils/Loader';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -43,10 +40,10 @@ export default class GameScene extends Phaser.Scene {
 
   constructor() {
     super(SCENE_GAME);
-    // currentScene = this;
   }
 
   preload = () => {
+    GameModule.currentScene = this;
     // PLUGIN
     this.load.scenePlugin({
       key: 'IsoPlugin',
@@ -100,7 +97,7 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
  
     let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
-    s.setInteractive(currentScene.input.makePixelPerfect(100));
+    s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
       if (this.activeState == GameScene.STATES.IDLE) {
         s.texture.manager.setTexture(s, 'button_red');
