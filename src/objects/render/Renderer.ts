@@ -91,23 +91,23 @@ export default class Renderer {
         //     e.scaleX.onUpdate = e.scaleX.defaultUpdate;
         //     this.bgParticles.push(e);
         // }
-
-        let e = currentScene.add.particles('p_bg').createEmitter({
-            frame: { frames: ['white','yellow'], cycle: true, quantity: 2 },
+        let e = GameModule.currentScene.add.particles('p_bg_square').createEmitter({
+            frame: { frames: ['stroke','fill'], cycle: true, quantity: 2 },
             x: 0,
             y: 0,
-            frequency: 400,
+            frequency: 500,
             lifespan:2000,
-            angle: { max: 360, min: 0 },
-            speed: { min: 20, max: 50 },
+            angle: { max: 360, min: 0,steps:10 },
+            speed: { min: 20, max: 30,steps:1 },
             scale: { min: 0.05, max: 0.1 },
-            alpha: { start: 1, end: 0 },
+            rotate: {min:0,max:360,steps:10},
+            alpha: { onEmit:(p) => p.alpha=0,onUpdate:(p,key,t,value)=> p.alpha = t<0.5?t:1-t},
             blendMode: 'SCREEN'
         });
         e.scaleX.onUpdate = e.scaleX.defaultUpdate;
         this.bgParticles.push(e);
 
-        this.spritesContainer.depth = 999;
+        // this.spritesContainer.depth = 999;
     }
 
     renderRoom = (room: Room) => {
@@ -351,6 +351,15 @@ export default class Renderer {
         return {
             x: e.isoX + locXY.x * sprIsoW, y: e.isoY + locXY.y * sprIsoW, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
         };
+    }
+
+    pauseBackgroundParticles() {
+        this.bgParticles.forEach(p => p.killAll());
+        this.bgParticles.forEach(p => p.pause());
+    }
+    
+    resumeBackgroundParticles() {
+        this.bgParticles.forEach(p => p.resume());
     }
 
     static init() { renderer = new Renderer(); }

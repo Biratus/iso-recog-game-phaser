@@ -72554,4 +72554,5 @@ interface Math {
     angleBetweenPoints(cx:number, cy:number, ex:number, ey:number,rad?:boolean):number;
     getCentroidPosition(pts:{x:number,y:number}[]):{x:number,y:number};
     lineIntersection(l1:{v1:{x:number,y:number},v2:{x:number,y:number}},l2:{v1:{x:number,y:number},v2:{x:number,y:number}});
+    map(n:number, start1:number, stop1:number, start2:number, stop2:number);
 }
