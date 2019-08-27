@@ -1,9 +1,6 @@
 import { Point, DollarRecognizer } from 'outlines';
-import 'phaser'
-import { currentScene } from '../../scenes/GameScene';
-import { Timeout } from '../utils/Timeout';
-import { RenderUtils } from '../utils/RenderUtils';
-import ArrayUtils from '../utils/ArrayUtils';
+import 'phaser';
+import { GameModule } from '../utils/GameUtils';
 
 export default class RecogListener {
     points: Point[] = [];
@@ -12,35 +9,55 @@ export default class RecogListener {
     _isDown: boolean;
     enabled: boolean;
 
-    shapeDrownTimeout: number;
-    opac:number;
-    shapeCenter:Point;
+    graphics: Phaser.GameObjects.Graphics;
 
-    constructor() {
+    shapeDrownTimeout: number;
+    opac: number;
+    shapeCenter: Point;
+
+    constructor(shapeDrownListener: Phaser.Events.EventEmitter) {
         this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
+        this.graphics = GameModule.currentScene.add.graphics({
+            x: 0, y: 0,
+            lineStyle: { color: 0xffffff, width: 10 },
+            fillStyle: { color: 0xffffff, alpha: 1 }
+        });
+        this.graphics.setDepth(GameModule.topZIndex());
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
-            this.points=[];
+            this.points = [];
             clearInterval(this.shapeDrownTimeout);
-            currentScene.graphics.clear();
-            currentScene.graphics.clearAlpha();
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
+            this.graphics.clear();
+            this.graphics.clearAlpha();
+            this.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointermove', (pointer) => {
             if (!this.enabled) return;
-            currentScene.graphics.fillCircle(pointer.x, pointer.y, 3);
+            this.graphics.fillCircle(pointer.x, pointer.y, 3);
             this.addPoint(pointer.x, pointer.y);
         });
         this.emitter.addListener('pointerup', (pointer) => {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            currentScene.animationGraph.fadeOutShape(this.points);
-            currentScene.events.emit('shapeDrown', shape);
+            shapeDrownListener.emit('shapeDrown', shape);
+            this.graphics.clear();
         });
+        for (let type in GameModule.Unistrokes) {
+            if (GameModule.Unistrokes.hasOwnProperty(type))
+                GameModule.Unistrokes[type].forEach(array => {
+                    let pts = array.map(coord => new Point(coord[0], coord[1]));
+                    this.recognizer.AddGesture(type, pts);
+                    this.recognizer.AddGesture(type, pts.slice().reverse());
+                });
+        }
+		var line = [Point(0, 0), Point(100, 0)];
+        this.recognizer.AddGesture('line', line);
+        this.recognizer.AddGesture('line', line.slice().reverse());
+        this.recognizer.NumUnistrokes = this.recognizer.Unistrokes.length;
     }
 
     addPoint(x, y) {
@@ -51,9 +68,14 @@ export default class RecogListener {
     getShape() {
         // this.uniformizePoints();
         if (this.points.length < 10) return [];
-        const shape = this.recognizer.Recognize(this.points,false);
-        
+        const shape = this.recognizer.Recognize(this.points, false);
+
         return shape;
+    }
+
+    addUserShape(shapeName) {
+        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points);
+        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points.slice().reverse());
     }
 
     uniformizePoints() {
@@ -140,7 +162,7 @@ export default class RecogListener {
         return max;
     }
     minDistanceBetweenPoints(): number {
-        let min = Phaser.Math.Distance.Between(0, 0, currentScene.game.canvas.width, currentScene.game.canvas.height);
+        let min = Phaser.Math.Distance.Between(0, 0, GameModule.currentScene.game.canvas.width, GameModule.currentScene.game.canvas.height);
         let current, next;
         for (let i = 0; i < this.points.length - 1; i++) {
             current = this.points[i];

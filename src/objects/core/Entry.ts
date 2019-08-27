@@ -1,9 +1,5 @@
-import { GAME_CONFIG, DEFAULT_ROOM_CONFIG } from "../../constants/Constants";
 import EnemyManager from "./EnemyManager";
-import { currentScene } from "../../scenes/GameScene";
-import { renderer } from "../render/Renderer";
 import Room from "./Room";
-import Enemy from "../character/Enemy";
 import { ENEMY_TYPE } from "../../constants/Enums";
 // import { MapRenderer } from "../render/MapRenderer";
 

@@ -1,94 +1,70 @@
-import ArrayUtils from "../utils/ArrayUtils";
 import { RenderUtils } from "../utils/RenderUtils";
-import { Point } from 'outlines';
-import { currentScene } from "../../scenes/GameScene";
 import { GAME_CONFIG } from "../../constants/Constants";
 import { renderer } from "./Renderer";
+import { GameModule } from "../utils/GameUtils";
 
 export default class AnimationGraph {
-    timeouts: any = {};
+    intervals: any = {};
     lightSource: Phaser.GameObjects.Sprite;
     lightSourceTween: Phaser.Tweens.Tween;
 
-    emmitter = new Phaser.Events.EventEmitter();
+    graphics: { [key: string]: Phaser.GameObjects.Graphics } = {};
+    updates: { [key: string]: Function } = {};
+    particles: { [key: string]: Phaser.GameObjects.Particles.ParticleEmitter } = {};
+    emitter = new Phaser.Events.EventEmitter();
 
-    constructor(private graphics: Phaser.GameObjects.Graphics) {
-        // this.lightSource = currentScene.make.sprite({
-        //     x: 0,
-        //     y: 0,
-        //     key: 'mask1',
-        //     add: false
-        // });
+    constructor(private mainGraphics: Phaser.GameObjects.Graphics) {
     }
 
-    fadeOutShape(points) {
-        this.graphics.clear();
-        clearInterval(this.timeouts.shape);
-        let axisNb = 3;
-        let axis: any = [];
-        let loops = 0;
-        points.forEach(p => { p.x = p.X, p.y = p.Y; });
-        for (let i = 0; i < axisNb; i++) {
-            let flatMap = axis.flatMap(a => [a.v1, a.v2]);
-            let maxDist = ArrayUtils.of(axis).maxValue((a) => Math.dist(a.v1.x, a.v1.y, a.v2.x, a.v2.y));
-            let pos;
-            let turns = 0;
-            do {
-                turns++;
-                pos = points[Math.floor(Math.random() * points.length)];
-                if (turns > 1000) break;
-            } while (RenderUtils.posAreNear(pos, flatMap, maxDist));
-            let max = ArrayUtils.of(points).max((p) => Math.dist(pos.x, pos.y, p.x, p.y));
-            if (!max) continue;
-            if (RenderUtils.posAreNear(max, flatMap, maxDist)) {
-                loops++;
-                if (loops > 1000) break;
-                i--; continue;
-            }
-            axis.push({ v1: pos, v2: max });
-        }
-
-        let pts: Point[] = [];
-        for (let i = 0; i < axis.length; i++) {
-            for (let j = i + 1; j < axis.length; j++) {
-                pts.push(Math.lineIntersection(axis[i], axis[j]));
-            }
-        }
-        if (pts.length == 0) {
-            console.log('no interset');
-            return;
-        }
-
-        let shapeCenter = Math.getCentroidPosition(pts);
-
-        for (let p of points) {
-            p.originDist = Math.dist(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            p.dist = Math.dist(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            let a = Math.angleBetweenPoints(shapeCenter.x, shapeCenter.y, p.x, p.y);
-            p.cos = Math.cos(a);
-            p.sin = Math.sin(a);
-        }
-        let opac = 1;
-        this.timeouts.shape = setInterval(() => {
-            if (opac <= 0) {
-                this.graphics.clear();
-                clearInterval(this.timeouts.shape);
-                return;
-            }
-
-            points.forEach(p => {
-                p.dist += p.originDist * 0.01;
-                p.x = shapeCenter.x + p.cos * p.dist;
-                p.y = shapeCenter.y + p.sin * p.dist;
-            });
-
-            this.graphics.clear();
-            opac -= 1 / 10;
-            opac = parseFloat(opac.toFixed(1));
-            this.graphics.fillStyle(0xff0000, opac);
-            points.forEach(p => this.graphics.fillCircle(p.x, p.y, 3));
-        }, 50);
+    deleteAll() {
+        this.mainGraphics.destroy();
+        if (this.lightSourceTween) this.lightSourceTween.stop();
+        if (this.lightSource) this.lightSource.destroy();
+        for (let i in this.graphics) this.graphics[i].destroy();
+        for (let i in this.particles) this.particles[i].stop();
     }
+
+    update(time, delta) {
+        for (let i in this.updates) this.updates[i](time, delta);
+    }
+
+    fadeOutShape(shape, points) {
+        if (!shape) return;
+        points = GameModule.normalizePointName(points);
+        switch (shape.toUpperCase()) {
+            case 'SQUARE':
+                let shapeCenter = RenderUtils.getCentroidOfPoints(points);
+                let sortX = points.sort((p1, p2) => p1.x - p2.x);
+                let size = sortX[sortX.length - 1].x - sortX[0].x
+                let square = new Phaser.Geom.Rectangle(0, 0, size, size);
+                this.particles.fadeOutShape = this.particles.fadeOutShape || GameModule.currentScene.add.particles('blue').createEmitter({
+                    x: 0,
+                    y: 0,
+                    blendMode: 'SCREEN',
+                    scale: { start: 0.2, end: 0 },
+                    speed: { min: -30, max: 30 },
+                    quantity: 50
+                });
+                this.particles.fadeOutShape.stop();
+                this.particles.fadeOutShape.setEmitZone({ source: square, type: 'edge', quantity: 50 });
+                this.particles.fadeOutShape.explode(50, shapeCenter!.x - size / 2, shapeCenter!.y - size / 2);
+                break;
+        }
+    }
+
+    fadeOutPoints(points,texture,speed,onFinishCallback?) {
+        let p = GameModule.currentScene.add.particles(texture);
+        let emit = p.createEmitter({
+            scale: 0.1,
+            speed: { min: -1*speed, max: speed },
+            alpha: { start: 1, end: 0 },
+            blendMode: 'SCREEN',
+            on: false
+        })
+        if(onFinishCallback) emit.onParticleDeath(() => { if (emit.getAliveParticleCount() <= 0) onFinishCallback(); });
+        GameModule.normalizePointName(points).forEach((pt) => p.emitParticleAt(pt.x, pt.y));
+    }
+
     drawDashedHollowRect(config: { x: number, y: number, w: number, h: number, holeW: number, holeH: number, rectColor: number, rectAlpha: number, dashSize: number, dashGap: number, strokeColor: number, strokeAlpha: number }) {
         this.drawHollowRect(config.x, config.y, config.w, config.h, config.holeW, config.holeH, config.rectColor, config.rectAlpha);
 
@@ -98,8 +74,9 @@ export default class AnimationGraph {
         this.dashedRect(config.x, config.y, config.w, config.h, config.dashSize, config.dashGap, config.strokeColor, config.strokeAlpha, 0x000000, 0);
         this.dashedRect(config.x + factX, config.y + factY, config.w - 2 * factX, config.h - 2 * factY, config.dashSize, config.dashGap, config.strokeColor, config.strokeAlpha, 0x000000, 0);
     }
+
     drawHollowRect(x, y, w, h, holeW, holeH, fillColor, alpha?) {
-        this.graphics.fillStyle(fillColor, alpha);
+        this.mainGraphics.fillStyle(fillColor, alpha);
 
         let factX = (w - holeW) / 2;
         let factY = (h - holeH) / 2;
@@ -111,21 +88,24 @@ export default class AnimationGraph {
     }
 
     dashedRect(x, y, w, h, dashSize, dashGap, strokeColor, strokeAlpha, fillColor, fillAlpha) {
-        this.graphics.lineStyle(3, strokeColor, strokeAlpha);
+        this.mainGraphics.lineStyle(3, strokeColor, strokeAlpha);
         this.dashHorizontal(x, x + w, y, dashSize, dashGap);
         this.dashVertical(y, y + h, x, dashSize, dashGap);
         this.dashVertical(y + h, y, x + w, dashSize, dashGap);
         this.dashHorizontal(x, x + w, y + h, dashSize, dashGap);
-        this.graphics.fillStyle(fillColor, fillAlpha);
+        this.mainGraphics.fillStyle(fillColor, fillAlpha);
         this.rect(x, y, w, h);
     }
 
     rect(x, y, w, h) {
-        this.graphics.fillRect(x, y, w, h);
+        this.mainGraphics.fillRect(x, y, w, h);
+    }
+    clearMain() {
+        this.mainGraphics.clear();
     }
 
     line(x, y, x1, y1) {
-        this.graphics.strokeLineShape(new Phaser.Geom.Line(x, y, x1, y1));
+        this.mainGraphics.strokeLineShape(new Phaser.Geom.Line(x, y, x1, y1));
     }
 
     dashHorizontal(x1, x2, y, dashSize, dashGap) {
@@ -160,33 +140,60 @@ export default class AnimationGraph {
     }
 
     focusLight(sprite, endEvent) {
-        this.lightSource = currentScene.make.sprite({
+        this.lightSource = GameModule.currentScene.make.sprite({
             x: sprite.isoBounds.centerX,
-            y: sprite.y - sprite.height / 2,
-            key: 'mask8'
+            y: sprite.y - sprite.height * 0.75,
+            key: 'mask1',
+            add: false
         }).setScale(0.5);
         this.lightSource.scale = GAME_CONFIG.scale;
-        let mask = new Phaser.Display.Masks.BitmapMask(currentScene, this.lightSource);
+        let mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);
         renderer.spritesContainer.setMask(mask);
+        this.lightSource.alpha = 0.8;
         this.lightSource.x = sprite.x;
         this.lightSource.y = sprite.y;
-        this.lightSourceTween = currentScene.tweens.add({
+        this.lightSourceTween = GameModule.currentScene.tweens.add({
             targets: this.lightSource,
-            alpha: 0.8,
-            duration: 1000,
+            alpha: 0.5,
+            scale: 0.8,
+            duration: 2000,
             ease: 'Sine.easeInOut',
             loop: -1,
             yoyo: true
         });
-        this.emmitter.on(endEvent, () => {
+        this.emitter.on(endEvent, () => {
+            renderer.spritesContainer.clearMask();
+            this.lightSource.destroy();
             this.lightSourceTween.stop();
-            currentScene.cameras.main.clearMask();
         });
     }
 
-    // clearSquareSpace(x, y, w, h) {
-    //     let shape = this.graphics.fillRect(x, y, w, h);
-    //     let mask = shape.createGeometryMask();
-    //     currentScene.cameras.main.
-    // }
+    shapeClue(path, destroyEvt) {
+        if (this.particles.hasOwnProperty(destroyEvt)) {
+            this.particles[destroyEvt].killAll();
+            delete this.particles[destroyEvt];
+        }
+        let p = GameModule.currentScene.add.particles('blue');
+        this.particles[destroyEvt] = p.createEmitter({
+            scale: { start: 0.5, end: 0 },
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            frequency: 30,
+            emitZone: { type: 'edge', source: path, quantity: 175, yoyo: false }
+        });
+        this.emitter.once(destroyEvt, () => {
+            if(this.particles[destroyEvt]) this.particles[destroyEvt].stop();
+            delete this.particles[destroyEvt];
+        });
+    }
+
+    getGraph(name, config): Phaser.GameObjects.Graphics {
+        this.graphics[name] = this.graphics[name] || GameModule.currentScene.add.graphics(config);
+        return this.graphics[name];
+    }
+    destroyGraph(name) {
+        if (!this.graphics[name]) return;
+        this.graphics[name].destroy();
+        delete this.graphics[name];
+    }
 }

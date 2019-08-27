@@ -1,26 +1,22 @@
-import 'phaser'
-import { SCENE_GAME } from '../constants/Constants'
-import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric'
+import 'phaser';
+import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import Cube from 'phaser3-plugin-isometric/src/Cube';
-import Level from '../objects/core/Level';
-import Renderer, { renderer } from '../objects/render/Renderer';
-import { _ } from 'underscore';
-import RecogListener from '../objects/recognizer/RecogListener';
-import Loader from '../objects/utils/Loader';
+import { SCENE_GAME } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { LOCATION, INTERACTION_EVENT } from '../constants/Enums';
-import { Game } from 'phaser';
-import ArrayUtils from '../objects/utils/ArrayUtils';
+import { INTERACTION_EVENT } from '../constants/Enums';
+import Level from '../objects/core/Level';
+import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
-import Tutorial from './Tutorial';
+import Renderer, { renderer } from '../objects/render/Renderer';
+import ArrayUtils from '../objects/utils/ArrayUtils';
+import { GameModule } from '../objects/utils/GameUtils';
+import Loader from '../objects/utils/Loader';
 
-export var currentScene: GameScene;
 
 export default class GameScene extends Phaser.Scene {
 
-  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' };
+  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' ,'TUTORIAL':'TUTORIAL'};
 
   private _activeState = GameScene.STATES.IDLE;
 
@@ -44,10 +40,10 @@ export default class GameScene extends Phaser.Scene {
 
   constructor() {
     super(SCENE_GAME);
-    currentScene = this;
   }
 
   preload = () => {
+    GameModule.currentScene = this;
     // PLUGIN
     this.load.scenePlugin({
       key: 'IsoPlugin',
@@ -60,7 +56,7 @@ export default class GameScene extends Phaser.Scene {
       sceneKey: 'isoPhysics'
     });
     this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
-    this.recogListener = new RecogListener();
+    this.recogListener = new RecogListener(this.events);
     this.animationGraph = new AnimationGraph(this.add.graphics({
       x: 0, y: 0,
       lineStyle: { color: 0xffffff, width: 10 },
@@ -87,9 +83,11 @@ export default class GameScene extends Phaser.Scene {
     this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
     //LEVEL
-    // this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
-    // this.currentLevel.preload();
-    // this.currentLevel.create();
+    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
+    this.currentLevel.preload();
+    this.currentLevel.create();
+    renderer.renderRoom(this.currentLevel.currentRoom);
+    renderer.renderPlayer();
 
     this.activeState = GameScene.STATES.IDLE;
 
@@ -97,26 +95,25 @@ export default class GameScene extends Phaser.Scene {
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
-
-    let s = this.add.image(20, window.innerHeight * 0.5, 'plyer');
-    s.setInteractive(currentScene.input.makePixelPerfect(100));
+ 
+    let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
+    s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
       if (this.activeState == GameScene.STATES.IDLE) {
-        s.texture.manager.setTexture(s, 'plyer');
+        s.texture.manager.setTexture(s, 'button_red');
         this.activeState = GameScene.STATES.RECOG;
       } else {
-        s.texture.manager.setTexture(s, 'en_sm_square');
+        s.texture.manager.setTexture(s, 'button_green');
         this.activeState = GameScene.STATES.IDLE;
       }
     });
     // let squareW=window.innerWidth*0.5;
     // this.animationGraph.drawHollowRect(window.innerWidth*0.5-squareW/2,window.innerHeight*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
-
-    Tutorial.start();
   }
 
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
+    this.animationGraph.update(time,delta);
     this.info.setText("Active particle "+renderer.bgParticles.reduce((acc,elt:Phaser.GameObjects.Particles.ParticleEmitter) => acc+=elt.getAliveParticleCount(),0))
   }
 
@@ -135,10 +132,10 @@ export default class GameScene extends Phaser.Scene {
 
   initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', ({ result, list }) => {
-      // if(!result) {
-      //   this.currentShape.setText("NO RESULTS");
-      //   return;
-      // }
+      if(!result || !list) {
+        this.currentShape.setText("NO RESULTS");
+        return;
+      }
       let ordered = {};
       for (let shape of list) {
         if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
@@ -168,16 +165,16 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointerdown', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });
     this.input.on('pointermove', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointermove', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.on('pointerup', (pointer) => {
       if (this.isPause) return;
-      this.recogListener.emitter.emit('pointerup', pointer);
+      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
     renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {

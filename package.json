@@ -20,7 +20,7 @@
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-standard": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
-    "outlines": "^1.0.1",
+    "outlines": "git+https://github.com/Biratus/outlines.git",
     "phaser": "^3.18.1",
     "phaser3-plugin-isometric": "git+https://github.com/Biratus/phaser3-plugin-isometric.git",
     "raw-loader": "^0.5.1",

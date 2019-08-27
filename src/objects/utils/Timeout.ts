@@ -1,8 +1,10 @@
+import { Time } from "phaser";
+
 export class Timeout {
     static Type = { TIMEOUT: 0, INTERVAL: 1 };
 
     id: number;
-    name: string;
+    name = '';
     func: Function;
     args: any[];
     repeat: boolean;
@@ -10,31 +12,41 @@ export class Timeout {
     active: boolean;
     waitTime: number;
 
+    type: number;
+
     startTime: number;
 
-    constructor(func: Function, repeat: boolean, time: number, autoStart: boolean, args?: any[], name?: string) {
-        this.repeat = repeat;
-        this.name = name || '';
+    private constructor(time: number, type: number) {
+        this.type = type;
+        this.time = time;
+    }
+
+    do(func: Function, args?: any[]) {
         this.func = func;
         this.args = args || [];
-        this.time = time;
-        this.startTime = new Date().getTime();
-        if (autoStart) {
-            this.active = true;
-            if (repeat) this.id = setInterval((args) => { func(args); this.startTime = new Date().getTime(); }, time, args);
-            else this.id = setTimeout(func, time, args);
-        }
-
+        return this;
     }
 
     start() {
         if (this.active) {
             console.error('Timeout ' + this.name + ' already started', this.func);
-            return;
+            return this;
         }
-        if (this.repeat) this.id = setInterval(this.func, this.time, this.args);
-        else this.id = setTimeout(this.func, this.time, this.args);
-        this.active = true;
+        this.startTime = new Date().getTime();
+                    this.active = true;
+        switch (this.type) {
+            case Timeout.Type.INTERVAL:
+                // this.func(this.args);
+                this.id = setInterval(this.func, this.time, this.args);
+                break;
+            case Timeout.Type.TIMEOUT:
+                this.id = setTimeout(() => {
+                    this.func();
+                    this.active=false;
+                }, this.time, this.args);
+                break;
+        }
+        return this;
     }
 
     pause() {
@@ -43,43 +55,59 @@ export class Timeout {
             return;
         }
         let currTime = new Date().getTime();
-        if (this.repeat) {
-            this.waitTime -= currTime - this.startTime;
-            clearInterval(this.id);
-        } else {
-            this.time -= currTime - this.startTime;
-            clearTimeout(this.id);
+        this.active = false;
+        switch (this.type) {
+            case Timeout.Type.INTERVAL:
+                this.waitTime -= currTime - this.startTime;
+                clearInterval(this.id);
+                break;
+            case Timeout.Type.TIMEOUT:
+                this.time -= currTime - this.startTime;
+                clearTimeout(this.id);
+                break;
         }
-        this.active=false;
     }
 
     resume() {
-        if (this.active) {
-            console.error('Timeout ' + this.name + ' already started', this.func);
-            return;
+        if (this.active) return;
+        
+        this.active = true;
+        switch (this.type) {
+            case Timeout.Type.INTERVAL:
+                this.id = setTimeout(
+                    (args) =>
+                        this.id = setInterval(() => {
+                            this.func(args);
+                            this.startTime = new Date().getTime();
+                        }, this.time, this.args),
+                    this.waitTime,
+                    this.args
+                );
+                break;
+            case Timeout.Type.TIMEOUT:
+                this.startTime = new Date().getTime()
+                this.id = setTimeout(this.func, this.time, this.args);
+                break;
         }
-        if (this.repeat) {
-            this.id = setTimeout(
-                (args) =>
-                    this.id = setInterval(() => {
-                        this.func(args);
-                        this.startTime = new Date().getTime();
-                    }, this.time, this.args),
-                this.waitTime,
-                this.args
-            );
-        } else {
-            this.startTime = new Date().getTime()
-            this.id = setTimeout(this.func, this.time, this.args);
-        }
-        this.active=true;
     }
 
     destroy() {
-        if(this.repeat) clearInterval(this.id);
-        else clearTimeout(this.id);
+        this.active = false;
+        switch (this.type) {
+            case Timeout.Type.INTERVAL: clearInterval(this.id); break;
+            case Timeout.Type.TIMEOUT: clearTimeout(this.id); break;
+        }
         return this.time - new Date().getTime() - this.startTime;
     }
 
+    static in(time: number): Timeout {
+        let t = new Timeout(time, Timeout.Type.TIMEOUT);
+        return t;
+    }
+
+    static every(time: number): Timeout {
+        let t = new Timeout(time, Timeout.Type.INTERVAL);
+        return t;
+    }
 
 }

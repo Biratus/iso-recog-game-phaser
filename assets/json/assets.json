@@ -16,11 +16,16 @@
         "light.png",
         "mask1.png",
         "mask7.png",
-        "mask8.png",
         "p_white.png",
         "p_yellow.png",
         "p_square.png",
         "p_circle.png"
+        "mask8.png",
+        "blue.png",
+        "red.png",
+        "button_green.png",
+        "button_red.png",
+        "hollowcircle.png"
         
     ],
     "json": [

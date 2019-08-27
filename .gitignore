@@ -4,3 +4,4 @@
 /.env
 /yarn.lock
 /android
+package-lock\.json
