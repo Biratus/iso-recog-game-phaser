@@ -1,8 +1,8 @@
-import 'phaser'
-import { SCENE_BOOT, SCENE_LOAD } from '../constants/Constants'
+import 'phaser';
+import { SCENE_BOOT, SCENE_LOAD } from '../constants/Constants';
 
 export default class BootScene extends Phaser.Scene {
-  constructor () {
+  constructor() {
     super(SCENE_BOOT)
   }
 

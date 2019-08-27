@@ -1,13 +1,12 @@
+import { IsoSprite } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
-import { LOCATION, INTERACTION_EVENT } from "../../constants/Enums";
-import { IsoSprite } from 'phaser3-plugin-isometric';
-import Level from "../core/Level";
-import Room from "../core/Room";
-import { RenderUtils } from "../utils/RenderUtils";
-import { LevelUtils } from "../utils/LevelUtils";
+import { INTERACTION_EVENT, LOCATION } from "../../constants/Enums";
 import Entry from "../core/Entry";
+import Room from "../core/Room";
 import { GameModule } from "../utils/GameUtils";
+import { LevelUtils } from "../utils/LevelUtils";
+import { RenderUtils } from "../utils/RenderUtils";
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;

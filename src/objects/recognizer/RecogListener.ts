@@ -1,4 +1,4 @@
-import { Point, DollarRecognizer } from 'outlines';
+import { DollarRecognizer, Point } from 'outlines';
 import 'phaser';
 import { GameModule } from '../utils/GameUtils';
 

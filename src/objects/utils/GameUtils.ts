@@ -1,8 +1,8 @@
 import ArrayUtils from "./ArrayUtils";
 
 export module GameModule {
-    export var currentScene: Phaser.Scene;
-    export var Unistrokes = {
+	export var currentScene: Phaser.Scene;
+	export var Unistrokes = {
 		"triangle": [
 			[[191, 204], [191, 206], [191, 208], [187, 215], [185, 219], [179, 231], [178, 235], [173, 253], [169, 264], [166, 269], [164, 274], [162, 276], [159, 282], [159, 285], [156, 292], [155, 294], [155, 295], [157, 295], [160, 295], [161, 295], [166, 295], [168, 295], [176, 296], [180, 296], [185, 296], [191, 296], [194, 296], [204, 296], [206, 296], [212, 296], [214, 296], [219, 296], [221, 296], [228, 298], [232, 298], [235, 299], [239, 299], [241, 299], [242, 299], [242, 298], [241, 296], [240, 294], [240, 291], [238, 287], [237, 285], [234, 280], [233, 276], [228, 269], [228, 265], [224, 259], [222, 256], [218, 249], [216, 244], [213, 239], [211, 236], [210, 232], [208, 228], [207, 227], [204, 222], [202, 219], [200, 219], [200, 218], [200, 217], [199, 217], [198, 216], [197, 215], [196, 212], [193, 207], [192, 204], [191, 203], [191, 202]],
 			[[253, 182], [252, 184], [251, 186], [251, 190], [248, 196], [245, 201], [241, 217], [231, 242], [227, 249], [216, 274], [214, 282], [210, 292], [209, 294], [209, 295], [210, 295], [212, 295], [215, 295], [219, 295], [230, 295], [251, 295], [261, 295], [275, 294], [285, 294], [296, 294], [299, 294], [302, 294], [307, 292], [308, 292], [309, 292], [309, 291], [309, 290], [309, 289], [307, 286], [305, 278], [303, 276], [296, 264], [290, 255], [287, 247], [281, 238], [276, 230], [270, 218], [267, 209], [261, 198], [260, 197], [258, 191], [256, 189], [252, 183], [250, 179], [249, 179], [249, 178]]
@@ -33,18 +33,18 @@ export module GameModule {
 		]
 
 	};
-    export function normalizePointName(points): { x: number, y: number }[] {
-        let npoints: { x: number, y: number }[] = [];
-        for (let p of points) {
-
-            npoints.push({
-                x: p.hasOwnProperty('X') ? p.X : p.x,
-                y: p.hasOwnProperty('Y') ? p.Y : p.y
-            });
-        }
-        return npoints;
-    }
-    export function topZIndex() {
-        return ArrayUtils.of(GameModule.currentScene.children.list).maxValue((c) => c.depth) + 1;
-    }
+	export var game: Phaser.Game;
+	export function normalizePointName(points): { x: number, y: number }[] {
+		let npoints: { x: number, y: number }[] = [];
+		for (let p of points) {
+			npoints.push({
+				x: p.hasOwnProperty('X') ? p.X : p.x,
+				y: p.hasOwnProperty('Y') ? p.Y : p.y
+			});
+		}
+		return npoints;
+	}
+	export function topZIndex() {
+		return ArrayUtils.of(GameModule.currentScene.children.list).maxValue((c) => c.depth) + 1;
+	}
 }

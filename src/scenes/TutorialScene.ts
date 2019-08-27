@@ -1,17 +1,14 @@
-import Loader from "../objects/utils/Loader";
 import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import EnemyManager from "../objects/core/EnemyManager";
-import Renderer, { renderer } from "../objects/render/Renderer";
-import { LOCATION, ENEMY_TYPE } from "../constants/Enums";
-import { SCENE_TUTORIAL, SCENE_GAME } from "../constants/Constants";
+import { SCENE_GAME, SCENE_TUTORIAL } from "../constants/Constants";
+import Enemy from "../objects/character/Enemy";
 import Level from "../objects/core/Level";
 import RecogListener from "../objects/recognizer/RecogListener";
 import AnimationGraph from "../objects/render/AnimationGraph";
-import Enemy from "../objects/character/Enemy";
+import Renderer, { renderer } from "../objects/render/Renderer";
 import ArrayUtils from "../objects/utils/ArrayUtils";
-import { RenderUtils } from "../objects/utils/RenderUtils";
 import { GameModule } from "../objects/utils/GameUtils";
+import Loader from "../objects/utils/Loader";
 import { Timeout } from "../objects/utils/Timeout";
 
 export default class TutorialScene extends Phaser.Scene {
@@ -70,6 +67,7 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     create() {
+        this.children.sortChildrenFlag = true;
         // ISO PLUGIN
         // this.isoPhysics.world.gravity.setTo(0, 0, -500);
         let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
@@ -99,6 +97,23 @@ export default class TutorialScene extends Phaser.Scene {
         renderer.renderPlayer();
 
         this.initEvents();
+
+        // let startBtn = this.add.image(50, 100, 'button_green');
+        // startBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        // startBtn.once('pointerup', () => {
+        //     this.goToNextScene();
+        // });
+
+        this.start();
+
+        //DEBUG
+        let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
+        debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        debugBtn.on('pointerdown', () => console.log('GameModule.currentScene', this));
+    }
+
+    start() {
+        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
     }
 
     userInputShape(shape) {
@@ -173,7 +188,9 @@ export default class TutorialScene extends Phaser.Scene {
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
-            if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > 0.96) {
+            let debug = true;
+            let threshold = debug ? 0.8 : 0.96;
+            if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
                 this.animationGraph.emitter.emit('enLight');
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
@@ -181,11 +198,11 @@ export default class TutorialScene extends Phaser.Scene {
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
                 this.recogListener.disable();
                 // this.animationGraph.fadeOutShape(this.currentShape.shape, this.recogListener.points);
-                this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue',30);
+                this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue', 30);
                 this.recogListener.addUserShape(this.currentShape.shape);
                 // this.animationGraph.emitter.emit('userInput');
             } else {
-                this.animationGraph.fadeOutPoints(this.recogListener.points, 'red', 10,() => {
+                this.animationGraph.fadeOutPoints(this.recogListener.points, 'red', 10, () => {
                     if (!this.input.activePointer.isDown)
                         this.animationGraph.shapeClue(this.currentShape.path, 'userInput');
                 });

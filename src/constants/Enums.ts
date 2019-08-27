@@ -1,4 +1,3 @@
-import { renderer } from "../objects/render/Renderer";
 
 export const LOCATION = Object.freeze({
     TOP: { x: 0, y: -1 },

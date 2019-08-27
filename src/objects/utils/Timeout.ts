@@ -1,4 +1,3 @@
-import { Time } from "phaser";
 
 export class Timeout {
     static Type = { TIMEOUT: 0, INTERVAL: 1 };
@@ -33,7 +32,7 @@ export class Timeout {
             return this;
         }
         this.startTime = new Date().getTime();
-                    this.active = true;
+        this.active = true;
         switch (this.type) {
             case Timeout.Type.INTERVAL:
                 // this.func(this.args);
@@ -42,7 +41,7 @@ export class Timeout {
             case Timeout.Type.TIMEOUT:
                 this.id = setTimeout(() => {
                     this.func();
-                    this.active=false;
+                    this.active = false;
                 }, this.time, this.args);
                 break;
         }
@@ -70,7 +69,7 @@ export class Timeout {
 
     resume() {
         if (this.active) return;
-        
+
         this.active = true;
         switch (this.type) {
             case Timeout.Type.INTERVAL:

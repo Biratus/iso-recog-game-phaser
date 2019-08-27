@@ -1,7 +1,7 @@
-import { RenderUtils } from "../utils/RenderUtils";
 import { GAME_CONFIG } from "../../constants/Constants";
-import { renderer } from "./Renderer";
 import { GameModule } from "../utils/GameUtils";
+import { renderer } from "./Renderer";
+import { RenderUtils } from "../utils/RenderUtils";
 
 export default class AnimationGraph {
     intervals: any = {};
@@ -56,12 +56,18 @@ export default class AnimationGraph {
         let p = GameModule.currentScene.add.particles(texture);
         let emit = p.createEmitter({
             scale: 0.1,
-            speed: { min: -1*speed, max: speed },
+            speed: { min: -1 * speed, max: speed },
             alpha: { start: 1, end: 0 },
             blendMode: 'SCREEN',
             on: false
-        })
-        if(onFinishCallback) emit.onParticleDeath(() => { if (emit.getAliveParticleCount() <= 0) onFinishCallback(); });
+        });
+        emit.onParticleDeath(() => {
+            if (emit.getAliveParticleCount() <= 0) {
+                if (onFinishCallback) onFinishCallback();
+                p.destroy();
+                emit.stop();
+            }
+        });
         GameModule.normalizePointName(points).forEach((pt) => p.emitParticleAt(pt.x, pt.y));
     }
 
@@ -169,20 +175,20 @@ export default class AnimationGraph {
     }
 
     shapeClue(path, destroyEvt) {
-        if (this.particles.hasOwnProperty(destroyEvt)) {
-            this.particles[destroyEvt].killAll();
-            delete this.particles[destroyEvt];
-        }
+        if (this.particles.hasOwnProperty(destroyEvt)) this.emitter.emit(destroyEvt);
+
         let p = GameModule.currentScene.add.particles('blue');
         this.particles[destroyEvt] = p.createEmitter({
-            scale: { start: 0.5, end: 0 },
+            scale: { start: 0.35, end: 0 },
+            speed:{min:-10,max:10},
             blendMode: 'SCREEN',
-            lifespan: 500,
-            frequency: 30,
-            emitZone: { type: 'edge', source: path, quantity: 175, yoyo: false }
+            lifespan: 1500,
+            frequency: 20,
+            emitZone: { type: 'edge', source: path, quantity: 30, yoyo: false }
         });
         this.emitter.once(destroyEvt, () => {
-            if(this.particles[destroyEvt]) this.particles[destroyEvt].stop();
+            p.destroy();
+            if (this.particles[destroyEvt]) this.particles[destroyEvt].stop();
             delete this.particles[destroyEvt];
         });
     }

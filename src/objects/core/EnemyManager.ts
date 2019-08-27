@@ -1,12 +1,10 @@
 import 'phaser';
+import { ENEMY_SPAWN_EVENT, ENEMY_TYPE, LOCATION } from '../../constants/Enums';
 import Enemy from '../character/Enemy';
-import Entry from './Entry';
-import { Cube } from 'phaser3-plugin-isometric/src/Cube';
-import { Point3 } from 'phaser3-plugin-isometric/src/Point3';
-import { ENEMY_TYPE, LOCATION, ENEMY_SPAWN_EVENT } from '../../constants/Enums';
-import { Timeout } from '../utils/Timeout';
-import Renderer, { renderer } from '../render/Renderer';
+import { renderer } from '../render/Renderer';
 import { GameModule } from '../utils/GameUtils';
+import { Timeout } from '../utils/Timeout';
+import Entry from './Entry';
 
 export default class EnemyManager {
     entry: Entry;
