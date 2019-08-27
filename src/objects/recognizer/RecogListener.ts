@@ -46,6 +46,18 @@ export default class RecogListener {
             shapeDrownListener.emit('shapeDrown', shape);
             this.graphics.clear();
         });
+        for (let type in GameModule.Unistrokes) {
+            if (GameModule.Unistrokes.hasOwnProperty(type))
+                GameModule.Unistrokes[type].forEach(array => {
+                    let pts = array.map(coord => new Point(coord[0], coord[1]));
+                    this.recognizer.AddGesture(type, pts);
+                    this.recognizer.AddGesture(type, pts.slice().reverse());
+                });
+        }
+		var line = [Point(0, 0), Point(100, 0)];
+        this.recognizer.AddGesture('line', line);
+        this.recognizer.AddGesture('line', line.slice().reverse());
+        this.recognizer.NumUnistrokes = this.recognizer.Unistrokes.length;
     }
 
     addPoint(x, y) {
@@ -63,6 +75,7 @@ export default class RecogListener {
 
     addUserShape(shapeName) {
         this.recognizer.AddGesture(shapeName.toLowerCase(), this.points);
+        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points.slice().reverse());
     }
 
     uniformizePoints() {
