@@ -54,6 +54,7 @@ export default class Renderer {
     currentRoomTransitionSprite: IsoSprite;
     currentEntriesTransitionSprite: { [key: string]: IsoSprite };
     spritesContainer: Phaser.GameObjects.Container;
+    roomTransitionPlaying = false;
 
     player: IsoSprite;
     playerTween: Phaser.Tweens.Tween;
@@ -203,7 +204,8 @@ export default class Renderer {
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
-        if (this.group.tween && this.group.tween.isPlaying()) return;
+        if (this.roomTransitionPlaying) return;
+        this.roomTransitionPlaying = true;
 
         //check with source texture
         if (!this.currentRoomSprite || this.currentRoomSprite.key != Renderer.roomTexture) {
@@ -303,6 +305,7 @@ export default class Renderer {
                 this.getTransitionSprites().forEach(spr => { spr.alpha = 1; spr.visible = false; });
                 this.currentRoomSprite.isoX = 0;
                 this.currentRoomSprite.isoY = 0;
+                this.roomTransitionPlaying = false;
             }
         });
     }
