@@ -11,8 +11,10 @@ export default class LoadScene extends Phaser.Scene {
         for (let type in assets) {
             for (let key in assets[type]) {
                 let value = assets[type][key];
-                if (type == 'spritesheet') this.load[type](key.substring(key.lastIndexOf('/') + 1, key.lastIndexOf('.')), type + "/" + key, value);
-                else this.load[type](value.substring(value.lastIndexOf('/') + 1, value.lastIndexOf('.')), type + "/" + assets[type][key]);
+                let path = type + "/";
+                if (type == 'spritesheet') this.load[type](key.substring(key.lastIndexOf('/') + 1, key.lastIndexOf('.')), path + key, value);
+                else if(type == 'atlas') this.load[type](value,path+value+'.png',path+value+'.json');
+                else this.load[type](value.substring(value.lastIndexOf('/') + 1, value.lastIndexOf('.')), path + assets[type][key]);
             }
         }
     }

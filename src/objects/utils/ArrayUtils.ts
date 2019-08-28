@@ -1,27 +1,21 @@
 export default class ArrayUtils {
-    private items:any[] = [];
-    static of = (newItems) => {let a=new ArrayUtils();a.items=newItems;return a;};
-    max = (getMax,maxStart?) => {
+    private items: any[] = [];
+    static of = (newItems:any[]) => { let a = new ArrayUtils(); a.items = newItems; return a; };
+    max = (getMax, maxStart?) => {
         let maxElt;
-        maxStart = maxStart===undefined?-1:maxStart;
-        for(let elt of this.items) {
-            let val=getMax(elt);
-            if(maxStart<val) {maxElt=elt;maxStart=val;}
+        maxStart = maxStart === undefined ? -1 : maxStart;
+        for (let elt of this.items) {
+            let val = getMax(elt);
+            if (maxStart < val) { maxElt = elt; maxStart = val; }
         }
         return maxElt;
     };
-    maxValue = (getMax,maxStart?) => {
-        maxStart = maxStart===undefined?-1:maxStart;
-        for(let elt of this.items) {
-            let val=getMax(elt);
-            if(maxStart<val) maxStart=val;
+    maxValue = (getMax, maxStart?) => {
+        maxStart = maxStart === undefined ? -1 : maxStart;
+        for (let elt of this.items) {
+            let val = getMax(elt);
+            if (maxStart < val) maxStart = val;
         }
         return maxStart;
     };
-    reduce = (accumulate,startVal) => {
-        for(let index in this.items) {
-            startVal=accumulate(startVal,this.items[index]);
-        }
-        return startVal;
-    }
 };

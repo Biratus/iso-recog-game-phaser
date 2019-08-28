@@ -1,7 +1,7 @@
-import { IsoSprite } from 'phaser3-plugin-isometric';
 import { Point } from 'outlines';
-import { GameModule } from './GameUtils';
+import { IsoSprite } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
+import { GameModule } from './GameUtils';
 
 export module RenderUtils {
     export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }
@@ -18,11 +18,11 @@ export module RenderUtils {
 
     }
 
-    export function pointInRect(p,rect:{ x: number, y: number, w: number, h: number }) {
+    export function pointInRect(p, rect: { x: number, y: number, w: number, h: number }) {
         return p.x > rect.x && p.x < rect.x + rect.w && p.y > rect.y && p.y < rect.y + rect.h
     }
-    export function pointInCircle(p,circle:{x:number,y:number,rad:number}) {
-        return Math.dist(circle.x,circle.y,p.x,p.y)<circle.rad;
+    export function pointInCircle(p, circle: { x: number, y: number, rad: number }) {
+        return Math.dist(circle.x, circle.y, p.x, p.y) < circle.rad;
     }
     export function pointsInRect(points, rect: { x: number, y: number, w: number, h: number }) {
         points = GameModule.normalizePointName(points);
@@ -32,10 +32,10 @@ export module RenderUtils {
         return true;
     }
 
-    export function pointsInCircle(points,circle:{x:number,y:number,rad:number}) {
+    export function pointsInCircle(points, circle: { x: number, y: number, rad: number }) {
         points = GameModule.normalizePointName(points);
         for (let p of points) {
-            if (Math.dist(circle.x,circle.y,p.x,p.y)>circle.rad) return false;
+            if (Math.dist(circle.x, circle.y, p.x, p.y) > circle.rad) return false;
         }
         return true;
 
@@ -82,13 +82,13 @@ export module RenderUtils {
     }
 
     export function test() {
-        console.assert(RenderUtils.pointInRect({x:20,y:20},{x:0,y:0,w:50,h:50}),'pointInRect({x:20,y:20},{x:0,y:0,w:50,h:50})');
-        console.assert(!RenderUtils.pointInRect({x:60,y:20},{x:0,y:0,w:50,h:50}),'!pointInRect({x:60,y:20},{x:0,y:0,w:50,h:50} ');
-        console.assert(!RenderUtils.pointInRect({x:20,y:60},{x:0,y:0,w:50,h:50}),'!pointInRect({x:20,y:60},{x:0,y:0,w:50,h:50} ');
-        console.assert(!RenderUtils.pointInRect({x:60,y:60},{x:0,y:0,w:50,h:50}),'!pointInRect({x:60,y:26},{x:0,y:0,w:50,h:50} ');
-        console.assert(RenderUtils.pointInCircle({x:20,y:20},{x:0,y:0,rad:50}),' pointInCircle({x:20,y:20},{x:0,y:0,rad:50})');
-        console.assert(!RenderUtils.pointInCircle({x:20,y:20},{x:0,y:0,rad:10}),' !pointInCircle({x:20,y:20},{x:0,y:0,rad:10})');
-        console.assert(!RenderUtils.pointInCircle({x:30,y:20},{x:0,y:0,rad:20}),' !pointInCircle({x:30,y:20},{x:0,y:0,rad:20})');
-        console.assert(!RenderUtils.pointInCircle({x:20,y:30},{x:0,y:0,rad:20}),' !pointInCircle({x:20,y:30},{x:0,y:0,rad:20})');
+        console.assert(RenderUtils.pointInRect({ x: 20, y: 20 }, { x: 0, y: 0, w: 50, h: 50 }), 'pointInRect({x:20,y:20},{x:0,y:0,w:50,h:50})');
+        console.assert(!RenderUtils.pointInRect({ x: 60, y: 20 }, { x: 0, y: 0, w: 50, h: 50 }), '!pointInRect({x:60,y:20},{x:0,y:0,w:50,h:50} ');
+        console.assert(!RenderUtils.pointInRect({ x: 20, y: 60 }, { x: 0, y: 0, w: 50, h: 50 }), '!pointInRect({x:20,y:60},{x:0,y:0,w:50,h:50} ');
+        console.assert(!RenderUtils.pointInRect({ x: 60, y: 60 }, { x: 0, y: 0, w: 50, h: 50 }), '!pointInRect({x:60,y:26},{x:0,y:0,w:50,h:50} ');
+        console.assert(RenderUtils.pointInCircle({ x: 20, y: 20 }, { x: 0, y: 0, rad: 50 }), ' pointInCircle({x:20,y:20},{x:0,y:0,rad:50})');
+        console.assert(!RenderUtils.pointInCircle({ x: 20, y: 20 }, { x: 0, y: 0, rad: 10 }), ' !pointInCircle({x:20,y:20},{x:0,y:0,rad:10})');
+        console.assert(!RenderUtils.pointInCircle({ x: 30, y: 20 }, { x: 0, y: 0, rad: 20 }), ' !pointInCircle({x:30,y:20},{x:0,y:0,rad:20})');
+        console.assert(!RenderUtils.pointInCircle({ x: 20, y: 30 }, { x: 0, y: 0, rad: 20 }), ' !pointInCircle({x:20,y:30},{x:0,y:0,rad:20})');
     }
 }

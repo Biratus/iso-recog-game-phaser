@@ -1,12 +1,10 @@
 import 'phaser';
+import { ENEMY_SPAWN_EVENT, ENEMY_TYPE, LOCATION } from '../../constants/Enums';
 import Enemy from '../character/Enemy';
-import Entry from './Entry';
-import { Cube } from 'phaser3-plugin-isometric/src/Cube';
-import { Point3 } from 'phaser3-plugin-isometric/src/Point3';
-import { ENEMY_TYPE, LOCATION, ENEMY_SPAWN_EVENT } from '../../constants/Enums';
+import { renderer } from '../render/Renderer';
+import { GameModule } from '../utils/GameUtils';
 import { Timeout } from '../utils/Timeout';
-import Renderer, { renderer } from '../render/Renderer';
-import { currentScene } from '../../scenes/TutorialScene';
+import Entry from './Entry';
 
 export default class EnemyManager {
     entry: Entry;
@@ -106,7 +104,7 @@ export default class EnemyManager {
                     en.sprite.destroy();
                     this.alive.delete(en.id);
                 });
-                currentScene.events.emit(Enemy.ON_SPAWN, e);
+                GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
             } else this.timeout.destroy();
         }).start();
 
@@ -143,6 +141,7 @@ export default class EnemyManager {
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {
+        //TODO changer distance from 0,0 to GameModule getCenterOfGame ?
         let ordered = this.alive.values().filter((en) => en.sign.toLowerCase() === sign.toLowerCase()).sort((en1, en2) => Phaser.Math.Distance.Between(0, 0, en1.sprite.isoX, en1.sprite.isoY) - Phaser.Math.Distance.Between(0, 0, en2.sprite.isoX, en2.sprite.isoY));
         return ordered.splice(0, nb ? nb : 1);
     }

@@ -1,6 +1,6 @@
-import { Point, DollarRecognizer } from 'outlines';
+import { DollarRecognizer, Point } from 'outlines';
 import 'phaser';
-import TutorialScene, { currentScene } from '../../scenes/TutorialScene';
+import { GameModule } from '../utils/GameUtils';
 
 export default class RecogListener {
     points: Point[] = [];
@@ -18,11 +18,12 @@ export default class RecogListener {
     constructor(shapeDrownListener: Phaser.Events.EventEmitter) {
         this.recognizer = new DollarRecognizer();
         this.emitter = new Phaser.Events.EventEmitter();
-        this.graphics = currentScene.add.graphics({
+        this.graphics = GameModule.currentScene.add.graphics({
             x: 0, y: 0,
             lineStyle: { color: 0xffffff, width: 10 },
             fillStyle: { color: 0xffffff, alpha: 1 }
-        })
+        });
+        this.graphics.setDepth(GameModule.topZIndex());
         this.emitter.addListener('pointerdown', (pointer: Phaser.Input.Pointer) => {
             if (!this.enabled) return;
             this._isDown = true;
@@ -45,6 +46,29 @@ export default class RecogListener {
             shapeDrownListener.emit('shapeDrown', shape);
             this.graphics.clear();
         });
+        for (let type in GameModule.Unistrokes) {
+            if (GameModule.Unistrokes.hasOwnProperty(type))
+                GameModule.Unistrokes[type].forEach(array => {
+                    let pts = array.map(coord => new Point(coord[0], coord[1]));
+                    this.recognizer.AddGesture(type, pts);
+                    this.recognizer.AddGesture(type, pts.slice().reverse());
+                });
+        }
+        var line = [Point(0, 0), Point(100, 0)];
+        this.recognizer.AddGesture('line', line);
+        this.recognizer.AddGesture('line', line.slice().reverse());
+        if (localStorage.getItem('userShapes')) {
+            let userShapes = JSON.parse(<string>localStorage.getItem('userShapes'));
+            for (let type in userShapes) {
+                if (userShapes.hasOwnProperty(type)) {
+                    userShapes[type].forEach((pts) => {
+                        this.recognizer.AddGesture(type, pts);
+                        this.recognizer.AddGesture(type, pts.slice().reverse());
+                    });
+                }
+            }
+        }
+        this.recognizer.NumUnistrokes = this.recognizer.Unistrokes.length;
     }
 
     addPoint(x, y) {
@@ -61,7 +85,14 @@ export default class RecogListener {
     }
 
     addUserShape(shapeName) {
-        this.recognizer.AddGesture(shapeName.toLowerCase(), this.points);
+        shapeName = shapeName.toLowerCase();
+        this.recognizer.AddGesture(shapeName, this.points);
+        this.recognizer.AddGesture(shapeName, this.points.slice().reverse());
+        let userShapes = localStorage.getItem('userShapes') ? JSON.parse(<string>localStorage.getItem('userShapes')) : {};
+        userShapes[shapeName] = userShapes[shapeName] || [];
+        userShapes[shapeName].push(this.points);
+
+        localStorage.setItem('userShapes', JSON.stringify(userShapes));
     }
 
     uniformizePoints() {
@@ -148,7 +179,7 @@ export default class RecogListener {
         return max;
     }
     minDistanceBetweenPoints(): number {
-        let min = Phaser.Math.Distance.Between(0, 0, currentScene.game.canvas.width, currentScene.game.canvas.height);
+        let min = Phaser.Math.Distance.Between(0, 0, GameModule.currentScene.game.canvas.width, GameModule.currentScene.game.canvas.height);
         let current, next;
         for (let i = 0; i < this.points.length - 1; i++) {
             current = this.points[i];
