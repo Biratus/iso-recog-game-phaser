@@ -12,11 +12,12 @@ import Renderer, { renderer } from '../objects/render/Renderer';
 import ArrayUtils from '../objects/utils/ArrayUtils';
 import { GameModule } from '../objects/utils/GameUtils';
 import Loader from '../objects/utils/Loader';
+import MapUtils from '../objects/utils/MapUtils';
 
 
 export default class GameScene extends Phaser.Scene {
 
-  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' ,'TUTORIAL':'TUTORIAL'};
+  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE', 'TUTORIAL': 'TUTORIAL' };
 
   private _activeState = GameScene.STATES.IDLE;
 
@@ -28,7 +29,6 @@ export default class GameScene extends Phaser.Scene {
   info2: Phaser.GameObjects.Text;
   currentShape: Phaser.GameObjects.Text;
 
-  projectionText: string = "NONE";
   // selectedTile: Tile;
 
   isPause = false;
@@ -81,7 +81,7 @@ export default class GameScene extends Phaser.Scene {
 
     // GRAPHICS
     this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-    this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
+    this.info = this.add.text(50, 50, (localStorage.getItem('userShapes') !== undefined) + '', { color: 'red', size: '50px' });
     //LEVEL
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
@@ -95,7 +95,7 @@ export default class GameScene extends Phaser.Scene {
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
- 
+
     let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
     s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     s.on('pointerup', () => {
@@ -107,14 +107,23 @@ export default class GameScene extends Phaser.Scene {
         this.activeState = GameScene.STATES.IDLE;
       }
     });
+    //DEBUG
+    let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
+    debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+    debugBtn.on('pointerdown', () => {
+      if (GameModule.debug) {
+        console.log('GameModule.currentScene', this);
+      } else this.scene.restart();
+
+    });
     // let squareW=window.innerWidth*0.5;
     // this.animationGraph.drawHollowRect(window.innerWidth*0.5-squareW/2,window.innerHeight*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
   }
 
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
-    this.animationGraph.update(time,delta);
-    this.info.setText("Active particle "+renderer.bgParticles.reduce((acc,elt:Phaser.GameObjects.Particles.ParticleEmitter) => acc+=elt.getAliveParticleCount(),0))
+    this.animationGraph.update(time, delta);
+    renderer.update(time, delta);
   }
 
   pause() {
@@ -132,31 +141,52 @@ export default class GameScene extends Phaser.Scene {
 
   initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', ({ result, list }) => {
-      if(!result || !list) {
+      if (!result || !list) {
         this.currentShape.setText("NO RESULTS");
         return;
       }
       let ordered = {};
       for (let shape of list) {
         if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
-        else if (ArrayUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
+        else if (MapUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
           ordered[shape.Shape] = [];
           ordered[shape.Shape].push(shape.Score);
         } else break;
       }
+
       let cumul = 0;//cumul difference between 3 highest scores 
       let prev;
       for (let shape in ordered) {
-        ordered[shape] = ArrayUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
-        if(prev) cumul+=ordered[shape]-prev;
-        prev=ordered[shape]; 
+        ordered[shape] = MapUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
+        if (prev) cumul += ordered[shape] - prev;
+        prev = ordered[shape];
       }
-      console.log('cumul = '+cumul, ordered);
-      this.info.setText('Results :' + result.Name + " " + result.Score+"\ncumul: "+cumul);
+      let moy = cumul / 2;//moy difference between 3 highest scores
+
+      //get nb guess on 3 highest different
+      let counts = {};
+      prev = undefined;
+      for (let shape of list) {
+        if (MapUtils.of(counts).length() >= 3 && prev && prev !== shape.Shape) break;
+        if (!prev) counts[shape.Shape] = 1;
+        else if (prev && prev === shape.Shape) counts[shape.Shape]++;
+        else if (prev && prev !== shape.Shape) {
+          if (counts.hasOwnProperty(shape.Shape)) continue;
+          else counts[shape.Shape] = 1;
+        }
+        prev = shape.Shape;
+      }
+
+      console.log('cumul = ' + cumul + ' moy = ' + moy, ordered);
+      console.log('counts', counts);
+      this.info.setText('Results :' + result.Name + " " + result.Score +
+        "\ncumul: " + cumul +
+        '\nmoy: ' + moy +
+        '\ncounts: ' + MapUtils.of(counts).reduce((acc, elt, key) => acc += key + ' ' + elt + '\n', ''));
       console.log('results ' + result.Name + " " + result.Score, list);
-      if (result.Score < 0.9) {
-        this.currentShape.setText('Not Good Enough!');
-      } else this.currentShape.setText(result.Name);
+      // if (result.Score < 0.9) {
+      //   this.currentShape.setText('Not Good Enough!');
+      // } else this.currentShape.setText(result.Name);
 
       // if (result[0].Score - result[1].Score > 0.15) {
       //   this.currentShape.setText(result[0].Name);
@@ -165,25 +195,23 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
+      if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });
     this.input.on('pointermove', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
+      if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointermove', pointer);
     });
     this.input.on('pointerup', (pointer) => {
       if (this.isPause) return;
-      if(this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
+      if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
     renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
       if (this.activeState !== GameScene.STATES.IDLE) return;
       let r = this.currentLevel.currentRoom;
-      console.log('go to ' + location + ' from ' + r._id);
-      let dest = r._entries[location].dest
-      console.log(dest);
-      renderer.renderTransition(r, dest, () => { console.log('callback'); this.currentLevel.currentRoom = dest; });
+      let dest = r._entries[location].dest;
+      renderer.renderTransition(r, dest, () => { console.log('callback end transition'); this.currentLevel.currentRoom = dest; });
     });
   }
 

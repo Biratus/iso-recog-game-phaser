@@ -28,7 +28,7 @@ export class Timeout {
 
     start() {
         if (this.active) {
-            console.error('Timeout ' + this.name + ' already started', this.func);
+            console.warn('Timeout ' + this.name + ' already started', this.func);
             return this;
         }
         this.startTime = new Date().getTime();
@@ -50,7 +50,7 @@ export class Timeout {
 
     pause() {
         if (!this.active) {
-            console.error('Timeout ' + this.name + ' is not active', this.func);
+            console.warn('Timeout ' + this.name + ' is not active', this.func);
             return;
         }
         let currTime = new Date().getTime();

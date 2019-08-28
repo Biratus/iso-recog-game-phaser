@@ -1,6 +1,6 @@
 export default class ArrayUtils {
     private items: any[] = [];
-    static of = (newItems) => { let a = new ArrayUtils(); a.items = newItems; return a; };
+    static of = (newItems:any[]) => { let a = new ArrayUtils(); a.items = newItems; return a; };
     max = (getMax, maxStart?) => {
         let maxElt;
         maxStart = maxStart === undefined ? -1 : maxStart;
@@ -18,10 +18,4 @@ export default class ArrayUtils {
         }
         return maxStart;
     };
-    reduce = (accumulate, startVal) => {
-        for (let index in this.items) {
-            startVal = accumulate(startVal, this.items[index]);
-        }
-        return startVal;
-    }
 };

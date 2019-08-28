@@ -2,30 +2,20 @@
     "image": [
         "plyer_debug.png",
         "plyer.png",
-        "plyer_noshadow.png",
         "en_sm_square.png",
         "en_sm_circle.png",
         "en_sm_triangle.png",
-        "CLASSIC_blue_1,3,5.png",
         "background8.png",
         "CLASSIC_w1_Z0.5_olighterdarker_in.png",
         "CLASSIC_w1_Z0.5_olighterdarker_out.png",
         "CLASSIC_w1_Z0.5_olightermedium_in.png",
         "CLASSIC_w1_Z0.5_olightermedium_out.png",
-        "CLASSIC_Elongated _w1_Z1o_mediumdarker.png",
-        "light.png",
+        "CLASSIC_Elongated_w1_Z1o_mediumdarker.png",
         "mask1.png",
-        "mask7.png",
-        "p_white.png",
-        "p_yellow.png",
-        "p_square.png",
-        "p_circle.png",
-        "mask8.png",
         "blue.png",
         "red.png",
         "button_green.png",
-        "button_red.png",
-        "hollowcircle.png"
+        "button_red.png"
         
     ],
     "json": [
@@ -36,10 +26,6 @@
         "level_test_prev_die_event.json"
     ],
     "spritesheet": {
-        "cowboy.png": {
-            "frameWidth": 128,
-            "frameHeight": 128
-        },
         "floating_blue_spritesheet.png": {
             "frameWidth": 322,
             "frameHeight": 341,

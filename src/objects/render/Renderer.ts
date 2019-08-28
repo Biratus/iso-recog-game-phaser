@@ -7,6 +7,7 @@ import Room from "../core/Room";
 import { GameModule } from "../utils/GameUtils";
 import { LevelUtils } from "../utils/LevelUtils";
 import { RenderUtils } from "../utils/RenderUtils";
+import { Timeout } from '../utils/Timeout';
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
@@ -16,7 +17,7 @@ class IsoGroup {
     constructor() { }
 
     set x(val) {
-        if (this.prevX != null) {
+        if (this.prevX !== undefined) {
             for (let c of this.children) {
                 c.isoX += val - this.prevX!;
             }
@@ -24,7 +25,7 @@ class IsoGroup {
         this.prevX = val;
     }
     set y(val) {
-        if (this.prevY != null) {
+        if (this.prevY !== undefined) {
             for (let c of this.children) {
                 c.isoY += val - this.prevY!;
             }
@@ -43,7 +44,7 @@ export default class Renderer {
         'LEFT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_out' },
         'RIGHT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_in' },
     }
-    static roomTexture = 'CLASSIC_Elongated _w1_Z1o_mediumdarker';
+    static roomTexture = 'CLASSIC_Elongated_w1_Z1o_mediumdarker';
     static playerTexture = 'plyer';
     static entryOffset = 4.5;
 
@@ -62,6 +63,7 @@ export default class Renderer {
 
     bgParticles: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
 
+    spriteInitialized = false;
     debug = false;
 
     constructor() {
@@ -91,27 +93,33 @@ export default class Renderer {
         //     this.bgParticles.push(e);
         // }
         let e = GameModule.currentScene.add.particles('p_bg_square').createEmitter({
-            frame: { frames: ['stroke','fill'], cycle: true, quantity: 2 },
+            frame: { frames: ['stroke', 'fill'], cycle: true, quantity: 2 },
             x: 0,
             y: 0,
             frequency: 500,
-            lifespan:2000,
-            angle: { max: 360, min: 0,steps:10 },
-            speed: { min: 20, max: 30,steps:1 },
+            lifespan: 2000,
+            angle: { max: 360, min: 0, steps: 10 },
+            speed: { min: 20, max: 30, steps: 1 },
             scale: { min: 0.05, max: 0.1 },
-            rotate: {min:0,max:360,steps:10},
-            alpha: { onEmit:(p) => p.alpha=0,onUpdate:(p,key,t,value)=> p.alpha = t<0.5?t:1-t},
+            rotate: { min: 0, max: 360, steps: 10 },
+            alpha: { onEmit: (p) => p.alpha = 0, onUpdate: (p, key, t, value) => p.alpha = t < 0.5 ? t : 1 - t },
             blendMode: 'SCREEN'
         });
+        e.texture.source.forEach(src => src.resolution = 10);
         e.scaleX.onUpdate = e.scaleX.defaultUpdate;
         this.bgParticles.push(e);
+    }
 
-        // this.spritesContainer.depth = 999;
+    update(time, delta) {
+        this.spritesContainer.sort('depth');
     }
 
     renderRoom = (room: Room) => {
         this.initSprites();
         //render current room sprite with room texture
+        this.currentRoomSprite.visible = true;
+        this.currentRoomSprite.isoX = 0;
+        this.currentRoomSprite.isoY = 0;
         for (let loc of LOCATION.enum()) {
             //render sprite with entry texture
             let sprite = this.currentEntriesSprite[loc];
@@ -127,68 +135,59 @@ export default class Renderer {
     }
 
     private initSprites = () => {
-        if (!this.currentRoomSprite) {
-            this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-            this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-            this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-            this.currentRoomSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
-            this.currentRoomSprite.texture.source.forEach(src => src.resolution = 10);
+        if (this.spriteInitialized) return;
+        //current Room
+        this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
+        this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+        this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+        this.currentRoomSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
+        this.currentRoomSprite.texture.source.forEach(src => src.resolution = 100);
+        //current Entries
+        this.currentEntriesSprite = {};
+        for (let loc of LOCATION.enum()) {
+            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
+            let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
+            let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+            sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+            sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+            sprite.texture.source.forEach(src => src.resolution = 10);
+            tile_width = RenderUtils.spriteIsoWidth(sprite);
+            sprite.isoX += (tile_width / 2) * LOCATION[loc].x - LOCATION[loc].x * 100;
+            sprite.isoY += (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * 100;
+            sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
+            sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+            sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
+            this.currentEntriesSprite[loc] = sprite;
         }
-        if (!this.currentEntriesSprite) {
-            this.currentEntriesSprite = {};
-            for (let loc of LOCATION.enum()) {
-                let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
-                let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
-                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-                sprite.texture.source.forEach(src => src.resolution = 10);
-                tile_width = RenderUtils.spriteIsoWidth(sprite);
-                sprite.isoX += (tile_width / 2) * LOCATION[loc].x - LOCATION[loc].x * 100;
-                sprite.isoY += (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * 100;
-                sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
-                sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-                sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
-                this.currentEntriesSprite[loc] = sprite;
-            }
-        }
-        if (!this.currentRoomTransitionSprite) {
-            this.currentRoomTransitionSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-            this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-            this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-            this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
-            this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 10);
-            this.currentRoomTransitionSprite.visible = false;
-            // this.currentRoomTransitionSprite.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
-        }
-        if (!this.currentEntriesTransitionSprite) {
-            this.currentEntriesTransitionSprite = {};
-            for (let loc of LOCATION.enum()) {
-                let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
-                let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
-                let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
-                sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-                sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-                sprite.texture.source.forEach(src => src.resolution = 10);
-                tile_width = RenderUtils.spriteIsoWidth(sprite);
-                sprite.isoX += (tile_width / 2) * LOCATION[loc].x;
-                sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
-                sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
-                sprite.visible = false;
-                sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-                sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
-                this.currentEntriesTransitionSprite[loc] = sprite;
-            }
+        //current Room Transition
+        this.currentRoomTransitionSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
+        this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+        this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
+        this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
+        this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 10);
+        this.currentRoomTransitionSprite.visible = false;
+        // this.currentRoomTransitionSprite.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
+        //current Entries Transition
+        this.currentEntriesTransitionSprite = {};
+        for (let loc of LOCATION.enum()) {
+            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
+            let canvasLoc = LOCATION.multiply(LOCATION[loc], tile_width / 2);
+            let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
+            sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+            sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
+            sprite.texture.source.forEach(src => src.resolution = 10);
+            tile_width = RenderUtils.spriteIsoWidth(sprite);
+            sprite.isoX += (tile_width / 2) * LOCATION[loc].x;
+            sprite.isoY += (tile_width / 2) * LOCATION[loc].y;
+            sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
+            sprite.visible = false;
+            sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+            sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
+            this.currentEntriesTransitionSprite[loc] = sprite;
         }
         this.group.children = this.getAllSprites();
         this.spritesContainer.add(this.group.children);
-        console.log(this.spritesContainer);
-        let deathZone = {
-            type: 'onEnter',
-            source: new Phaser.Geom.Rectangle(0, this.currentEntriesSprite.TOP.y - 3*this.currentEntriesSprite.TOP.height / 4, window.innerWidth, window.innerHeight)
-        };
-        let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y)
-        // let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight);
+        let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y);
         let emitZone = {
             type: 'random', source: {
                 getRandomPoint: (vec) => {
@@ -199,13 +198,13 @@ export default class Renderer {
                 }
             }
         }
-        this.bgParticles.forEach(e => {
-            // e.setDeathZone(deathZone);
-            e.setEmitZone(emitZone);
-        });
+        this.bgParticles.forEach(e => e.setEmitZone(emitZone));
+        this.spriteInitialized = true;
     }
 
     renderTransition = (source: Room, dest: Room, callback: Function) => {
+        if (this.group.tween && this.group.tween.isPlaying()) return;
+
         //check with source texture
         if (!this.currentRoomSprite || this.currentRoomSprite.key != Renderer.roomTexture) {
             this.renderRoom(source);
@@ -247,7 +246,7 @@ export default class Renderer {
             entrySpr.isoY = newLoc.y;
             entrySpr.shouldAppear = true;
         }
-        setTimeout(() => this.getTransitionSprites().filter(spr => spr.shouldAppear).forEach(spr => spr.visible = true), 10);
+        Timeout.in(10).do(() => this.getTransitionSprites().filter(spr => spr.shouldAppear).forEach(spr => spr.visible = true)).start();
     }
 
     private startTransition(entry?: Entry, callback?: Function) {
@@ -262,8 +261,7 @@ export default class Renderer {
             delay: 0,
             yoyo: true
         });
-
-        setTimeout(() => {
+        Timeout.in(990).do(() => {
             let loc = LOCATION.multLoc({ x: -1, y: -1 },
                 {
                     x: this.currentRoomTransitionSprite.isoX,
@@ -280,7 +278,7 @@ export default class Renderer {
                 onComplete: () => this.endTransition(callback!)
             });
 
-        }, 990);
+        }).start();
     }
 
     private swap() {
@@ -333,6 +331,7 @@ export default class Renderer {
         this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
         this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
         this.player.texture.source.forEach(src => src.resolution = 10);
+        this.player.setDepth(GameModule.topZIndex());
         this.spritesContainer.add(this.player);
     }
 
@@ -356,7 +355,7 @@ export default class Renderer {
         this.bgParticles.forEach(p => p.killAll());
         this.bgParticles.forEach(p => p.pause());
     }
-    
+
     resumeBackgroundParticles() {
         this.bgParticles.forEach(p => p.resume());
     }

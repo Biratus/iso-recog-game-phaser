@@ -21,7 +21,7 @@ export default class AnimationGraph {
         if (this.lightSourceTween) this.lightSourceTween.stop();
         if (this.lightSource) this.lightSource.destroy();
         for (let i in this.graphics) this.graphics[i].destroy();
-        for (let i in this.particles) this.particles[i].stop();
+        for (let i in this.particles) this.emitter.emit(i);
     }
 
     update(time, delta) {
@@ -162,7 +162,7 @@ export default class AnimationGraph {
             targets: this.lightSource,
             alpha: 0.5,
             scale: 0.8,
-            duration: 2000,
+            duration: 1500,
             ease: 'Sine.easeInOut',
             loop: -1,
             yoyo: true

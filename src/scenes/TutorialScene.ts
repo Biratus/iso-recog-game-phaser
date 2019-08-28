@@ -10,6 +10,7 @@ import ArrayUtils from "../objects/utils/ArrayUtils";
 import { GameModule } from "../objects/utils/GameUtils";
 import Loader from "../objects/utils/Loader";
 import { Timeout } from "../objects/utils/Timeout";
+import MapUtils from '../objects/utils/MapUtils';
 
 export default class TutorialScene extends Phaser.Scene {
 
@@ -82,7 +83,7 @@ export default class TutorialScene extends Phaser.Scene {
         let startBtn = this.add.image(50, 100, 'button_green');
         startBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
         startBtn.once('pointerup', () => {
-            this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+            this.start();
             startBtn.once('pointerup', () => {
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
                 this.goToNextScene();
@@ -104,16 +105,21 @@ export default class TutorialScene extends Phaser.Scene {
         //     this.goToNextScene();
         // });
 
-        this.start();
+        // this.start();
 
         //DEBUG
         let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
         debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-        debugBtn.on('pointerdown', () => console.log('GameModule.currentScene', this));
+        debugBtn.on('pointerdown', () => {
+            if(GameModule.debug) {
+            console.log('GameModule.currentScene', this);   
+            } else this.scene.restart();
+        });
     }
 
     start() {
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+        localStorage.removeItem('userShapes');
     }
 
     userInputShape(shape) {
@@ -133,7 +139,7 @@ export default class TutorialScene extends Phaser.Scene {
             case 'CIRCLE':
                 x = window.innerWidth * 0.15 + totW / 2; y = totH / 2;
                 // path = new Phaser.Geom.Circle(x, y, window.innerWidth * 0.3);
-                path = new Phaser.Curves.Path(x, y).circleTo(window.innerWidth * 0.15);
+                path = new Phaser.Curves.Path(x, y).circleTo(window.innerWidth * 0.15,true);
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }
@@ -177,7 +183,7 @@ export default class TutorialScene extends Phaser.Scene {
             let ordered = {};
             for (let shape of list) {
                 if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
-                else if (ArrayUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
+                else if (MapUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
                     ordered[shape.Shape] = [];
                     ordered[shape.Shape].push(shape.Score);
                 } else break;
@@ -185,12 +191,11 @@ export default class TutorialScene extends Phaser.Scene {
             let cumul = 0;//cumul difference between 3 highest scores 
             let prev;
             for (let shape in ordered) {
-                ordered[shape] = ArrayUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
+                ordered[shape] = MapUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
                 if (prev) cumul += ordered[shape] - prev;
                 prev = ordered[shape];
             }
-            let debug = true;
-            let threshold = debug ? 0.8 : 0.96;
+            let threshold = GameModule.debug ? 0.8 : 0.955;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
                 renderer.resumeBackgroundParticles();
@@ -214,7 +219,10 @@ export default class TutorialScene extends Phaser.Scene {
                 this.currentShapeTxt.setText('Not Good Enough!');
             } else this.currentShapeTxt.setText(result.Name);
 
-            if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) this.goToNextScene();
+            if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) {
+                localStorage.setItem('tutorialOver','true');
+                this.goToNextScene();
+            }
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);

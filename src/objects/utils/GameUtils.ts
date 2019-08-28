@@ -1,6 +1,7 @@
 import ArrayUtils from "./ArrayUtils";
 
 export module GameModule {
+	export var debug = true;
 	export var currentScene: Phaser.Scene;
 	export var Unistrokes = {
 		"triangle": [
