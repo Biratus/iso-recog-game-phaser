@@ -11,5 +11,10 @@ export default class MapUtils {
         let c=0;
         for(let index in this.items) if(this.items.hasOwnProperty(index)) c++;
         return c;
+    };
+    flatValues = () => {
+        let flat:any[]=[];
+        for(let i in this.items) flat.push(this.items[i]);
+        return flat;
     }
 };

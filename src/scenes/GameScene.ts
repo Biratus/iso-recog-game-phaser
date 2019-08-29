@@ -184,6 +184,11 @@ export default class GameScene extends Phaser.Scene {
         '\nmoy: ' + moy +
         '\ncounts: ' + MapUtils.of(counts).reduce((acc, elt, key) => acc += key + ' ' + elt + '\n', ''));
       console.log('results ' + result.Name + " " + result.Score, list);
+      let flatMap:number[] = [];
+      GameModule.normalizePointName(this.recogListener.points).forEach(pt => {flatMap.push(pt.x);flatMap.push(pt.y);});
+      console.log('redu',MapUtils.of(counts).flatValues());
+      if((<any>window).NativeApp) (<any>window).NativeApp.endSave(flatMap,cumul,moy,MapUtils.of(counts).flatValues(),result.Name,result.Score);
+      // (<any>window).NativeApp.test([8.4,5.2]);
       // if (result.Score < 0.9) {
       //   this.currentShape.setText('Not Good Enough!');
       // } else this.currentShape.setText(result.Name);

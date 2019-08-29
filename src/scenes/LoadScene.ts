@@ -20,7 +20,7 @@ export default class LoadScene extends Phaser.Scene {
     }
 
     create = () => {
-        // this.scene.start(SCENE_GAME.key);
-        this.scene.start(SCENE_TUTORIAL.key);
+        this.scene.start(SCENE_GAME.key);
+        // this.scene.start(SCENE_TUTORIAL.key);
     }
 }
