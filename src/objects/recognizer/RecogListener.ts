@@ -46,9 +46,9 @@ export default class RecogListener {
             shapeDrownListener.emit('shapeDrown', shape);
             this.graphics.clear();
         });
-        for (let type in GameModule.Unistrokes) {
-            if (GameModule.Unistrokes.hasOwnProperty(type))
-                GameModule.Unistrokes[type].forEach(array => {
+        for (let type in GameModule.getUnistrokes()) {
+            if (GameModule.getUnistrokes().hasOwnProperty(type))
+                GameModule.getUnistrokes()[type].forEach(array => {
                     let pts = array.map(coord => new Point(coord[0], coord[1]));
                     this.recognizer.AddGesture(type, pts);
                     this.recognizer.AddGesture(type, pts.slice().reverse());

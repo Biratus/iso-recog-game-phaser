@@ -19,6 +19,7 @@
         
     ],
     "json": [
+        "test_points.json",
         "tutorial.json",
         "level_big.json",
         "level_test.json",

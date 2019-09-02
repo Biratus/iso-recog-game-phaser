@@ -148,7 +148,7 @@ export default class GameScene extends Phaser.Scene {
       let ordered = {};
       for (let shape of list) {
         if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
-        else if (MapUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
+        else if (MapUtils.of(ordered).length() < 3) {
           ordered[shape.Shape] = [];
           ordered[shape.Shape].push(shape.Score);
         } else break;
@@ -187,7 +187,12 @@ export default class GameScene extends Phaser.Scene {
       let flatMap:number[] = [];
       GameModule.normalizePointName(this.recogListener.points).forEach(pt => {flatMap.push(pt.x);flatMap.push(pt.y);});
       console.log('redu',MapUtils.of(counts).flatValues());
-      if((<any>window).NativeApp) (<any>window).NativeApp.endSave(flatMap,cumul,moy,MapUtils.of(counts).flatValues(),result.Name,result.Score);
+      (<any>window).nativeError=function(msg) {
+        this.currentShape.setText(msg);
+      }
+      if((<any>window).NativeApp) {
+        (<any>window).NativeApp.endSave(flatMap,cumul,moy,MapUtils.of(counts).flatValues(),result.Name,result.Score);
+      }
       // (<any>window).NativeApp.test([8.4,5.2]);
       // if (result.Score < 0.9) {
       //   this.currentShape.setText('Not Good Enough!');

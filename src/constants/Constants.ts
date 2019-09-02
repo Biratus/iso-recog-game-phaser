@@ -8,6 +8,7 @@ export const SCENE_TUTORIAL = {
     mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' }
 }
 export const SCENE_LOAD = { key: 'load' }
+export const SCENE_TEST = { key: 'test' }
 
 export const ENEMY_CONFIG = {
     scale: 0.2
