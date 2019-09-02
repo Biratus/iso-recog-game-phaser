@@ -5,25 +5,38 @@ import { renderer } from '../render/Renderer';
 import { GameModule } from '../utils/GameUtils';
 import { Timeout } from '../utils/Timeout';
 import Entry from './Entry';
+import MapUtils from '../utils/MapUtils';
 
 export default class EnemyManager {
     entry: Entry;
     alive: Phaser.Structs.Map<number, Enemy>;
-    timeout: Timeout;
+    timeouts: any = {};
 
     // config var
     nbEnSmall = 0;
     nbRndMed = 0;
     spawnEventsEnemies: Phaser.Structs.Map<number, Enemy>;
 
+    eventListener = new Phaser.Events.EventEmitter();
+
+    someData = { enemyKilledSinceBegining: 0 };
+
     constructor(entry) {
         this.entry = entry;
         this.alive = new Phaser.Structs.Map<number, Enemy>([]);
         this.spawnEventsEnemies = new Phaser.Structs.Map<number, Enemy>([]);
+
+        this.eventListener.addListener('reachCenter', (en) => {
+            this.someData.enemyKilledSinceBegining++;
+            GameModule.currentScene.events.emit('enemyReachCenter', en, this);
+            this.eventListener.emit('enemyKilled' + this.someData.enemyKilledSinceBegining);
+            this.killInstant(en);
+        });
     }
 
     spawnType = (type): Enemy | undefined => {
         let e;
+        // console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 if (this.nbEnSmall <= 0) return;
@@ -97,15 +110,15 @@ export default class EnemyManager {
 
     start() {
         // console.log('start enMana ' + this.entry.sign);
-        this.timeout = Timeout.every(15 * 100).do(() => {
+        this.timeouts.spawnSmall = Timeout.every(3.5 * 1000).randomized(-1.5*1000, 1.5 * 1000).do(() => {
             let e = this.spawnType(ENEMY_TYPE.SMALL);
+
             if (e) {
                 e.goToGoal(0, 0, (en) => {
-                    en.sprite.destroy();
-                    this.alive.delete(en.id);
+                    this.eventListener.emit('reachCenter', en, this);
                 });
                 GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
-            } else this.timeout.destroy();
+            } else this.timeouts.spawnSmall.destroy();
         }).start();
 
         // start spawn med en
@@ -131,13 +144,13 @@ export default class EnemyManager {
     pause() {
         // console.log('pause enMana ' + this.entry.sign);
         this.makeAllDo((en) => en.pause())
-        if (this.timeout) this.timeout.pause();
+        if (MapUtils.of(this.timeouts).length() > 0) MapUtils.of(this.timeouts).forEach((elt) => elt.pause());
     }
 
     resume() {
         // console.log('resume enMana ' + this.entry.sign);
         this.makeAllDo((en) => en.resume());
-        if (this.timeout) this.timeout.resume();
+        if (MapUtils.of(this.timeouts).length() > 0) MapUtils.of(this.timeouts).forEach((elt) => elt.resume());
     }
 
     getClosestWithSign(sign, nb?: number): Enemy[] {

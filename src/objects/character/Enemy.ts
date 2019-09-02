@@ -3,6 +3,7 @@ import { IsoSprite } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from '../../constants/Constants';
 import { ENEMY_TYPE } from '../../constants/Enums';
 import { GameModule } from '../utils/GameUtils';
+import { renderer } from '../render/Renderer';
 
 export default class Enemy {
     static _idCount = 0;
@@ -51,6 +52,7 @@ export default class Enemy {
         this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;
+        renderer.spritesContainer.add(this.sprite);
         this.emitter.emit(Enemy.ON_SPAWN);
     }
 

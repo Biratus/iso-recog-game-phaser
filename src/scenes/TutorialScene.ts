@@ -77,19 +77,19 @@ export default class TutorialScene extends Phaser.Scene {
         this.iso.projector.projectionAngle = CLASSIC;
 
         // GRAPHICS
-        this.currentShapeTxt = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-        this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
+        // this.currentShapeTxt = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+        // this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
 
-        let startBtn = this.add.image(50, 100, 'button_green');
-        startBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-        startBtn.once('pointerup', () => {
-            this.start();
-            startBtn.once('pointerup', () => {
-                this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
-                this.goToNextScene();
-            });
-        }
-        );
+        // let startBtn = this.add.image(50, 100, 'button_green');
+        // startBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        // startBtn.once('pointerup', () => {
+        //     this.start();
+        //     startBtn.once('pointerup', () => {
+        //         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
+        //         this.goToNextScene();
+        //     });
+        // }
+        // );
 
         this.currentLevel = Loader.loadLevel(GameModule.currentScene.cache.json.get('tutorial').Level);
         this.currentLevel.preload();
@@ -105,7 +105,7 @@ export default class TutorialScene extends Phaser.Scene {
         //     this.goToNextScene();
         // });
 
-        // this.start();
+        this.start();
 
         //DEBUG
         let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
@@ -180,21 +180,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.events.addListener('shapeDrown', ({ result, list }) => {
             result = result || { Name: undefined, Score: 0 };
             list = list || [];
-            let ordered = {};
-            for (let shape of list) {
-                if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
-                else if (MapUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
-                    ordered[shape.Shape] = [];
-                    ordered[shape.Shape].push(shape.Score);
-                } else break;
-            }
-            let cumul = 0;//cumul difference between 3 highest scores 
-            let prev;
-            for (let shape in ordered) {
-                ordered[shape] = MapUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
-                if (prev) cumul += ordered[shape] - prev;
-                prev = ordered[shape];
-            }
+            
             let threshold = GameModule.debug ? 0.8 : 0.955;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
@@ -214,10 +200,6 @@ export default class TutorialScene extends Phaser.Scene {
                         this.animationGraph.shapeClue(this.currentShape.path, 'userInput');
                 });
             }
-            this.info.setText('Results :' + result.Name + " " + result.Score + "\ncumul: " + cumul);
-            if (result.Score < 0.9) {
-                this.currentShapeTxt.setText('Not Good Enough!');
-            } else this.currentShapeTxt.setText(result.Name);
 
             if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) {
                 localStorage.setItem('tutorialOver','true');

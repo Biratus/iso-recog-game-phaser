@@ -52,7 +52,7 @@ export default class AnimationGraph {
         }
     }
 
-    fadeOutPoints(points,texture,speed,onFinishCallback?) {
+    fadeOutPoints(points, texture, speed, onFinishCallback?) {
         let p = GameModule.currentScene.add.particles(texture);
         let emit = p.createEmitter({
             scale: 0.1,
@@ -146,6 +146,10 @@ export default class AnimationGraph {
     }
 
     focusLight(sprite, endEvent) {
+        renderer.spritesContainer.clearMask();
+        if(this.lightSource) this.lightSource.destroy();
+        if(this.lightSourceTween) this.lightSourceTween.stop();
+
         this.lightSource = GameModule.currentScene.make.sprite({
             x: sprite.isoBounds.centerX,
             y: sprite.y - sprite.height * 0.75,
@@ -180,7 +184,7 @@ export default class AnimationGraph {
         let p = GameModule.currentScene.add.particles('blue');
         this.particles[destroyEvt] = p.createEmitter({
             scale: { start: 0.35, end: 0 },
-            speed:{min:-10,max:10},
+            speed: { min: -10, max: 10 },
             blendMode: 'SCREEN',
             lifespan: 1500,
             frequency: 20,

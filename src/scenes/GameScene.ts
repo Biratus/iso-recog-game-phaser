@@ -4,20 +4,19 @@ import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
 import { SCENE_GAME } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { INTERACTION_EVENT } from '../constants/Enums';
+import { INTERACTION_EVENT, LOCATION } from '../constants/Enums';
 import Level from '../objects/core/Level';
 import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
 import Renderer, { renderer } from '../objects/render/Renderer';
-import ArrayUtils from '../objects/utils/ArrayUtils';
 import { GameModule } from '../objects/utils/GameUtils';
 import Loader from '../objects/utils/Loader';
-import MapUtils from '../objects/utils/MapUtils';
+import { Timeout } from '../objects/utils/Timeout';
 
 
 export default class GameScene extends Phaser.Scene {
 
-  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE', 'TUTORIAL': 'TUTORIAL' };
+  static STATES = { 'RECOG': 'RECOG', 'IDLE': 'IDLE' };
 
   private _activeState = GameScene.STATES.IDLE;
 
@@ -80,8 +79,8 @@ export default class GameScene extends Phaser.Scene {
     this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
-    this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-    this.info = this.add.text(50, 50, (localStorage.getItem('userShapes') !== undefined) + '', { color: 'red', size: '50px' });
+    // this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+    // this.info = this.add.text(50, 50, (localStorage.getItem('userShapes') !== undefined) + '', { color: 'red', size: '50px' });
     //LEVEL
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
@@ -89,24 +88,31 @@ export default class GameScene extends Phaser.Scene {
     renderer.renderRoom(this.currentLevel.currentRoom);
     renderer.renderPlayer();
 
-    this.activeState = GameScene.STATES.IDLE;
-
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
     console.log("Level", this.currentLevel);
     console.log("Renderer", renderer);
 
-    let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
-    s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-    s.on('pointerup', () => {
-      if (this.activeState == GameScene.STATES.IDLE) {
-        s.texture.manager.setTexture(s, 'button_red');
-        this.activeState = GameScene.STATES.RECOG;
-      } else {
-        s.texture.manager.setTexture(s, 'button_green');
-        this.activeState = GameScene.STATES.IDLE;
-      }
-    });
+    // START GAME
+    this.activeState = GameScene.STATES.RECOG;
+    this.recogListener.enable();
+    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+
+    // Timeout.testInterval();
+
+    // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
+    // s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+    // s.on('pointerup', () => {
+    //   t.destroy();
+    // if (this.activeState == GameScene.STATES.IDLE) {
+    //   s.texture.manager.setTexture(s, 'button_red');
+    //   this.activeState = GameScene.STATES.RECOG;
+    // } else {
+    //   s.texture.manager.setTexture(s, 'button_green');
+    //   this.activeState = GameScene.STATES.IDLE;
+    // }
+    // });
+
     //DEBUG
     let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
     debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
@@ -145,53 +151,15 @@ export default class GameScene extends Phaser.Scene {
         this.currentShape.setText("NO RESULTS");
         return;
       }
-      let ordered = {};
-      for (let shape of list) {
-        if (ordered.hasOwnProperty(shape.Shape)) ordered[shape.Shape].push(shape.Score);
-        else if (MapUtils.of(ordered).reduce((acc, elt) => ++acc, 0) < 3) {
-          ordered[shape.Shape] = [];
-          ordered[shape.Shape].push(shape.Score);
-        } else break;
+
+      if (result.Score < 0.93) {
+        this.animationGraph.fadeOutPoints(this.recogListener.points, 'red', 10);
+        // this.currentShape.setText('Not Good Enough!');
+      } else {
+        this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue', 30);
+        this.currentShape.setText(result.Name);
+        this.currentLevel.currentRoom.killEnemies(result.Name);
       }
-
-      let cumul = 0;//cumul difference between 3 highest scores 
-      let prev;
-      for (let shape in ordered) {
-        ordered[shape] = MapUtils.of(ordered[shape]).reduce((acc, elt) => acc += elt / ordered[shape].length, 0);
-        if (prev) cumul += ordered[shape] - prev;
-        prev = ordered[shape];
-      }
-      let moy = cumul / 2;//moy difference between 3 highest scores
-
-      //get nb guess on 3 highest different
-      let counts = {};
-      prev = undefined;
-      for (let shape of list) {
-        if (MapUtils.of(counts).length() >= 3 && prev && prev !== shape.Shape) break;
-        if (!prev) counts[shape.Shape] = 1;
-        else if (prev && prev === shape.Shape) counts[shape.Shape]++;
-        else if (prev && prev !== shape.Shape) {
-          if (counts.hasOwnProperty(shape.Shape)) continue;
-          else counts[shape.Shape] = 1;
-        }
-        prev = shape.Shape;
-      }
-
-      console.log('cumul = ' + cumul + ' moy = ' + moy, ordered);
-      console.log('counts', counts);
-      this.info.setText('Results :' + result.Name + " " + result.Score +
-        "\ncumul: " + cumul +
-        '\nmoy: ' + moy +
-        '\ncounts: ' + MapUtils.of(counts).reduce((acc, elt, key) => acc += key + ' ' + elt + '\n', ''));
-      console.log('results ' + result.Name + " " + result.Score, list);
-      // if (result.Score < 0.9) {
-      //   this.currentShape.setText('Not Good Enough!');
-      // } else this.currentShape.setText(result.Name);
-
-      // if (result[0].Score - result[1].Score > 0.15) {
-      //   this.currentShape.setText(result[0].Name);
-      //   this.currentLevel.currentRoom.killEnemies(result[0].Name);
-      // } else this.currentShape.setText("UNDEFINED");
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
@@ -211,7 +179,17 @@ export default class GameScene extends Phaser.Scene {
       if (this.activeState !== GameScene.STATES.IDLE) return;
       let r = this.currentLevel.currentRoom;
       let dest = r._entries[location].dest;
-      renderer.renderTransition(r, dest, () => { console.log('callback end transition'); this.currentLevel.currentRoom = dest; });
+      renderer.renderTransition(r, dest, () => {
+        this.currentLevel.currentRoom = dest;
+        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+      });
+    });
+
+    this.events.addListener('enemyReachCenter', (en, enMana) => {
+      renderer.playerTakeHit(enMana.entry);
+    });
+    this.events.addListener('enemyWaveEnd', () => {
+      this.activeState = GameScene.STATES.IDLE;
     });
   }
 

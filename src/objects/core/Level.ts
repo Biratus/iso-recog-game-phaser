@@ -1,4 +1,5 @@
 import Room from "./Room";
+import { GameModule } from "../utils/GameUtils";
 
 export default class Level {
     name: string;
@@ -39,6 +40,9 @@ export default class Level {
 
     update(time, delta) {
         this.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.update(time, delta));
+        if(this.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) {
+            GameModule.currentScene.events.emit('enemyWaveEnd');
+        }
     }
 
 }

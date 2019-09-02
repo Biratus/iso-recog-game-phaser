@@ -294,7 +294,6 @@ export default class Renderer {
 
     private endTransition(callback: Function) {
         this.swap();
-        callback();
         GameModule.currentScene.add.tween({
             targets: this.getTransitionSprites(),
             alpha: 0,
@@ -306,6 +305,7 @@ export default class Renderer {
                 this.currentRoomSprite.isoX = 0;
                 this.currentRoomSprite.isoY = 0;
                 this.roomTransitionPlaying = false;
+                callback();
             }
         });
     }
@@ -361,6 +361,25 @@ export default class Renderer {
 
     resumeBackgroundParticles() {
         this.bgParticles.forEach(p => p.resume());
+    }
+
+    playerTakeHit(fromEntry:Entry) {
+        if (this.playerTween) {
+            this.playerTween.stop();
+            GameModule.currentScene.tweens.remove(this.playerTween);
+        }
+        let knockbackDist = window.innerWidth*0.025;
+        this.player.setTint(0xff002b);
+        this.playerTween =  GameModule.currentScene.add.tween({
+            targets:this.player,
+            isoX:{value:knockbackDist*fromEntry.location.x*-1,yoyo:true},
+            isoY:{value:knockbackDist*fromEntry.location.y*-1,yoyo:true},
+            duration:30,
+            onComplete: () => {
+                GameModule.currentScene.tweens.remove(this.playerTween);
+                this.player.clearTint();
+            }            
+        });
     }
 
     static init() { renderer = new Renderer(); }

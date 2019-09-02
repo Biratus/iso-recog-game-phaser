@@ -11,5 +11,8 @@ export default class MapUtils {
         let c=0;
         for(let index in this.items) if(this.items.hasOwnProperty(index)) c++;
         return c;
-    }
+    };
+    forEach = (f) => {
+        for(let index in this.items) if(this.items.hasOwnProperty(index)) f(this.items[index]);
+    } 
 };
