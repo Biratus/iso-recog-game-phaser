@@ -2,6 +2,7 @@ import { GAME_CONFIG } from "../../constants/Constants";
 import { GameModule } from "../utils/GameUtils";
 import { renderer } from "./Renderer";
 import { RenderUtils } from "../utils/RenderUtils";
+import { Point3 } from 'phaser3-plugin-isometric';
 
 export default class AnimationGraph {
     intervals: any = {};
@@ -205,5 +206,20 @@ export default class AnimationGraph {
         if (!this.graphics[name]) return;
         this.graphics[name].destroy();
         delete this.graphics[name];
+    }
+
+    drawCorners(spr) {
+        spr.resetIsoBounds();
+        this.mainGraphics.setDepth(GameModule.topZIndex());
+        let corners = spr.isoBounds.getCorners();
+        for(let c of corners) {
+            let proj = GameModule.currentScene.iso.projector.project(c);
+            this.mainGraphics.fillCircle(proj.x,proj.y,2);
+        }
+        this.mainGraphics.fillStyle(0xff0000);
+        let p = (<any>Object).assign({},spr.isoPosition);
+        p.z+=spr.isoBounds.halfHeight;
+        let proj = GameModule.currentScene.iso.projector.project(p);
+        this.mainGraphics.fillCircle(proj.x,proj.y,2);
     }
 }

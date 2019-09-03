@@ -12,6 +12,7 @@ import Renderer, { renderer } from '../objects/render/Renderer';
 import { GameModule } from '../objects/utils/GameUtils';
 import Loader from '../objects/utils/Loader';
 import { Timeout } from '../objects/utils/Timeout';
+import { RenderUtils } from '../objects/utils/RenderUtils';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -81,7 +82,7 @@ export default class GameScene extends Phaser.Scene {
     // GRAPHICS
     // this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     // this.info = this.add.text(50, 50, (localStorage.getItem('userShapes') !== undefined) + '', { color: 'red', size: '50px' });
-    //LEVEL
+    //LEVEL 
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
     this.currentLevel.create();
@@ -98,7 +99,6 @@ export default class GameScene extends Phaser.Scene {
     this.recogListener.enable();
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
 
-    // Timeout.testInterval();
 
     // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
     // s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
@@ -117,9 +117,7 @@ export default class GameScene extends Phaser.Scene {
     let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
     debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     debugBtn.on('pointerdown', () => {
-      if (GameModule.debug) {
-        console.log('GameModule.currentScene', this);
-      } else this.scene.restart();
+      console.log('GameModule.currentScene', this);
 
     });
     // let squareW=window.innerWidth*0.5;
@@ -148,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
   initEvents() {//Events should be down in room
     this.events.addListener('shapeDrown', ({ result, list }) => {
       if (!result || !list) {
-        this.currentShape.setText("NO RESULTS");
+        // this.currentShape.setText("NO RESULTS");
         return;
       }
 
@@ -157,7 +155,7 @@ export default class GameScene extends Phaser.Scene {
         // this.currentShape.setText('Not Good Enough!');
       } else {
         this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue', 30);
-        this.currentShape.setText(result.Name);
+        // this.currentShape.setText(result.Name);
         this.currentLevel.currentRoom.killEnemies(result.Name);
       }
     });
@@ -177,9 +175,11 @@ export default class GameScene extends Phaser.Scene {
 
     renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
       if (this.activeState !== GameScene.STATES.IDLE) return;
+      renderer.emitter.emit('tapIndic');
       let r = this.currentLevel.currentRoom;
       let dest = r._entries[location].dest;
       renderer.renderTransition(r, dest, () => {
+        this.activeState = GameScene.STATES.RECOG
         this.currentLevel.currentRoom = dest;
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
       });

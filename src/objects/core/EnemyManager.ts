@@ -110,7 +110,7 @@ export default class EnemyManager {
 
     start() {
         // console.log('start enMana ' + this.entry.sign);
-        this.timeouts.spawnSmall = Timeout.every(3.5 * 1000).randomized(-1.5*1000, 1.5 * 1000).do(() => {
+        this.timeouts.spawnSmall = Timeout.every(3.5 * 1000).randomized(-1.5 * 1000, 1.5 * 1000).do(() => {
             let e = this.spawnType(ENEMY_TYPE.SMALL);
 
             if (e) {
@@ -132,13 +132,7 @@ export default class EnemyManager {
     }
 
     update(time, delta) {
-        for (let eId of this.alive.keys()) {
-            if (this.alive.get(eId).isDead) {
-                let rndE = this.spawnEventsEnemies.values()[Math.floor(Math.random() * this.spawnEventsEnemies.size)];
-                if (this.spawnEventsEnemies.size > 0) rndE.emitter.emit(ENEMY_SPAWN_EVENT.PREVIOUS_DIE.name, this);
-                this.alive.delete(eId);
-            }
-        }
+        this.checkDeadEnemies();
     }
 
     pause() {
@@ -166,7 +160,18 @@ export default class EnemyManager {
         enemy.emitter.emit(Enemy.ON_DIE);
     }
 
+    checkDeadEnemies() {
+        for (let eId of this.alive.keys()) {
+            if (this.alive.get(eId).isDead) {
+                let rndE = this.spawnEventsEnemies.values()[Math.floor(Math.random() * this.spawnEventsEnemies.size)];
+                if (this.spawnEventsEnemies.size > 0) rndE.emitter.emit(ENEMY_SPAWN_EVENT.PREVIOUS_DIE.name, this);
+                this.alive.delete(eId);
+            }
+        }
+    }
+
     isOver() {
-        return this.nbEnSmall <= 0;
+        this.checkDeadEnemies();
+        return this.nbEnSmall <= 0 && this.alive.size == 0;
     }
 }

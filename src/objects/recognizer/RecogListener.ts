@@ -84,13 +84,14 @@ export default class RecogListener {
         return shape;
     }
 
-    addUserShape(shapeName) {
+    addUserShape(shapeName,points?) {
+        points = points || this.points;
         shapeName = shapeName.toLowerCase();
-        this.recognizer.AddGesture(shapeName, this.points);
-        this.recognizer.AddGesture(shapeName, this.points.slice().reverse());
+        this.recognizer.AddGesture(shapeName, points);
+        this.recognizer.AddGesture(shapeName, points.slice().reverse());
         let userShapes = localStorage.getItem('userShapes') ? JSON.parse(<string>localStorage.getItem('userShapes')) : {};
         userShapes[shapeName] = userShapes[shapeName] || [];
-        userShapes[shapeName].push(this.points);
+        userShapes[shapeName].push(points);
 
         localStorage.setItem('userShapes', JSON.stringify(userShapes));
     }

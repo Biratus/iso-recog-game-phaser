@@ -8,6 +8,7 @@ import { GameModule } from "../utils/GameUtils";
 import { LevelUtils } from "../utils/LevelUtils";
 import { RenderUtils } from "../utils/RenderUtils";
 import { Timeout } from '../utils/Timeout';
+import { Game } from 'phaser';
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
@@ -68,6 +69,13 @@ export default class Renderer {
     debug = false;
 
     constructor() {
+        GameModule.currentScene.cameras.main.alpha=0;
+        GameModule.currentScene.add.tween({
+            targets:GameModule.currentScene.cameras.main,
+            alpha:1,
+            duration:1000,
+            ease:Phaser.Math.Easing.Quartic.In
+        });
         this.bg = GameModule.currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
         this.bg.scaleX = window.innerWidth / this.bg.width;
         this.bg.scaleY = window.innerHeight / this.bg.height;
@@ -93,7 +101,7 @@ export default class Renderer {
         //     e.scaleX.onUpdate = e.scaleX.defaultUpdate;
         //     this.bgParticles.push(e);
         // }
-        let e = GameModule.currentScene.add.particles('p_bg_square').createEmitter({
+        let e = GameModule.currentScene.add.particles('p_bg_square2').createEmitter({
             frame: { frames: ['stroke', 'fill'], cycle: true, quantity: 2 },
             x: 0,
             y: 0,
@@ -108,6 +116,16 @@ export default class Renderer {
         });
         e.texture.source.forEach(src => src.resolution = 10);
         e.scaleX.onUpdate = e.scaleX.defaultUpdate;
+        e.setEmitZone({
+            type: 'random', source: {
+                getRandomPoint: (vec) => {
+                    let p = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight).getRandomPoint();
+                    vec.x = p.x;
+                    vec.y = p.y;
+                    return vec;
+                }
+            }
+        });
         this.bgParticles.push(e);
     }
 
@@ -379,6 +397,35 @@ export default class Renderer {
                 GameModule.currentScene.tweens.remove(this.playerTween);
                 this.player.clearTint();
             }            
+        });
+    }
+
+    tapIndication(x,y,onClick,destroyEvt) {
+        let img = GameModule.currentScene.add.sprite(x,y,'circle_skew').setScale(0.35);
+        let tween = GameModule.currentScene.add.tween({
+            targets:img,
+            scale:0.25,
+            alpha:0.5,
+            duration:300,
+            yoyo:true,
+            loop:-1,
+            ease:'Quadratic.InOut'
+        });
+        img.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        img.on('pointerup',onClick);
+        this.emitter.addListener(destroyEvt,() => {img.destroy();tween.stop();});
+    }
+
+    sceneTransition(sceneKey,onSceneEnd = () => {}) {
+        GameModule.currentScene.add.tween({
+            targets:GameModule.currentScene.cameras.main,
+            alpha:0,
+            duration:1000,
+            ease:Phaser.Math.Easing.Quartic.Out,
+            onComplete:() => {
+                onSceneEnd();
+                GameModule.currentScene.scene.start(sceneKey);
+            }
         });
     }
 

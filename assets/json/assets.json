@@ -15,7 +15,9 @@
         "blue.png",
         "red.png",
         "button_green.png",
-        "button_red.png"
+        "button_red.png",
+        "play.png",
+        "circle_skew.png"
         
     ],
     "json": [
@@ -35,6 +37,7 @@
     "atlas":[
         "p_bg",
         "p_bg2",
-        "p_bg_square"
+        "p_bg_square",
+        "p_bg_square2"
     ]
 }

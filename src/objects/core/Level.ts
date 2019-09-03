@@ -29,8 +29,11 @@ export default class Level {
     }
 
     create() {
-        for (let e of this.start.entries()) {
-            e.initEnemyManager();
+        for(let r of this.rooms.values()) {
+            for (let e of r.entries()) {
+                e.initEnemyManager();
+            }
+
         }
     }
 

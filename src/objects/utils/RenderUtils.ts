@@ -1,5 +1,5 @@
 import { Point } from 'outlines';
-import { IsoSprite } from 'phaser3-plugin-isometric';
+import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
 import { GameModule } from './GameUtils';
 
@@ -8,6 +8,11 @@ export module RenderUtils {
     export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.displayWidth / 2, 2) + Math.pow(sprite.displayWidth / 4, 2)); }
     export function spriteHalfIsoWidth(sprite: IsoSprite) { return RenderUtils.spriteIsoWidth(sprite) / 2; }
     export function spriteHalfIsoHeight(sprite: IsoSprite) { return RenderUtils.spriteIsoHeight(sprite) / 2; }
+    export function topXYFromIsoSprite(sprite: IsoSprite) { 
+        let p = (<any>Object).assign({},sprite.isoPosition);
+        p.z+=sprite.isoBounds.halfHeight;
+        return GameModule.currentScene.iso.projector.project(p) 
+    }
     export function posAreNear(val, pos, maxDist) {
         if (pos.length == 0) return false;
         for (let p of pos) {
