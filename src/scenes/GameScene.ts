@@ -81,7 +81,7 @@ export default class GameScene extends Phaser.Scene {
 
     // GRAPHICS
     // this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-    // this.info = this.add.text(50, 50, (localStorage.getItem('userShapes') !== undefined) + '', { color: 'red', size: '50px' });
+    this.info = this.add.text(50, 50, '', { color: 'red', size: '50px' });
     //LEVEL 
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
     this.currentLevel.preload();
@@ -96,8 +96,8 @@ export default class GameScene extends Phaser.Scene {
 
     // START GAME
     this.activeState = GameScene.STATES.RECOG;
-    this.recogListener.enable();
-    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+    this.resume();
+    // this.info.setText(renderer.smokeEntry('TOP'))
 
 
     // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
@@ -118,6 +118,8 @@ export default class GameScene extends Phaser.Scene {
     debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     debugBtn.on('pointerdown', () => {
       console.log('GameModule.currentScene', this);
+      // this.info.setText(renderer.smokeEntry('TOP'));
+
 
     });
     // let squareW=window.innerWidth*0.5;
@@ -128,6 +130,10 @@ export default class GameScene extends Phaser.Scene {
     this.currentLevel.update(time, delta);
     this.animationGraph.update(time, delta);
     renderer.update(time, delta);
+    this.info.setText((1000 / delta).toFixed(3));
+    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
+      if(enMana.isOver()) renderer.emitter.emit('smoke'+LOCATION.name(enMana.entry.location));
+    });
   }
 
   pause() {
@@ -139,7 +145,7 @@ export default class GameScene extends Phaser.Scene {
   resume() {
     this.isPause = false;
     this.recogListener.enable();
-    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+    this.startEnemyManagers();
 
   }
 
@@ -181,7 +187,7 @@ export default class GameScene extends Phaser.Scene {
       renderer.renderTransition(r, dest, () => {
         this.activeState = GameScene.STATES.RECOG
         this.currentLevel.currentRoom = dest;
-        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+        this.startEnemyManagers();
       });
     });
 
@@ -190,6 +196,12 @@ export default class GameScene extends Phaser.Scene {
     });
     this.events.addListener('enemyWaveEnd', () => {
       this.activeState = GameScene.STATES.IDLE;
+    });
+  }
+  startEnemyManagers() {
+    this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
+      if(!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+      enMana.start();
     });
   }
 

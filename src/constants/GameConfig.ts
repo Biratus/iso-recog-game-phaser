@@ -8,7 +8,8 @@ import MenuScene from '../scenes/MenuScene';
 export const gameConfig = {
   type: Phaser.WEBGL,
   parent: 'gameContainer',
-  scene: [BootScene, LoadScene, MenuScene,GameScene, TutorialScene],
+  scene: [BootScene, LoadScene, MenuScene,GameScene, TutorialScene]
+  // resolution:10
   // physics:{
   //   debug:true
   // }

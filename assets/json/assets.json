@@ -17,7 +17,17 @@
         "button_green.png",
         "button_red.png",
         "play.png",
-        "circle_skew.png"
+        "circle_skew.png",
+        "smoke_06_gray.png",
+        "smoke_07_gray.png",
+        "smoke_08_gray.png",
+        "smoke_01_gray.png",
+        "smoke_02_gray.png",
+        "smoke_03_gray.png",
+        "smoke_04_gray.png",
+        "smoke_05_gray.png",
+        "fire_01_gray.png",
+        "fire_02_gray.png"
         
     ],
     "json": [

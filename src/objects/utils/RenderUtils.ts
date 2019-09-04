@@ -2,16 +2,18 @@ import { Point } from 'outlines';
 import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
 import { GameModule } from './GameUtils';
+import { LOCATION } from '../../constants/Enums';
+import GameScene from '../../scenes/GameScene';
 
 export module RenderUtils {
     export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }
     export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.displayWidth / 2, 2) + Math.pow(sprite.displayWidth / 4, 2)); }
     export function spriteHalfIsoWidth(sprite: IsoSprite) { return RenderUtils.spriteIsoWidth(sprite) / 2; }
     export function spriteHalfIsoHeight(sprite: IsoSprite) { return RenderUtils.spriteIsoHeight(sprite) / 2; }
-    export function topXYFromIsoSprite(sprite: IsoSprite) { 
+    export function topXYFromIsoSprite(sprite: IsoSprite,proj2d = false) { 
         let p = (<any>Object).assign({},sprite.isoPosition);
         p.z+=sprite.isoBounds.halfHeight;
-        return GameModule.currentScene.iso.projector.project(p) 
+        return proj2d?GameModule.currentScene.iso.projector.project(p):p; 
     }
     export function posAreNear(val, pos, maxDist) {
         if (pos.length == 0) return false;
@@ -84,6 +86,24 @@ export module RenderUtils {
 
         return Math.getCentroidPosition(pts);
 
+    }
+
+    export function getTopFrontLine(spr,proj2d = false) :Phaser.Geom.Line{        
+        let p = (<any>Object).assign({},spr.isoPosition);
+        p.z+=spr.isoBounds.halfHeight;
+
+        let opp = LOCATION.opposite(LOCATION.signFromCoord(spr.isoPosition));
+        let w = RenderUtils.spriteHalfIsoWidth(spr);
+        p.x+=opp.x*w;
+        p.y+=opp.y*w;
+        let switched = LOCATION.signFromCoord(LOCATION.switchXY(p));
+        let s={x:p.x+switched.x*w,y:p.y+switched.y*w};
+        let e={x:p.x-switched.x*w,y:p.y-switched.y*w};
+        if(proj2d) {
+            s = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:s.x,y:s.y,z:p.z});
+            e = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:e.x,y:e.y,z:p.z});
+        }
+        return new Phaser.Geom.Line(s.x,s.y,e.x,e.y);
     }
 
     export function test() {

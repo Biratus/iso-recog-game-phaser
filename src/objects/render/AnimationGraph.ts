@@ -222,4 +222,14 @@ export default class AnimationGraph {
         let proj = GameModule.currentScene.iso.projector.project(p);
         this.mainGraphics.fillCircle(proj.x,proj.y,2);
     }
+
+    drawLine(line) {
+        this.mainGraphics.setDepth(GameModule.topZIndex());
+        this.mainGraphics.fillStyle(0xff0000);
+        for(let i=0;i<50;i++) {
+            let p = line.getRandomPoint();
+            this.mainGraphics.fillCircle(p.x,p.y,2);
+        }
+        // this.mainGraphics.lineBetween(line.x1,line.y1,line.x2,line.y2);
+    }
 }
