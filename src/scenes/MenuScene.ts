@@ -18,8 +18,8 @@ export default class MenuScene extends Phaser.Scene {
         let play = this.add.image(window.innerWidth / 2, window.innerHeight / 2, 'play').setScale(0.75);
         play.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
         play.once('pointerup', () => {
-            // renderer.sceneTransition(SCENE_TUTORIAL.key);
-            renderer.sceneTransition(SCENE_GAME.key);
+            renderer.sceneTransition(SCENE_TUTORIAL.key);
+            // renderer.sceneTransition(SCENE_GAME.key);
         });
         this.add.tween({
             targets:play,
