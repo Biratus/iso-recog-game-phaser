@@ -12,7 +12,7 @@ import Loader from "../objects/utils/Loader";
 import { Timeout } from "../objects/utils/Timeout";
 import MapUtils from '../objects/utils/MapUtils';
 import { RenderUtils } from '../objects/utils/RenderUtils';
-import { INTERACTION_EVENT } from '../constants/Enums';
+import { INTERACTION_EVENT, LOCATION } from '../constants/Enums';
 
 export default class TutorialScene extends Phaser.Scene {
 
@@ -114,11 +114,11 @@ export default class TutorialScene extends Phaser.Scene {
         this.start();
 
         //DEBUG
-        let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
-        debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-        debugBtn.on('pointerdown', () => {
-            console.log('GameModule.currentScene', this);
-        });
+        // let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
+        // debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        // debugBtn.on('pointerdown', () => {
+        //     console.log('GameModule.currentScene', this);
+        // });
     }
 
     start() {
@@ -160,13 +160,19 @@ export default class TutorialScene extends Phaser.Scene {
     resume() {
         this.isPause = false;
         this.recogListener.enable();
-        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
+            if (!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+            enMana.start();
+        });
 
     }
 
     update(time: number, delta: number) {
         this.currentLevel.update(time, delta);
         this.animationGraph.update(time, delta);
+        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
+            if (enMana.isOver()) renderer.emitter.emit('smoke' + LOCATION.name(enMana.entry.location));
+        });
         renderer.update(time, delta);
     }
 
@@ -208,7 +214,7 @@ export default class TutorialScene extends Phaser.Scene {
                 localStorage.setItem('tutorialOver', 'true');
                 for (let shape of this.userShapes) this.recogListener.addUserShape(shape.name, shape.points);
                 let entry = renderer.currentEntriesSprite.BOTTOM;
-                let pos = RenderUtils.topXYFromIsoSprite(entry);
+                let pos = RenderUtils.topXYFromIsoSprite(entry,true);
                 renderer.tapIndication(pos.x, pos.y, () => {
                     renderer.emitter.emit('tapIndic');
                 }, 'tapIndic');
