@@ -110,7 +110,7 @@ export default class EnemyManager {
 
     start() {
         // console.log('start enMana ' + this.entry.sign);
-        this.timeouts.spawnSmall = Timeout.every(3.5 * 1000).randomized(-1.5 * 1000, 1.5 * 1000).do(() => {
+        this.timeouts.spawnSmall = Timeout.every(2.5 * 1000 + this.nbEnSmall * 500).randomized(-0.5 * 1000 + this.nbEnSmall * 250, 1.5 * 1000 + this.nbEnSmall * 250).do(() => {
             let e = this.spawnType(ENEMY_TYPE.SMALL);
 
             if (e) {
