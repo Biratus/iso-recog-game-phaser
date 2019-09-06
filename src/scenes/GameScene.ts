@@ -4,7 +4,7 @@ import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
 import { SCENE_GAME } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { INTERACTION_EVENT, LOCATION } from '../constants/Enums';
+import { INTERACTION_EVENT, LOCATION, EVENTS } from '../constants/Enums';
 import Level from '../objects/core/Level';
 import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
@@ -132,7 +132,7 @@ export default class GameScene extends Phaser.Scene {
     renderer.update(time, delta);
     this.info.setText((1000 / delta).toFixed(3));
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-      if(enMana.isOver()) renderer.emitter.emit('smoke'+LOCATION.name(enMana.entry.location));
+      if(enMana.isOver()) renderer.emitter.emit(EVENTS.ENTRY_SMOKE+LOCATION.name(enMana.entry.location));
     });
   }
 
@@ -150,7 +150,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   initEvents() {//Events should be down in room
-    this.events.addListener('shapeDrown', ({ result, list }) => {
+    this.events.addListener(EVENTS.SHAPE_DRAWN, ({ result, list }) => {
       if (!result || !list) {
         // this.currentShape.setText("NO RESULTS");
         return;
@@ -179,9 +179,9 @@ export default class GameScene extends Phaser.Scene {
       if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
-    renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
+    renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
       if (this.activeState !== GameScene.STATES.IDLE) return;
-      renderer.emitter.emit('tapIndic');
+      renderer.emitter.emit(EVENTS.TAP_INDICATION);
       let r = this.currentLevel.currentRoom;
       let dest = r._entries[location].dest;
       renderer.renderTransition(r, dest, () => {
@@ -191,10 +191,10 @@ export default class GameScene extends Phaser.Scene {
       });
     });
 
-    this.events.addListener('enemyReachCenter', (en, enMana) => {
+    this.events.addListener(EVENTS.REACH_CENTER, (en, enMana) => {
       renderer.playerTakeHit(enMana.entry);
     });
-    this.events.addListener('enemyWaveEnd', () => {
+    this.events.addListener(EVENTS.WAVE_END, () => {
       this.activeState = GameScene.STATES.IDLE;
     });
   }

@@ -12,7 +12,7 @@ import Loader from "../objects/utils/Loader";
 import { Timeout } from "../objects/utils/Timeout";
 import MapUtils from '../objects/utils/MapUtils';
 import { RenderUtils } from '../objects/utils/RenderUtils';
-import { INTERACTION_EVENT, LOCATION } from '../constants/Enums';
+import { LOCATION, EVENTS } from '../constants/Enums';
 
 export default class TutorialScene extends Phaser.Scene {
 
@@ -185,11 +185,11 @@ export default class TutorialScene extends Phaser.Scene {
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
                 this.awaitingDrawing = true;
                 this.recogListener.enable();
-                this.animationGraph.focusLight(en.sprite, 'enLight');
+                this.animationGraph.focusLight(en.sprite, EVENTS.LIGHT);
                 this.userInputShape(en.sign);
             }).start();
         });
-        this.events.addListener('shapeDrown', ({ result, list }) => {
+        this.events.addListener(EVENTS.SHAPE_DRAWN, ({ result, list }) => {
             result = result || { Name: undefined, Score: 0 };
             list = list || [];
 
@@ -197,7 +197,7 @@ export default class TutorialScene extends Phaser.Scene {
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
                 renderer.resumeBackgroundParticles();
-                this.animationGraph.emitter.emit('enLight');
+                this.animationGraph.emitter.emit(EVENTS.LIGHT);
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
                 this.awaitingDrawing = false;
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
@@ -216,14 +216,13 @@ export default class TutorialScene extends Phaser.Scene {
                 let entry = renderer.currentEntriesSprite.BOTTOM;
                 let pos = RenderUtils.topXYFromIsoSprite(entry,true);
                 renderer.tapIndication(pos.x, pos.y, () => {
-                    renderer.emitter.emit('tapIndic');
+                    renderer.emitter.emit(EVENTS.TAP_INDICATION);
                 }, 'tapIndic');
                 this.over = true;
             }
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);
-            this.animationGraph.emitter.emit('userInput');
         });
         this.input.on('pointermove', (pointer) => {
             this.recogListener.emitter.emit('pointermove', pointer);
@@ -231,9 +230,9 @@ export default class TutorialScene extends Phaser.Scene {
         this.input.on('pointerup', (pointer) => {
             this.recogListener.emitter.emit('pointerup', pointer);
         });
-        renderer.emitter.addListener(INTERACTION_EVENT.ENTRY_CLICK, (location: string) => {
+        renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
             if (!this.over) return;
-            renderer.emitter.emit('tapIndic');
+            renderer.emitter.emit(EVENTS.TAP_INDICATION);
             let renderEntry = renderer.currentEntriesSprite[location];
             GameModule.currentScene.tweens.add({
                 targets: renderer.player,

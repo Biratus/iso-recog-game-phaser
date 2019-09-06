@@ -28,7 +28,7 @@ export default class Entry {
     initEnemyManager() {
         this.enemyManager = new EnemyManager(this);
         this.enemyManager.createMultiple(ENEMY_TYPE.SMALL, this.nbEnSmall);
-        for (let e of this.spawnEvtMed) this.enemyManager.createMultipleMed(1, e);
+        for (let e of this.spawnEvtMed) this.enemyManager.createMultipleEvent(1, ENEMY_TYPE.MEDIUM,e);
         this.enemyManager.createMultiple(ENEMY_TYPE.MEDIUM, this.nbEnMed - this.spawnEvtMed.length);
 
     }

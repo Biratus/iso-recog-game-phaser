@@ -1,7 +1,7 @@
 import 'phaser';
 import { IsoSprite } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from '../../constants/Constants';
-import { ENEMY_TYPE } from '../../constants/Enums';
+import { ENEMY_TYPE, EVENTS } from '../../constants/Enums';
 import { GameModule } from '../utils/GameUtils';
 import { renderer } from '../render/Renderer';
 
@@ -24,36 +24,24 @@ export default class Enemy {
     speed: number;
     isDead: boolean
 
-    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, sign: string, frame?: number }, type: string, onSpawnEvent, spawningEvent?) {
+    constructor(spriteConfig: { x: number, y: number, z: number, texture: string, sign: string, frame?: number }, type: string, speed) {
         this._id = Enemy._idCount++;
         this._config = spriteConfig;
-        this.speed = 10;
-        this.spawningEvent = spawningEvent;
+        this.speed = speed;
         this.type = type;
         this.sign = this._config.sign;
         this.emitter = new Phaser.Events.EventEmitter();
-        if (!this.spawningEvent) {
-            this.create();
-            onSpawnEvent(this);
-        }
-        else {
-            this.emitter.on(spawningEvent.name, (enMana) => {
-                this.create();
-                spawningEvent.run(this, enMana);
-            });
-        }
-
     }
 
     get id() { return this._id; }
 
     create() {
-        this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0,this._config.texture);//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
+        this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, this._config.texture);//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
         this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;
         renderer.spritesContainer.add(this.sprite);
-        this.emitter.emit(Enemy.ON_SPAWN);
+        this.emitter.emit(EVENTS.ENEMY_SPAWN);
     }
 
     goToGoal = (x, y, onFinish): void => {
@@ -81,11 +69,18 @@ export default class Enemy {
     takeHit() {
         switch (this.type) {
             case ENEMY_TYPE.SMALL:
-                console.log('ouch');
                 this.tween.stop();
                 this.sprite.destroy();
                 this.isDead = true;
                 break;
+            case ENEMY_TYPE.MEDIUM:
+                this.tween.stop();
+                //TODO knockback
+                this.type=ENEMY_TYPE.SMALL;
+                this.sprite.texture = 'en_'+ENEMY_TYPE.SMALL+'_'+this.sign;
+                this.goToGoal(0, 0, );
+                break;
+
         }
     }
 

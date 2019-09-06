@@ -1,7 +1,7 @@
 import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
-import { INTERACTION_EVENT, LOCATION } from "../../constants/Enums";
+import { INTERACTION_EVENT, LOCATION, EVENTS } from "../../constants/Enums";
 import Entry from "../core/Entry";
 import Room from "../core/Room";
 import { GameModule } from "../utils/GameUtils";
@@ -175,7 +175,7 @@ export default class Renderer {
             sprite.isoY += (tile_width / 2) * LOCATION[loc].y - LOCATION[loc].y * 100;
             sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
             sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-            sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
+            sprite.on('pointerdown', () => this.emitter.emit(EVENTS.ENTRY_CLICK, loc));
             this.currentEntriesSprite[loc] = sprite;
         }
         //current Room Transition
@@ -201,7 +201,7 @@ export default class Renderer {
             sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
             sprite.visible = false;
             sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-            sprite.on('pointerdown', () => this.emitter.emit(INTERACTION_EVENT.ENTRY_CLICK, loc));
+            sprite.on('pointerdown', () => this.emitter.emit(EVENTS.ENTRY_CLICK, loc));
             this.currentEntriesTransitionSprite[loc] = sprite;
         }
         this.group.children = this.getAllSprites();

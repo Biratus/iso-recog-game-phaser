@@ -1,5 +1,5 @@
 import 'phaser';
-import { ENEMY_SPAWN_EVENT, ENEMY_TYPE, LOCATION } from '../../constants/Enums';
+import { ENEMY_SPAWN_EVENT, ENEMY_TYPE, LOCATION, EVENTS } from '../../constants/Enums';
 import Enemy from '../character/Enemy';
 import { renderer } from '../render/Renderer';
 import { GameModule } from '../utils/GameUtils';
@@ -15,43 +15,53 @@ export default class EnemyManager {
     // config var
     nbEnSmall = 0;
     nbRndMed = 0;
+
+    totEnemies = 0;
+
     spawnEventsEnemies: Phaser.Structs.Map<number, Enemy>;
 
     eventListener = new Phaser.Events.EventEmitter();
 
     someData = { enemyKilledSinceBegining: 0 };
 
+    static enemySpeed = {};
+
     constructor(entry) {
+        EnemyManager.enemySpeed[ENEMY_TYPE.SMALL] = 10;
+        EnemyManager.enemySpeed[ENEMY_TYPE.MEDIUM] = 7;
         this.entry = entry;
         this.alive = new Phaser.Structs.Map<number, Enemy>([]);
         this.spawnEventsEnemies = new Phaser.Structs.Map<number, Enemy>([]);
 
-        this.eventListener.addListener('reachCenter', (en) => {
+        this.eventListener.addListener(EVENTS.REACH_CENTER, (en) => {
             this.someData.enemyKilledSinceBegining++;
-            GameModule.currentScene.events.emit('enemyReachCenter', en, this);
-            this.eventListener.emit('enemyKilled' + this.someData.enemyKilledSinceBegining);
-            this.killInstant(en);
+            GameModule.currentScene.events.emit(EVENTS.REACH_CENTER, en, this);
+            en.isDead = true;
         });
     }
 
-    spawnType = (type): Enemy | undefined => {
-        let e;
+    spawn = (type) => {
+        let e = new Enemy(this.getEnemyConfig(type), type,EnemyManager.enemySpeed[type]);
+        e.emitter.on(Enemy.ON_SPAWN, () => {
+            this.alive.set(e.id, e);
+        });
+        this.alive.set(e.id, e);
+        return e;
+    }
+
+    spawnRandom = (type): Enemy | undefined => {
         // console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 if (this.nbEnSmall <= 0) return;
                 this.nbEnSmall--;
-                e = this.createEnemy(this.getEnemyConfig(type), type);
-                this.alive.set(e.id, e);
                 break;
             case ENEMY_TYPE.MEDIUM:
                 if (this.nbRndMed <= 0) return;
                 this.nbRndMed--;
-                e = this.createEnemy(this.getEnemyConfig(type), type);
-                this.alive.set(e.id, e);
                 break;
         }
-        return e;
+        return this.spawn(type);
     }
 
     getEnemyConfig(type) {
@@ -69,39 +79,28 @@ export default class EnemyManager {
 
     }
 
-    spawnEvent(event) {
-
-    }
-
     createMultiple(type, nb) {
+        this.totEnemies+=nb;
         if (isNaN(nb)) nb = 0;
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 this.nbEnSmall = nb;
                 break;
+            case ENEMY_TYPE.MEDIUM:
+                this.nbRndMed = nb;
+                break;
         }
     }
 
-    createMultipleMed(nb, event) {
+    createMultipleEvent(nb,type, event) {
         for (let i = 0; i < nb; i++) {
-            let e = this.createEnemy(this.getEnemyConfig(ENEMY_TYPE.MEDIUM), ENEMY_TYPE.MEDIUM, event);
-            this.spawnEventsEnemies.set(e.id, e);
+            this.eventListener.once(event, () => {
+                let e = this.spawn(type);
+                if (e) e.goToGoal(0, 0, (en) => {
+                    this.eventListener.emit(EVENTS.REACH_CENTER, en, this);
+                });
+            });
         }
-    }
-
-    createEnemy(config, type, event?) {
-        // console.log('create Enemy enMana '+this.entry.sign);
-        let e = new Enemy(config, type, (en) => {
-            this.alive.set(en.id, en);
-            this.spawnEventsEnemies.delete(en.id);
-
-        }, event);
-        e.emitter.on(Enemy.ON_SPAWN, () => {
-            this.alive.set(e.id, e);
-            this.spawnEventsEnemies.delete(e.id);
-
-        });
-        return e;
     }
 
     makeAllDo = (behavior: (e: Enemy) => void) => {
@@ -109,26 +108,32 @@ export default class EnemyManager {
     }
 
     start() {
+        let smallInter = 2.5 * 1000 + this.totEnemies * 500;
+        let medInter = 4.5 * 1000 + this.totEnemies * 500;
+        let rndInter = 0.5 * 1000 + this.totEnemies * 250;
         // console.log('start enMana ' + this.entry.sign);
-        this.timeouts.spawnSmall = Timeout.every(2.5 * 1000 + this.nbEnSmall * 500).randomized(-0.5 * 1000 + this.nbEnSmall * 250, 1.5 * 1000 + this.nbEnSmall * 250).do(() => {
-            let e = this.spawnType(ENEMY_TYPE.SMALL);
-
+        this.timeouts.spawnSmall = Timeout.every(smallInter).randomized(-1*rndInter,rndInter ).do(() => {
+            let e = this.spawnRandom(ENEMY_TYPE.SMALL);
             if (e) {
                 e.goToGoal(0, 0, (en) => {
-                    this.eventListener.emit('reachCenter', en, this);
+                    this.eventListener.emit(EVENTS.REACH_CENTER, en, this);
                 });
                 GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
             } else this.timeouts.spawnSmall.destroy();
         }).start();
 
-        // start spawn med en
-        // let e = this.spawnType(ENEMY_TYPE.MEDIUM);
-        // let c = renderer.getCenterXYOfRoom(this.entry.source);
-        // e!.goToGoal(0,0, (en) => {
-        //     this.killInstant(en,true);
-        // });
+        this.timeouts.spawnMed = Timeout.every(medInter).randomized(-1*rndInter,rndInter).do(() => {
+            let e = this.spawnRandom(ENEMY_TYPE.MEDIUM);
 
+            if (e) {
+                e.goToGoal(0, 0, (en) => {
+                    this.eventListener.emit(EVENTS.REACH_CENTER, en, this);
+                });
+                GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
+            } else this.timeouts.spawnMed.destroy();
+        }).start();
 
+        this.eventListener.emit(EVENTS.GAME_START);//for enemy with game start evt
     }
 
     update(time, delta) {
@@ -153,18 +158,14 @@ export default class EnemyManager {
         return ordered.splice(0, nb ? nb : 1);
     }
 
-    killInstant(enemy: Enemy, playEvent = false) {
-        if (!playEvent) this.alive.delete(enemy.id);
-        enemy.isDead = true;
-        enemy.sprite.destroy();
-        enemy.emitter.emit(Enemy.ON_DIE);
-    }
-
     checkDeadEnemies() {
         for (let eId of this.alive.keys()) {
             if (this.alive.get(eId).isDead) {
-                let rndE = this.spawnEventsEnemies.values()[Math.floor(Math.random() * this.spawnEventsEnemies.size)];
-                if (this.spawnEventsEnemies.size > 0) rndE.emitter.emit(ENEMY_SPAWN_EVENT.PREVIOUS_DIE.name, this);
+                this.alive.get(eId).sprite.destroy();
+                this.alive.get(eId).emitter.emit(Enemy.ON_DIE);
+
+                this.someData.enemyKilledSinceBegining++;
+                this.eventListener.emit(EVENTS.ENEMY_KILLED + this.someData.enemyKilledSinceBegining);
                 this.alive.delete(eId);
             }
         }

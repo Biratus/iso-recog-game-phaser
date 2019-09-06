@@ -1,6 +1,7 @@
 import { DollarRecognizer, Point } from 'outlines';
 import 'phaser';
 import { GameModule } from '../utils/GameUtils';
+import { EVENTS } from '../../constants/Enums';
 
 export default class RecogListener {
     points: Point[] = [];
@@ -43,7 +44,7 @@ export default class RecogListener {
             if (!this.enabled) return;
             this._isDown = false;
             let shape = this.getShape();
-            shapeDrownListener.emit('shapeDrown', shape);
+            shapeDrownListener.emit(EVENTS.SHAPE_DRAWN, shape);
             this.graphics.clear();
         });
         for (let type in GameModule.Unistrokes) {
