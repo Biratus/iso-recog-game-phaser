@@ -1,4 +1,4 @@
-import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
+import { IsoSprite, Point3 } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
 import { INTERACTION_EVENT, LOCATION, EVENTS } from "../../constants/Enums";
@@ -8,7 +8,7 @@ import { GameModule } from "../utils/GameUtils";
 import { LevelUtils } from "../utils/LevelUtils";
 import { RenderUtils } from "../utils/RenderUtils";
 import { Timeout } from '../utils/Timeout';
-import { Game } from 'phaser';
+import { Game, FacebookInstantGamesLeaderboard } from 'phaser';
 import GameScene from '../../scenes/GameScene';
 
 class IsoGroup {
@@ -155,6 +155,33 @@ export default class Renderer {
 
     private initSprites = () => {
         if (this.spriteInitialized) return;
+
+        this.initSpritesRoom();
+
+        this.group.children = this.getAllSprites();
+        console.log(this.group.children.length + ' created');
+        this.spritesContainer.add(this.group.children);
+        console.log(this.spritesContainer.list.length + ' sprCont child');
+        // this.spritesContainer.setDepth(GameModule.topZIndex());
+        // //bg particles
+        // let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y);
+        // let emitZone = {
+        //     type: 'random', source: {
+        //         getRandomPoint: (vec) => {
+        //             let p = validZone.getRandomPoint();
+        //             vec.x = p.x;
+        //             vec.y = p.y;
+        //             return vec;
+        //         }
+        //     }
+        // }
+        // this.particles.bg.setEmitZone(emitZone);
+
+
+        this.spriteInitialized = true;
+    }
+
+    private initSpritesRoom = () => {
         //current Room
         this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
         this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
@@ -204,23 +231,7 @@ export default class Renderer {
             sprite.on('pointerdown', () => this.emitter.emit(EVENTS.ENTRY_CLICK, loc));
             this.currentEntriesTransitionSprite[loc] = sprite;
         }
-        this.group.children = this.getAllSprites();
-        this.spritesContainer.add(this.group.children);
-        let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y);
-        let emitZone = {
-            type: 'random', source: {
-                getRandomPoint: (vec) => {
-                    let p = validZone.getRandomPoint();
-                    vec.x = p.x;
-                    vec.y = p.y;
-                    return vec;
-                }
-            }
-        }
-        this.particles.bg.setEmitZone(emitZone);
-        this.spriteInitialized = true;
     }
-
     renderTransition = (source: Room, dest: Room, callback: Function) => {
         if (this.roomTransitionPlaying) return;
         this.roomTransitionPlaying = true;
@@ -381,6 +392,25 @@ export default class Renderer {
         this.particles.bg.resume();
     }
 
+    pauseSmokeParticles() {
+        for (let location of LOCATION.enum()) {
+        //     for (let i = 0; i < 4; i++) {
+        //         if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].stop();
+        //     }
+                if (this.particles['smoke' + location]) this.particles['smoke' + location].stop();
+        }
+
+    }
+    resumeSmokeParticles() {
+        for (let location of LOCATION.enum()) {
+            // for (let i = 0; i < 4; i++) {
+            //     if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].start();
+            // }
+            if (this.particles['smoke' + location]) this.particles['smoke' + location].start();
+        }
+
+    }
+
     playerTakeHit(fromEntry: Entry) {
         if (this.playerTween) {
             this.playerTween.stop();
@@ -428,28 +458,47 @@ export default class Renderer {
             }
         });
     }
-    textIndx= 0;
-    smokeEntry(location: string,destroyEvt = 'smoke'+location) {
-        let textures=[
-        "smoke_06_gray",
-        "smoke_08_gray",
-        "smoke_07_gray",
-        "smoke_01_gray",
-        "smoke_02_gray",
-        "smoke_03_gray",
-        "smoke_04_gray",
-        "smoke_05_gray",]
-            if(this.textIndx>=textures.length) this.textIndx=0;
+    textIndx = 0;
+    smokeEntry(location: string, destroyEvt = 'smoke' + location) {
+        let textures = [
+            "smoke_06_gray",
+            "smoke_08_gray",
+            "smoke_07_gray",
+            "smoke_01_gray",
+            "smoke_02_gray",
+            "smoke_03_gray",
+            "smoke_04_gray",
+            "smoke_05_gray",]
+        if (this.textIndx >= textures.length) this.textIndx = 0;
         let smoke = GameModule.currentScene.add.particles(textures[0]);
         this.textIndx++;
         // let line2d = RenderUtils.getTopFrontLine(this.currentEntriesSprite[location], true);
-            console.log('smoke at '+location,this.currentEntriesSprite[location]);
         let center = RenderUtils.topXYFromIsoSprite(this.currentEntriesSprite[location]);
-        let w = RenderUtils.spriteHalfIsoWidth(this.currentEntriesSprite[location])*0.7;
-        let ptsShape = [{x:center.x+w,y:center.y+w,z:center.z},{x:center.x+w,y:center.y-w,z:center.z},{x:center.x-w,y:center.y-w,z:center.z},{x:center.x-w,y:center.y+w,z:center.z}];
+        let w = RenderUtils.spriteHalfIsoWidth(this.currentEntriesSprite[location]) * 0.4;
+        let ptsShape = [{ x: center.x + w, y: center.y + w, z: center.z }, { x: center.x + w, y: center.y - w, z: center.z }, { x: center.x - w, y: center.y - w, z: center.z }, { x: center.x - w, y: center.y + w, z: center.z }];
 
         let emitShape = new Phaser.Geom.Polygon(ptsShape.map(pt => (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>pt)));
         let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
+        let pts = aabb.getPoints(4);
+        // for (let i = 0; i < 4; i++) {
+        //     let pt = pts[i];
+        //     if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].stop();
+        //     let rnd = aabb.getRandomPoint();
+        //     while (!emitShape.contains(rnd.x, rnd.y)) rnd = aabb.getRandomPoint();
+        //     this.particles['smoke' + location + i] = smoke.createEmitter({
+        //         alpha: { start: 1, end: 0 },
+        //         scale: { start: 0, end: 0.15 },
+        //         speed: 20,
+        //         accelerationY: -70,
+        //         angle: { min: 20, max: 120 },
+        //         // rotate: { min: -180, max: 180 },
+        //         lifespan: { min: 900, max: 1000 },
+        //         // blendMode: 'SCREEN',
+        //         frequency: 300,
+        //         x: pt.x,
+        //         y: pt.y
+        //     });
+        // }
         if (this.particles['smoke' + location]) this.particles['smoke' + location].stop();
         this.particles['smoke' + location] = smoke.createEmitter({
             alpha: { start: 1, end: 0 },
@@ -457,7 +506,7 @@ export default class Renderer {
             speed: 20,
             accelerationY: -70,
             angle: { min: -85, max: -95 },
-            rotate: { min: -180, max: 180 },
+            // rotate: { min: -180, max: 180 },
             lifespan: { min: 900, max: 1000 },
             // blendMode: 'SCREEN',
             frequency: 80,
@@ -475,11 +524,15 @@ export default class Renderer {
                 }
             }
         });
-        this.emitter.once(destroyEvt,() => {
+        this.emitter.once(destroyEvt, () => {
+            // for (let i = 0; i < 4; i++) {
+            //     this.particles['smoke' + location + i].stop();
+            //     delete this.particles['smoke' + location + i];
+            // }
             this.particles['smoke' + location].stop();
             delete this.particles['smoke' + location];
         });
-        return textures[this.textIndx-1];
+        return textures[this.textIndx - 1];
     }
 
     static init() { renderer = new Renderer(); }

@@ -122,7 +122,10 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     start() {
-        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.start());
+        this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
+            if (!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+            enMana.start();
+        });
     }
 
     userInputShape(shape) {
@@ -182,6 +185,7 @@ export default class TutorialScene extends Phaser.Scene {
             this.currentLevel.currentRoom.getAllEnemiesManager().filter((enMana) => !enMana.alive.has(en.id)).forEach((enMana) => enMana.pause());
             this.shapeDrawTimeout = Timeout.in(1500).do(() => {
                 renderer.pauseBackgroundParticles();
+                renderer.pauseSmokeParticles();
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
                 this.awaitingDrawing = true;
                 this.recogListener.enable();
@@ -192,11 +196,12 @@ export default class TutorialScene extends Phaser.Scene {
         this.events.addListener(EVENTS.SHAPE_DRAWN, ({ result, list }) => {
             result = result || { Name: undefined, Score: 0 };
             list = list || [];
-
+           
             let threshold = GameModule.debug ? 0.8 : 0.955;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 this.animationGraph.clearMain();
                 renderer.resumeBackgroundParticles();
+                renderer.resumeSmokeParticles();
                 this.animationGraph.emitter.emit(EVENTS.LIGHT);
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
                 this.awaitingDrawing = false;
@@ -223,6 +228,7 @@ export default class TutorialScene extends Phaser.Scene {
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);
+            this.animationGraph.emitter.emit('userInput');
         });
         this.input.on('pointermove', (pointer) => {
             this.recogListener.emitter.emit('pointermove', pointer);

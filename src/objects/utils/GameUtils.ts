@@ -48,4 +48,7 @@ export module GameModule {
 	export function topZIndex() {
 		return ArrayUtils.of(GameModule.currentScene.children.list).maxValue((c) => c.depth) + 1;
 	}
+	export function lowZIndex() {
+		return ArrayUtils.of(GameModule.currentScene.children.list).minValue((c) => c.depth) - 1;
+	}
 }

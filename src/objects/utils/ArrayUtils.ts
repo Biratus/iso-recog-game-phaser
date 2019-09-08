@@ -18,4 +18,12 @@ export default class ArrayUtils {
         }
         return maxStart;
     };
+    minValue = (getMin, minStart?) => {
+        minStart = minStart === undefined ? 1 : minStart;
+        for (let elt of this.items) {
+            let val = getMin(elt);
+            if (minStart > val) minStart = val;
+        }
+        return minStart;
+    };
 };

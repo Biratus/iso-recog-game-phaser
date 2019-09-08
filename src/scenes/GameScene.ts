@@ -95,11 +95,11 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
 
     // START GAME
-    this.activeState = GameScene.STATES.RECOG;
-    this.resume();
+    this.activeState = GameScene.STATES.IDLE;
+    // this.resume();
     // this.info.setText(renderer.smokeEntry('TOP'))
 
-
+    renderer.smokeEntry('TOP');
     // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
     // s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     // s.on('pointerup', () => {
@@ -167,6 +167,7 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
+      renderer.smokeEntry('TOP');
       if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });

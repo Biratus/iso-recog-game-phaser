@@ -24,6 +24,8 @@ export default class Enemy {
     speed: number;
     isDead: boolean
 
+    gotToGoalConfig: any;
+
     constructor(spriteConfig: { x: number, y: number, z: number, texture: string, sign: string, frame?: number }, type: string, speed) {
         this._id = Enemy._idCount++;
         this._config = spriteConfig;
@@ -48,6 +50,7 @@ export default class Enemy {
         if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) return;
         // console.log('dx='+Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)/this.speed);
         // console.log('dy = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)+'ty = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed);
+        this.gotToGoalConfig = { x, y, onFinish };
         this.tween = GameModule.currentScene.tweens.add({
             targets: this.sprite,
             onComplete: () => onFinish(this),
@@ -67,6 +70,7 @@ export default class Enemy {
     }
 
     takeHit() {
+        console.log(this.type+' '+this.sign+' ouch');
         switch (this.type) {
             case ENEMY_TYPE.SMALL:
                 this.tween.stop();
@@ -76,9 +80,28 @@ export default class Enemy {
             case ENEMY_TYPE.MEDIUM:
                 this.tween.stop();
                 //TODO knockback
-                this.type=ENEMY_TYPE.SMALL;
-                this.sprite.texture = 'en_'+ENEMY_TYPE.SMALL+'_'+this.sign;
-                this.goToGoal(0, 0, );
+                let x=(this.sprite.isoX - this.gotToGoalConfig.x)/Math.abs(this.sprite.isoX - this.gotToGoalConfig.x);
+                let y=(this.sprite.isoY - this.gotToGoalConfig.y)/Math.abs(this.sprite.isoY - this.gotToGoalConfig.y);
+                x*=GAME_CONFIG.scale * GAME_CONFIG.tile_size*0.02;
+                y*=GAME_CONFIG.scale * GAME_CONFIG.tile_size*0.02
+                this.tween = GameModule.currentScene.add.tween({
+                    isoX: {
+                        value: x,
+                        duration: 100,
+                        ease: 'Linear'
+                    },
+                    isoY: {
+                        value: y,
+                        duration: 100,
+                        ease: 'Linear'
+                    },
+                    onComplete:() => this.goToGoal(this.gotToGoalConfig.x, this.gotToGoalConfig.y, this.gotToGoalConfig.onFinish)
+                });
+                this.type = ENEMY_TYPE.SMALL;
+                this.sprite.texture = 'en_' + ENEMY_TYPE.SMALL + '_' + this.sign;
+                /* IN THE FUTURE: 
+                    replace texture change with animation and then give small texture
+                */
                 break;
 
         }

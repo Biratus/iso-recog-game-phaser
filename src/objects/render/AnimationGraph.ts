@@ -148,21 +148,19 @@ export default class AnimationGraph {
 
     focusLight(sprite, endEvent) {
         renderer.spritesContainer.clearMask();
-        if(this.lightSource) this.lightSource.destroy();
-        if(this.lightSourceTween) this.lightSourceTween.stop();
+        if (this.lightSource) this.lightSource.destroy();
+        if (this.lightSourceTween) this.lightSourceTween.stop();
 
         this.lightSource = GameModule.currentScene.make.sprite({
-            x: sprite.isoBounds.centerX,
-            y: sprite.y - sprite.height * 0.75,
+            x: sprite.x,
+            y: sprite.y,
+            angle:90,
+            alpha:0.8,
             key: 'mask1',
-            add: true
-        }).setScale(0.5);
+            add: false
+        });
+        
         this.lightSource.scale = GAME_CONFIG.scale;
-        let mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);
-        renderer.spritesContainer.setMask(mask);
-        this.lightSource.alpha = 0.8;
-        this.lightSource.x = sprite.x;
-        this.lightSource.y = sprite.y;
         this.lightSourceTween = GameModule.currentScene.tweens.add({
             targets: this.lightSource,
             alpha: 0.5,
@@ -173,10 +171,25 @@ export default class AnimationGraph {
             yoyo: true
         });
         this.emitter.on(endEvent, () => {
+            console.log("lol");
+            this.lightSourceTween.stop();
             renderer.spritesContainer.clearMask();
             this.lightSource.destroy();
-            this.lightSourceTween.stop();
+            // this.lightSourceTween.stop();
+            // this.lightSource.alpha=1;
+            // this.lightSourceTween = GameModule.currentScene.tweens.add({
+            //     targets: this.lightSource,
+            //     scale: 30,
+            //     alpha:1,
+            //     duration: 1700,
+            //     ease: 'Sine.easeInOut',
+            //     onComplete: () => {
+            //         renderer.spritesContainer.clearMask();
+            //         this.lightSource.destroy();
+            //     }
+            // });
         });
+        renderer.spritesContainer.mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);
     }
 
     shapeClue(path, destroyEvt) {
@@ -212,23 +225,23 @@ export default class AnimationGraph {
         spr.resetIsoBounds();
         this.mainGraphics.setDepth(GameModule.topZIndex());
         let corners = spr.isoBounds.getCorners();
-        for(let c of corners) {
+        for (let c of corners) {
             let proj = GameModule.currentScene.iso.projector.project(c);
-            this.mainGraphics.fillCircle(proj.x,proj.y,2);
+            this.mainGraphics.fillCircle(proj.x, proj.y, 2);
         }
         this.mainGraphics.fillStyle(0xff0000);
-        let p = (<any>Object).assign({},spr.isoPosition);
-        p.z+=spr.isoBounds.halfHeight;
+        let p = (<any>Object).assign({}, spr.isoPosition);
+        p.z += spr.isoBounds.halfHeight;
         let proj = GameModule.currentScene.iso.projector.project(p);
-        this.mainGraphics.fillCircle(proj.x,proj.y,2);
+        this.mainGraphics.fillCircle(proj.x, proj.y, 2);
     }
 
     drawLine(line) {
         this.mainGraphics.setDepth(GameModule.topZIndex());
         this.mainGraphics.fillStyle(0xff0000);
-        for(let i=0;i<50;i++) {
+        for (let i = 0; i < 50; i++) {
             let p = line.getRandomPoint();
-            this.mainGraphics.fillCircle(p.x,p.y,2);
+            this.mainGraphics.fillCircle(p.x, p.y, 2);
         }
         // this.mainGraphics.lineBetween(line.x1,line.y1,line.x2,line.y2);
     }

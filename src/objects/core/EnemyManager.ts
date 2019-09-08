@@ -42,9 +42,7 @@ export default class EnemyManager {
 
     spawn = (type) => {
         let e = new Enemy(this.getEnemyConfig(type), type,EnemyManager.enemySpeed[type]);
-        e.emitter.on(Enemy.ON_SPAWN, () => {
-            this.alive.set(e.id, e);
-        });
+        e.create();
         this.alive.set(e.id, e);
         return e;
     }
@@ -80,8 +78,8 @@ export default class EnemyManager {
     }
 
     createMultiple(type, nb) {
-        this.totEnemies+=nb;
         if (isNaN(nb)) nb = 0;
+        this.totEnemies+=nb;
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 this.nbEnSmall = nb;
@@ -113,6 +111,7 @@ export default class EnemyManager {
         let rndInter = 0.5 * 1000 + this.totEnemies * 250;
         // console.log('start enMana ' + this.entry.sign);
         this.timeouts.spawnSmall = Timeout.every(smallInter).randomized(-1*rndInter,rndInter ).do(() => {
+            console.log('spawn small '+this.entry.sign);
             let e = this.spawnRandom(ENEMY_TYPE.SMALL);
             if (e) {
                 e.goToGoal(0, 0, (en) => {
