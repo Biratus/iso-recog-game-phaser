@@ -35,6 +35,7 @@ export default class EnemyManager {
 
         this.eventListener.addListener(EVENTS.REACH_CENTER, (en) => {
             this.someData.enemyKilledSinceBegining++;
+            this.eventListener.emit(EVENTS.ENEMY_KILLED + this.someData.enemyKilledSinceBegining);
             GameModule.currentScene.events.emit(EVENTS.REACH_CENTER, en, this);
             en.isDead = true;
         });
@@ -48,7 +49,6 @@ export default class EnemyManager {
     }
 
     spawnRandom = (type): Enemy | undefined => {
-        // console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
         switch (type) {
             case ENEMY_TYPE.SMALL:
                 if (this.nbEnSmall <= 0) return;
@@ -59,6 +59,7 @@ export default class EnemyManager {
                 this.nbRndMed--;
                 break;
         }
+        console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
         return this.spawn(type);
     }
 
@@ -71,7 +72,7 @@ export default class EnemyManager {
             x: position.x,
             y: position.y,
             z: 0,
-            sign: this.entry.sign,
+            sign: this.entry.sign.toLowerCase(),
             texture: 'en_' + type + '_' + this.entry.sign.toLowerCase()
         }
 
@@ -111,7 +112,6 @@ export default class EnemyManager {
         let rndInter = 0.5 * 1000 + this.totEnemies * 250;
         // console.log('start enMana ' + this.entry.sign);
         this.timeouts.spawnSmall = Timeout.every(smallInter).randomized(-1*rndInter,rndInter ).do(() => {
-            console.log('spawn small '+this.entry.sign);
             let e = this.spawnRandom(ENEMY_TYPE.SMALL);
             if (e) {
                 e.goToGoal(0, 0, (en) => {
@@ -160,6 +160,7 @@ export default class EnemyManager {
     checkDeadEnemies() {
         for (let eId of this.alive.keys()) {
             if (this.alive.get(eId).isDead) {
+                console.log(this.alive.get(eId).sign+' is dead');
                 this.alive.get(eId).sprite.destroy();
                 this.alive.get(eId).emitter.emit(Enemy.ON_DIE);
 
@@ -172,6 +173,6 @@ export default class EnemyManager {
 
     isOver() {
         this.checkDeadEnemies();
-        return this.nbEnSmall <= 0 && this.alive.size == 0;
+        return this.nbEnSmall <= 0 && this.nbRndMed <= 0 && this.alive.size == 0;
     }
 }

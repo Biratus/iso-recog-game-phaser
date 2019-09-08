@@ -8,9 +8,9 @@
                         "sign": "CIRCLE",
                         "loc": "TOP",
                         "dest": 1,
-                        "en_sm": 3,
+                        "en_sm": 0,
                         "en_med": {
-                            "nb": 0,
+                            "nb": 1,
                             "events": []
                         },
                         "en_big": {}

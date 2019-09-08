@@ -159,9 +159,7 @@ export default class Renderer {
         this.initSpritesRoom();
 
         this.group.children = this.getAllSprites();
-        console.log(this.group.children.length + ' created');
         this.spritesContainer.add(this.group.children);
-        console.log(this.spritesContainer.list.length + ' sprCont child');
         // this.spritesContainer.setDepth(GameModule.topZIndex());
         // //bg particles
         // let validZone = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, this.currentEntriesSprite.TOP.y);
@@ -395,18 +393,18 @@ export default class Renderer {
     pauseSmokeParticles() {
         for (let location of LOCATION.enum()) {
         //     for (let i = 0; i < 4; i++) {
-        //         if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].stop();
+        //         if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
         //     }
-                if (this.particles['smoke' + location]) this.particles['smoke' + location].stop();
+                if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].stop();
         }
 
     }
     resumeSmokeParticles() {
         for (let location of LOCATION.enum()) {
             // for (let i = 0; i < 4; i++) {
-            //     if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].start();
+            //     if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].start();
             // }
-            if (this.particles['smoke' + location]) this.particles['smoke' + location].start();
+            if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].start();
         }
 
     }
@@ -459,7 +457,7 @@ export default class Renderer {
         });
     }
     textIndx = 0;
-    smokeEntry(location: string, destroyEvt = 'smoke' + location) {
+    smokeEntry(location: string, destroyEvt = EVENTS.ENTRY_SMOKE + location) {
         let textures = [
             "smoke_06_gray",
             "smoke_08_gray",
@@ -482,10 +480,10 @@ export default class Renderer {
         let pts = aabb.getPoints(4);
         // for (let i = 0; i < 4; i++) {
         //     let pt = pts[i];
-        //     if (this.particles['smoke' + location + i]) this.particles['smoke' + location + i].stop();
+        //     if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
         //     let rnd = aabb.getRandomPoint();
         //     while (!emitShape.contains(rnd.x, rnd.y)) rnd = aabb.getRandomPoint();
-        //     this.particles['smoke' + location + i] = smoke.createEmitter({
+        //     this.particles[EVENTS.ENTRY_SMOKE + location + i] = smoke.createEmitter({
         //         alpha: { start: 1, end: 0 },
         //         scale: { start: 0, end: 0.15 },
         //         speed: 20,
@@ -499,8 +497,8 @@ export default class Renderer {
         //         y: pt.y
         //     });
         // }
-        if (this.particles['smoke' + location]) this.particles['smoke' + location].stop();
-        this.particles['smoke' + location] = smoke.createEmitter({
+        if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].stop();
+        this.particles[EVENTS.ENTRY_SMOKE + location] = smoke.createEmitter({
             alpha: { start: 1, end: 0 },
             scale: { start: 0, end: 0.2 },
             speed: 20,
@@ -526,11 +524,11 @@ export default class Renderer {
         });
         this.emitter.once(destroyEvt, () => {
             // for (let i = 0; i < 4; i++) {
-            //     this.particles['smoke' + location + i].stop();
-            //     delete this.particles['smoke' + location + i];
+            //     this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
+            //     delete this.particles[EVENTS.ENTRY_SMOKE + location + i];
             // }
-            this.particles['smoke' + location].stop();
-            delete this.particles['smoke' + location];
+            this.particles[EVENTS.ENTRY_SMOKE + location].stop();
+            delete this.particles[EVENTS.ENTRY_SMOKE + location];
         });
         return textures[this.textIndx - 1];
     }

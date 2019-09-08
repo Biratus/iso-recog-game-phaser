@@ -95,11 +95,10 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
 
     // START GAME
-    this.activeState = GameScene.STATES.IDLE;
-    // this.resume();
+    this.activeState = GameScene.STATES.RECOG;
+    this.resume();
     // this.info.setText(renderer.smokeEntry('TOP'))
 
-    renderer.smokeEntry('TOP');
     // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
     // s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     // s.on('pointerup', () => {
@@ -132,7 +131,9 @@ export default class GameScene extends Phaser.Scene {
     renderer.update(time, delta);
     this.info.setText((1000 / delta).toFixed(3));
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-      if(enMana.isOver()) renderer.emitter.emit(EVENTS.ENTRY_SMOKE+LOCATION.name(enMana.entry.location));
+      if(enMana.isOver()) {
+        renderer.emitter.emit(EVENTS.ENTRY_SMOKE+LOCATION.name(enMana.entry.location));
+      }
     });
   }
 
@@ -145,6 +146,7 @@ export default class GameScene extends Phaser.Scene {
   resume() {
     this.isPause = false;
     this.recogListener.enable();
+    if(this.activeState != GameScene.STATES.RECOG) console.warn('NOT IN RECOG MODE');
     this.startEnemyManagers();
 
   }
@@ -167,7 +169,6 @@ export default class GameScene extends Phaser.Scene {
     });
     this.input.on('pointerdown', (pointer) => {
       if (this.isPause) return;
-      renderer.smokeEntry('TOP');
       if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerdown', pointer);
 
     });

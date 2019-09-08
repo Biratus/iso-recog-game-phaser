@@ -1,4 +1,4 @@
-import { LOCATION } from "../../constants/Enums";
+import { LOCATION, EVENTS } from "../../constants/Enums";
 import EnemyManager from "./EnemyManager";
 import Entry from "./Entry";
 
@@ -7,9 +7,19 @@ export default class Room {
     _id: number;
     _entries: { [key: string]: Entry } = {};
     diff: number;
+    enemyKilledSinceBegining=0;
     constructor(id, diff) {
         this._id = id;
         this.diff = diff;
+    }
+
+    update(time,delta) {
+        let totEnKilled = this.getAllEnemiesManager().reduce((acc,enMana) => acc+=enMana.someData.enemyKilledSinceBegining,0);
+        if(totEnKilled>this.enemyKilledSinceBegining) {
+            for(let i=this.enemyKilledSinceBegining;i<totEnKilled;i++) {
+                this.getAllEnemiesManager().forEach((enMana) => enMana.eventListener.emit(EVENTS.ENEMY_KILLED+i))
+            }
+        }
     }
 
     get id() { return this._id };

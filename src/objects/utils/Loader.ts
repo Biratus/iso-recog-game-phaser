@@ -27,7 +27,7 @@ export default class Loader {
         e.nbEnSmall = jsonObj.en_sm;
         if (jsonObj.en_med.nb) {
             e.nbEnMed = jsonObj.en_med.nb;
-            jsonObj.en_med.events.forEach((evt) => e.spawnEvtMed.push(ENEMY_SPAWN_EVENT.parse(evt)));
+            e.spawnEvtMed = jsonObj.en_med.events;
         }
         return e;
     }

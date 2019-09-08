@@ -24,7 +24,7 @@ export default class Enemy {
     speed: number;
     isDead: boolean
 
-    gotToGoalConfig: any;
+    goToGoalConfig: any;
 
     constructor(spriteConfig: { x: number, y: number, z: number, texture: string, sign: string, frame?: number }, type: string, speed) {
         this._id = Enemy._idCount++;
@@ -38,22 +38,29 @@ export default class Enemy {
     get id() { return this._id; }
 
     create() {
-        this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, this._config.texture);//renderer.addCharacterLayer(this._config.x, this._config.y, this._config.z, this._config.texture, this._config.frame);
+        this.createSprite();
+        this.emitter.emit(EVENTS.ENEMY_SPAWN);
+    }
+
+    private createSprite() {
+        // this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, this._config.texture);
+        this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, 'en_'+this.type+'_'+this.sign);
         this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;
         renderer.spritesContainer.add(this.sprite);
-        this.emitter.emit(EVENTS.ENEMY_SPAWN);
     }
 
-    goToGoal = (x, y, onFinish): void => {
+    goToGoal = (x, y, onDead): void => {
         if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) return;
         // console.log('dx='+Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)/this.speed);
         // console.log('dy = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)+'ty = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed);
-        this.gotToGoalConfig = { x, y, onFinish };
+        this.goToGoalConfig = { x, y, onDead };
         this.tween = GameModule.currentScene.tweens.add({
             targets: this.sprite,
-            onComplete: () => onFinish(this),
+            onComplete: () => {
+                if(this.isDead) onDead(this);
+            },
             props: {
                 isoX: {
                     value: x * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
@@ -73,18 +80,22 @@ export default class Enemy {
         console.log(this.type+' '+this.sign+' ouch');
         switch (this.type) {
             case ENEMY_TYPE.SMALL:
+                this.isDead = true;
                 this.tween.stop();
                 this.sprite.destroy();
-                this.isDead = true;
                 break;
             case ENEMY_TYPE.MEDIUM:
-                this.tween.stop();
+                this.tween.pause();
                 //TODO knockback
-                let x=(this.sprite.isoX - this.gotToGoalConfig.x)/Math.abs(this.sprite.isoX - this.gotToGoalConfig.x);
-                let y=(this.sprite.isoY - this.gotToGoalConfig.y)/Math.abs(this.sprite.isoY - this.gotToGoalConfig.y);
-                x*=GAME_CONFIG.scale * GAME_CONFIG.tile_size*0.02;
-                y*=GAME_CONFIG.scale * GAME_CONFIG.tile_size*0.02
+                let start = {isoX:0,isoY:0};
+                for(let data of this.tween.data) {
+                    if(data.key=='isoX' || data.key=='isoY') (<any>start)[data.key]=data.start;
+                }
+                let x=(start.isoX+this.sprite.isoX)/2;
+                let y=(start.isoY+this.sprite.isoY)/2;
+                console.log('will go to ',{x,y});
                 this.tween = GameModule.currentScene.add.tween({
+                    targets:this.sprite,
                     isoX: {
                         value: x,
                         duration: 100,
@@ -95,13 +106,18 @@ export default class Enemy {
                         duration: 100,
                         ease: 'Linear'
                     },
-                    onComplete:() => this.goToGoal(this.gotToGoalConfig.x, this.gotToGoalConfig.y, this.gotToGoalConfig.onFinish)
+                    onComplete:() => {
+                        this.type = ENEMY_TYPE.SMALL;
+                        this._config.x=this.sprite.isoX;
+                        this._config.y=this.sprite.isoY;
+                        this.sprite.destroy();
+                        this.createSprite();
+                        /* IN THE FUTURE: 
+                            replace texture change with animation and then give small texture
+                        */
+                        this.goToGoal(this.goToGoalConfig.x,this.goToGoalConfig.y,this.goToGoalConfig.onDead);
+                    }
                 });
-                this.type = ENEMY_TYPE.SMALL;
-                this.sprite.texture = 'en_' + ENEMY_TYPE.SMALL + '_' + this.sign;
-                /* IN THE FUTURE: 
-                    replace texture change with animation and then give small texture
-                */
                 break;
 
         }
