@@ -149,7 +149,7 @@ export default class TutorialScene extends Phaser.Scene {
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }
-        this.animationGraph.shapeClue(path, 'userInput');
+        renderer.shapeClue(path, 'userInput');
         this.currentShape = { shape, path };
 
     }
@@ -174,22 +174,22 @@ export default class TutorialScene extends Phaser.Scene {
         this.currentLevel.update(time, delta);
         this.animationGraph.update(time, delta);
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-            if (enMana.isOver()) renderer.emitter.emit('smoke' + LOCATION.name(enMana.entry.location));
+            if (enMana.isOver()) renderer.emitter.emit(EVENTS.ENTRY_SMOKE + LOCATION.name(enMana.entry.location));
         });
         renderer.update(time, delta);
     }
 
     initEvents() {
 
-        this.events.on(Enemy.ON_SPAWN, (en: Enemy) => {
+        this.events.on(EVENTS.ENEMY_SPAWN, (en: Enemy) => {
             this.currentLevel.currentRoom.getAllEnemiesManager().filter((enMana) => !enMana.alive.has(en.id)).forEach((enMana) => enMana.pause());
             this.shapeDrawTimeout = Timeout.in(1500).do(() => {
                 renderer.pauseBackgroundParticles();
-                renderer.pauseSmokeParticles();
+                // renderer.pauseSmokeParticles();
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.pause());
                 this.awaitingDrawing = true;
                 this.recogListener.enable();
-                this.animationGraph.focusLight(en.sprite, EVENTS.LIGHT);
+                renderer.focusLight(en.sprite, EVENTS.LIGHT);
                 this.userInputShape(en.sign);
             }).start();
         });
@@ -199,20 +199,18 @@ export default class TutorialScene extends Phaser.Scene {
            
             let threshold = GameModule.debug ? 0.8 : 0.955;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
-                this.animationGraph.clearMain();
                 renderer.resumeBackgroundParticles();
-                renderer.resumeSmokeParticles();
-                this.animationGraph.emitter.emit(EVENTS.LIGHT);
+                renderer.fadeOutPoints(this.recogListener.points, 'blue', 30);
+                renderer.emitter.emit(EVENTS.LIGHT);
                 this.currentLevel.currentRoom.killEnemies(this.currentShape.shape);
                 this.awaitingDrawing = false;
                 this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => enMana.resume());
                 this.recogListener.disable();
-                this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue', 30);
                 this.userShapes.push({ name: this.currentShape.shape, points: this.recogListener.points });
             } else {
-                this.animationGraph.fadeOutPoints(this.recogListener.points, 'red', 10, () => {
+                renderer.fadeOutPoints(this.recogListener.points, 'red', 10, () => {
                     if (!this.input.activePointer.isDown)
-                        this.animationGraph.shapeClue(this.currentShape.path, 'userInput');
+                        renderer.shapeClue(this.currentShape.path, 'userInput');
                 });
             }
             if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) {
@@ -228,7 +226,7 @@ export default class TutorialScene extends Phaser.Scene {
         });
         this.input.on('pointerdown', (pointer) => {
             this.recogListener.emitter.emit('pointerdown', pointer);
-            this.animationGraph.emitter.emit('userInput');
+            renderer.emitter.emit('userInput');
         });
         this.input.on('pointermove', (pointer) => {
             this.recogListener.emitter.emit('pointermove', pointer);

@@ -6,6 +6,7 @@ import { GameModule } from '../utils/GameUtils';
 import { Timeout } from '../utils/Timeout';
 import Entry from './Entry';
 import MapUtils from '../utils/MapUtils';
+import { Events } from 'phaser';
 
 export default class EnemyManager {
     entry: Entry;
@@ -59,7 +60,7 @@ export default class EnemyManager {
                 this.nbRndMed--;
                 break;
         }
-        console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
+        // console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
         return this.spawn(type);
     }
 
@@ -107,6 +108,7 @@ export default class EnemyManager {
     }
 
     start() {
+        console.log('EnMana '+this.entry.sign+' '+LOCATION.name(this.entry.location)+'\n totEnemies '+this.totEnemies);
         let smallInter = 2.5 * 1000 + this.totEnemies * 500;
         let medInter = 4.5 * 1000 + this.totEnemies * 500;
         let rndInter = 0.5 * 1000 + this.totEnemies * 250;
@@ -117,7 +119,7 @@ export default class EnemyManager {
                 e.goToGoal(0, 0, (en) => {
                     this.eventListener.emit(EVENTS.REACH_CENTER, en, this);
                 });
-                GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
+                GameModule.currentScene.events.emit(EVENTS.ENEMY_SPAWN, e);
             } else this.timeouts.spawnSmall.destroy();
         }).start();
 
@@ -128,7 +130,7 @@ export default class EnemyManager {
                 e.goToGoal(0, 0, (en) => {
                     this.eventListener.emit(EVENTS.REACH_CENTER, en, this);
                 });
-                GameModule.currentScene.events.emit(Enemy.ON_SPAWN, e);
+                GameModule.currentScene.events.emit(EVENTS.ENEMY_SPAWN, e);
             } else this.timeouts.spawnMed.destroy();
         }).start();
 
@@ -162,7 +164,7 @@ export default class EnemyManager {
             if (this.alive.get(eId).isDead) {
                 console.log(this.alive.get(eId).sign+' is dead');
                 this.alive.get(eId).sprite.destroy();
-                this.alive.get(eId).emitter.emit(Enemy.ON_DIE);
+                this.alive.get(eId).emitter.emit(EVENTS.ENEMY_KILLED);
 
                 this.someData.enemyKilledSinceBegining++;
                 this.eventListener.emit(EVENTS.ENEMY_KILLED + this.someData.enemyKilledSinceBegining);

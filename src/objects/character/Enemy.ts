@@ -8,9 +8,6 @@ import { renderer } from '../render/Renderer';
 export default class Enemy {
     static _idCount = 0;
 
-    static ON_SPAWN = 'onSpawn';
-    static ON_DIE = 'onDie';
-
     // core
     _id: number;
     _config: { x: number, y: number, z: number, texture: string, sign: string, frame?: number };
@@ -48,18 +45,18 @@ export default class Enemy {
         this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
         this.sprite.isoZ += this.sprite.isoBounds.height / 2;
-        renderer.spritesContainer.add(this.sprite);
+        renderer.characterContainer.add(this.sprite);
     }
 
-    goToGoal = (x, y, onDead): void => {
-        if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) return;
+    goToGoal = (x, y, onGoalReached): void => {
+        if ((this.tween && this.tween.isPlaying()) || this.speed <= 0) this.tween.stop();
         // console.log('dx='+Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)/this.speed);
         // console.log('dy = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)+'ty = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed);
-        this.goToGoalConfig = { x, y, onDead };
+        this.goToGoalConfig = { x, y, onGoalReached };
         this.tween = GameModule.currentScene.tweens.add({
             targets: this.sprite,
             onComplete: () => {
-                if(this.isDead) onDead(this);
+                onGoalReached(this);
             },
             props: {
                 isoX: {
@@ -86,14 +83,12 @@ export default class Enemy {
                 break;
             case ENEMY_TYPE.MEDIUM:
                 this.tween.pause();
-                //TODO knockback
-                let start = {isoX:0,isoY:0};
+                let start = {isoX:this.goToGoalConfig.x,isoY:this.goToGoalConfig.y};
                 for(let data of this.tween.data) {
                     if(data.key=='isoX' || data.key=='isoY') (<any>start)[data.key]=data.start;
                 }
                 let x=(start.isoX+this.sprite.isoX)/2;
                 let y=(start.isoY+this.sprite.isoY)/2;
-                console.log('will go to ',{x,y});
                 this.tween = GameModule.currentScene.add.tween({
                     targets:this.sprite,
                     isoX: {
@@ -115,7 +110,7 @@ export default class Enemy {
                         /* IN THE FUTURE: 
                             replace texture change with animation and then give small texture
                         */
-                        this.goToGoal(this.goToGoalConfig.x,this.goToGoalConfig.y,this.goToGoalConfig.onDead);
+                        this.goToGoal(this.goToGoalConfig.x,this.goToGoalConfig.y,this.goToGoalConfig.onGoalReached);
                     }
                 });
                 break;

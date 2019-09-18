@@ -8,6 +8,9 @@ export default class Room {
     _entries: { [key: string]: Entry } = {};
     diff: number;
     enemyKilledSinceBegining=0;
+
+    combo = 1;
+
     constructor(id, diff) {
         this._id = id;
         this.diff = diff;

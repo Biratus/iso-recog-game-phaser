@@ -129,7 +129,7 @@ export default class GameScene extends Phaser.Scene {
     this.currentLevel.update(time, delta);
     this.animationGraph.update(time, delta);
     renderer.update(time, delta);
-    this.info.setText((1000 / delta).toFixed(3));
+    this.info.setText('fps :'+(1000 / delta).toFixed(3)+'\ncombo: x'+this.currentLevel.currentRoom.combo);
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
       if(enMana.isOver()) {
         renderer.emitter.emit(EVENTS.ENTRY_SMOKE+LOCATION.name(enMana.entry.location));
@@ -158,11 +158,13 @@ export default class GameScene extends Phaser.Scene {
         return;
       }
 
-      if (result.Score < 0.93) {
-        this.animationGraph.fadeOutPoints(this.recogListener.points, 'red', 10);
+      if (result.Score < 0.93) {// BAD !!!
+        this.currentLevel.currentRoom.combo=1;
+        renderer.fadeOutPoints(this.recogListener.points, 'red', 10);
         // this.currentShape.setText('Not Good Enough!');
-      } else {
-        this.animationGraph.fadeOutPoints(this.recogListener.points, 'blue', 30);
+      } else {// GOOD !!
+        this.currentLevel.currentRoom.combo+=2;
+        renderer.fadeOutPoints(this.recogListener.points, 'blue', 30);
         // this.currentShape.setText(result.Name);
         this.currentLevel.currentRoom.killEnemies(result.Name);
       }

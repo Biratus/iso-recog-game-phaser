@@ -29,49 +29,6 @@ export default class AnimationGraph {
         for (let i in this.updates) this.updates[i](time, delta);
     }
 
-    fadeOutShape(shape, points) {
-        if (!shape) return;
-        points = GameModule.normalizePointName(points);
-        switch (shape.toUpperCase()) {
-            case 'SQUARE':
-                let shapeCenter = RenderUtils.getCentroidOfPoints(points);
-                let sortX = points.sort((p1, p2) => p1.x - p2.x);
-                let size = sortX[sortX.length - 1].x - sortX[0].x
-                let square = new Phaser.Geom.Rectangle(0, 0, size, size);
-                this.particles.fadeOutShape = this.particles.fadeOutShape || GameModule.currentScene.add.particles('blue').createEmitter({
-                    x: 0,
-                    y: 0,
-                    blendMode: 'SCREEN',
-                    scale: { start: 0.2, end: 0 },
-                    speed: { min: -30, max: 30 },
-                    quantity: 50
-                });
-                this.particles.fadeOutShape.stop();
-                this.particles.fadeOutShape.setEmitZone({ source: square, type: 'edge', quantity: 50 });
-                this.particles.fadeOutShape.explode(50, shapeCenter!.x - size / 2, shapeCenter!.y - size / 2);
-                break;
-        }
-    }
-
-    fadeOutPoints(points, texture, speed, onFinishCallback?) {
-        let p = GameModule.currentScene.add.particles(texture);
-        let emit = p.createEmitter({
-            scale: 0.1,
-            speed: { min: -1 * speed, max: speed },
-            alpha: { start: 1, end: 0 },
-            blendMode: 'SCREEN',
-            on: false
-        });
-        emit.onParticleDeath(() => {
-            if (emit.getAliveParticleCount() <= 0) {
-                if (onFinishCallback) onFinishCallback();
-                p.destroy();
-                emit.stop();
-            }
-        });
-        GameModule.normalizePointName(points).forEach((pt) => p.emitParticleAt(pt.x, pt.y));
-    }
-
     drawDashedHollowRect(config: { x: number, y: number, w: number, h: number, holeW: number, holeH: number, rectColor: number, rectAlpha: number, dashSize: number, dashGap: number, strokeColor: number, strokeAlpha: number }) {
         this.drawHollowRect(config.x, config.y, config.w, config.h, config.holeW, config.holeH, config.rectColor, config.rectAlpha);
 
@@ -144,71 +101,6 @@ export default class AnimationGraph {
                 yi += dashGap;
             }
         }
-    }
-
-    focusLight(sprite, endEvent) {
-        renderer.spritesContainer.clearMask();
-        if (this.lightSource) this.lightSource.destroy();
-        if (this.lightSourceTween) this.lightSourceTween.stop();
-
-        this.lightSource = GameModule.currentScene.make.sprite({
-            x: sprite.x,
-            y: sprite.y,
-            angle:90,
-            alpha:0.8,
-            key: 'mask1',
-            add: false
-        });
-        
-        this.lightSource.scale = GAME_CONFIG.scale;
-        this.lightSourceTween = GameModule.currentScene.tweens.add({
-            targets: this.lightSource,
-            alpha: 0.5,
-            scale: 0.8,
-            duration: 1500,
-            ease: 'Sine.easeInOut',
-            loop: -1,
-            yoyo: true
-        });
-        this.emitter.on(endEvent, () => {
-            console.log("lol");
-            this.lightSourceTween.stop();
-            renderer.spritesContainer.clearMask();
-            this.lightSource.destroy();
-            // this.lightSourceTween.stop();
-            // this.lightSource.alpha=1;
-            // this.lightSourceTween = GameModule.currentScene.tweens.add({
-            //     targets: this.lightSource,
-            //     scale: 30,
-            //     alpha:1,
-            //     duration: 1700,
-            //     ease: 'Sine.easeInOut',
-            //     onComplete: () => {
-            //         renderer.spritesContainer.clearMask();
-            //         this.lightSource.destroy();
-            //     }
-            // });
-        });
-        renderer.spritesContainer.mask = new Phaser.Display.Masks.BitmapMask(GameModule.currentScene, this.lightSource);
-    }
-
-    shapeClue(path, destroyEvt) {
-        if (this.particles.hasOwnProperty(destroyEvt)) this.emitter.emit(destroyEvt);
-
-        let p = GameModule.currentScene.add.particles('blue');
-        this.particles[destroyEvt] = p.createEmitter({
-            scale: { start: 0.35, end: 0 },
-            speed: { min: -10, max: 10 },
-            blendMode: 'SCREEN',
-            lifespan: 1500,
-            frequency: 20,
-            emitZone: { type: 'edge', source: path, quantity: 30, yoyo: false }
-        });
-        this.emitter.once(destroyEvt, () => {
-            p.destroy();
-            if (this.particles[destroyEvt]) this.particles[destroyEvt].stop();
-            delete this.particles[destroyEvt];
-        });
     }
 
     getGraph(name, config): Phaser.GameObjects.Graphics {
