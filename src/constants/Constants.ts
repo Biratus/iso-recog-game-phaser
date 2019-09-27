@@ -9,13 +9,22 @@ export const SCENE_TUTORIAL = {
 }
 export const SCENE_LOAD = { key: 'load' }
 export const SCENE_MENU = { key: 'menu' }
+export const SCENE_EDITOR = {
+    key: 'editor',
+    mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' },
+    active:true
+}
+export const SCENE_INTERACT = {
+    key: 'interact',
+    active:true
+}
 
 export const ENEMY_CONFIG = {
     scale: 0.2
 }
 
 export const GAME_CONFIG = {
-    scale: 1,
+    scale: 0.75,
     tile_size: 64,
     tile_height: 63,
     entryScale: 0.4,

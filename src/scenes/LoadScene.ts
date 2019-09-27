@@ -1,5 +1,5 @@
 import 'phaser'
-import { SCENE_LOAD, SCENE_GAME, SCENE_TUTORIAL, SCENE_MENU } from '../constants/Constants'
+import { SCENE_LOAD, SCENE_GAME, SCENE_TUTORIAL, SCENE_MENU,SCENE_EDITOR } from '../constants/Constants'
 
 export default class LoadScene extends Phaser.Scene {
     constructor() {
@@ -21,7 +21,8 @@ export default class LoadScene extends Phaser.Scene {
 
     create = () => {
         // this.scene.start(SCENE_MENU.key);
-        this.scene.start(SCENE_GAME.key);
+        // this.scene.start(SCENE_GAME.key);
+        this.scene.start(SCENE_EDITOR.key);
         // this.scene.start(SCENE_TUTORIAL.key);
     }
 }

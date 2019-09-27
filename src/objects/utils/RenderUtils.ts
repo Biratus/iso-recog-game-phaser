@@ -3,7 +3,7 @@ import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
 import { GameModule } from './GameUtils';
 import { LOCATION } from '../../constants/Enums';
-import GameScene from '../../scenes/GameScene';
+import RenderEntry from '../render/RenderEntry';
 
 export module RenderUtils {
     export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }
@@ -87,24 +87,34 @@ export module RenderUtils {
         return Math.getCentroidPosition(pts);
 
     }
-
-    export function getTopFrontLine(spr,proj2d = false) :Phaser.Geom.Line{        
-        let p = (<any>Object).assign({},spr.isoPosition);
-        p.z+=spr.isoBounds.halfHeight;
-
-        let opp = LOCATION.opposite(LOCATION.signFromCoord(spr.isoPosition));
-        let w = RenderUtils.spriteHalfIsoWidth(spr);
-        p.x+=opp.x*w;
-        p.y+=opp.y*w;
-        let switched = LOCATION.signFromCoord(LOCATION.switchXY(p));
-        let s={x:p.x+switched.x*w,y:p.y+switched.y*w};
-        let e={x:p.x-switched.x*w,y:p.y-switched.y*w};
-        if(proj2d) {
-            s = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:s.x,y:s.y,z:p.z});
-            e = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:e.x,y:e.y,z:p.z});
-        }
-        return new Phaser.Geom.Line(s.x,s.y,e.x,e.y);
+    export function getLocRoomOpposite(entry:RenderEntry) {
+        let loc = entry.location;
+        let entryLoc = {x:entry.sprite.isoX,y:entry.sprite.isoY};
+        let tile_width = RenderUtils.spriteIsoWidth(entry.sprite);
+        let roomLoc = LOCATION.add(entryLoc,LOCATION.multiply(LOCATION[loc], tile_width / 2));//outside Entry
+        roomLoc = LOCATION.add(roomLoc,LOCATION.multiply(LOCATION[loc], tile_width));//inside new Entry
+        tile_width = RenderUtils.spriteIsoWidth(entry.source.sprite);
+        roomLoc = LOCATION.add(roomLoc,LOCATION.multiply(LOCATION[loc], tile_width/2));
+        return roomLoc;
     }
+
+    // export function getTopFrontLine(spr,proj2d = false) :Phaser.Geom.Line{        
+    //     let p = (<any>Object).assign({},spr.isoPosition);
+    //     p.z+=spr.isoBounds.halfHeight;
+
+    //     let opp = LOCATION.opposite(LOCATION.signFromCoord(spr.isoPosition));
+    //     let w = RenderUtils.spriteHalfIsoWidth(spr);
+    //     p.x+=opp.x*w;
+    //     p.y+=opp.y*w;
+    //     let switched = LOCATION.signFromCoord(LOCATION.switchXY(p));
+    //     let s={x:p.x+switched.x*w,y:p.y+switched.y*w};
+    //     let e={x:p.x-switched.x*w,y:p.y-switched.y*w};
+    //     if(proj2d) {
+    //         s = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:s.x,y:s.y,z:p.z});
+    //         e = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:e.x,y:e.y,z:p.z});
+    //     }
+    //     return new Phaser.Geom.Line(s.x,s.y,e.x,e.y);
+    // }
 
     export function test() {
         console.assert(RenderUtils.pointInRect({ x: 20, y: 20 }, { x: 0, y: 0, w: 50, h: 50 }), 'pointInRect({x:20,y:20},{x:0,y:0,w:50,h:50})');

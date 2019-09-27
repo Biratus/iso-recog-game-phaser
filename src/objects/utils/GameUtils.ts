@@ -51,4 +51,9 @@ export module GameModule {
 	export function lowZIndex() {
 		return ArrayUtils.of(GameModule.currentScene.children.list).minValue((c) => c.depth) - 1;
 	}
+
+	
+
+    export var mapPanel = new Phaser.Geom.Rectangle(0, 0, window.innerWidth * 0.75, window.innerHeight);
+    export var interactionPanel = new Phaser.Geom.Rectangle(mapPanel.width, 0, window.innerWidth - mapPanel.width, window.innerHeight);
 }
