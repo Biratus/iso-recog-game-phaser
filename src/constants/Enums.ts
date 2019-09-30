@@ -33,7 +33,7 @@ export const LOCATION = Object.freeze({
 });
 
 export enum ENTRY_DIFF {
-    LOW
+    LOW, NEUTRAL, HIGH
 };
 
 export namespace ENTRY_DIFF {
@@ -75,6 +75,10 @@ export const EVENTS = Object.freeze({
     TAP_INDICATION: 'tapIndic',
     LIGHT: 'light'
 });
+
+export const ENEMY_EVENTS = {
+    'enemyKilled':'number'
+};
 
 export const INTERACTION_EVENT = Object.freeze({
 });

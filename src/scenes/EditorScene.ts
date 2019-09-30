@@ -8,6 +8,7 @@ import RenderRoom from '../objects/render/RenderRoom';
 import RenderEntry from '../objects/render/RenderEntry';
 import InteractionScene from './InteractionScene';
 import { LOCATION } from '../constants/Enums';
+import { RenderUtils } from '../objects/utils/RenderUtils';
 // import Level from '../objects/core/Level';
 export default class EditorScene extends Phaser.Scene {
 
@@ -17,6 +18,8 @@ export default class EditorScene extends Phaser.Scene {
     interact: InteractionScene;
 
     selected: RenderRoom | RenderEntry;
+    startIndic:Phaser.GameObjects.Image;
+    finishIndic:Phaser.GameObjects.Image;
 
     constructor() {
         super(SCENE_EDITOR)
@@ -57,13 +60,13 @@ export default class EditorScene extends Phaser.Scene {
         this.graphics.fillRectShape(GameModule.mapPanel);
         this.graphics.lineStyle(2, 0xff6565);
         this.graphics.lineBetween(GameModule.interactionPanel.x, GameModule.interactionPanel.y, GameModule.interactionPanel.x, GameModule.interactionPanel.bottom);
-
+        
         this.input.on('pointerdown', (pointer) => {
             if (!GameModule.mapPanel.contains(pointer.x, pointer.y)) {
                 this.mapMove = undefined;
                 return;
             }
-            this.mapMove = { x: renderer.terrainContainer.x, y: renderer.terrainContainer.y };
+            this.mapMove = { x: renderer.rendererContainer.x, y: renderer.rendererContainer.y };
         });
         this.input.on('pointermove', (pointer) => {
             if (!GameModule.mapPanel.contains(pointer.x, pointer.y)) {
@@ -71,13 +74,12 @@ export default class EditorScene extends Phaser.Scene {
                 return;
             }
             if (this.mapMove) {
-                renderer.terrainContainer.x = (pointer.x - pointer.downX) + this.mapMove.x;
-                renderer.terrainContainer.y = (pointer.y - pointer.downY) + this.mapMove.y;
+                renderer.rendererContainer.x = (pointer.x - pointer.downX) + this.mapMove.x;
+                renderer.rendererContainer.y = (pointer.y - pointer.downY) + this.mapMove.y;
             }
         });
         this.input.on('pointerup', (pointer) => {
             this.mapMove = undefined;
-
         });
         let room = renderer.addRoom();
         this.genericPointerEventSprite(room);
@@ -160,6 +162,12 @@ export default class EditorScene extends Phaser.Scene {
         levelMap[room.id].render = renderRoom;
         for(let e of room.entries) {
             let entry = this.addEntry(<RenderRoom>renderRoom,e.loc);
+            entry.diff=e.diff;entry.sign=e.sign;
+            entry.nbEnSmall = e.en_sm;
+            entry.nbRndMed=e.en_med.nb;
+            entry.spawnEvtMed=e.en_med.events;
+            entry.nbRndHard=e.en_big.nb || 0;
+            entry.spawnEvtHard=e.en_big.events || [];
             if(e.dest && !levelMap[e.dest].render) this.loadRoom(levelMap[e.dest].room,entry,levelMap);
         }
     }
@@ -174,5 +182,15 @@ export default class EditorScene extends Phaser.Scene {
                 txtSpr.destroy();
             }
         })
+    }
+
+    changeStart(isStart,room) {
+        let loc = RenderUtils.topXYFromIsoSprite(room.sprite,true);
+        renderer.changeStart(loc,isStart);
+    }
+    
+    changeFinish(isFinish,room) {        
+        let loc = RenderUtils.topXYFromIsoSprite(room.sprite,true);
+        renderer.changeFinish(loc,isFinish);
     }
 }

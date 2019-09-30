@@ -57,6 +57,8 @@ export default class Renderer {
 
     spriteInitialized = false;
     debug = false;
+    startIndic:Phaser.GameObjects.Image;
+    finishIndic:Phaser.GameObjects.Image;
 
     rooms:{[key:number]: RenderRoom};
 
@@ -69,7 +71,15 @@ export default class Renderer {
         this.rendererContainer.add(this.terrainContainer);
         this.rendererContainer.add(this.characterContainer);
         this.rendererContainer.add(this.terrainOverlayContainer);
-        // this.rendererContainer.add(this.uiContainer);
+        
+        this.startIndic = GameModule.currentScene.add.image(0,0,'circle_skew').setScale(0.5);
+        this.startIndic.setTint(0x65ff00);
+        this.startIndic.visible=false;
+        this.finishIndic = GameModule.currentScene.add.image(0,0,'circle_skew').setScale(0.5);
+        this.finishIndic.setTint(0xff6500);
+        this.finishIndic.visible=false;
+        this.terrainOverlayContainer.add(this.startIndic);
+        this.terrainOverlayContainer.add(this.finishIndic);
     }
 
     all(func) {this.terrainContainer.each(func);}
@@ -99,6 +109,17 @@ export default class Renderer {
         room.addEntry(entry);
         this.terrainContainer.add(entry.sprite);
         return entry;
+    }
+
+    changeStart(loc,setVisible=true) {
+        this.startIndic.visible=setVisible;
+        this.startIndic.x=loc.x;
+        this.startIndic.y=loc.y;
+    }
+    changeFinish(loc,setVisible=true) {
+        this.finishIndic.visible=setVisible;
+        this.finishIndic.x=loc.x;
+        this.finishIndic.y=loc.y;
     }
 
     /*renderRoom = (room: Room) => {

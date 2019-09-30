@@ -10,6 +10,13 @@ export default class RenderEntry {
     source: RenderRoom;
     dest: RenderRoom;
     sprite:IsoSprite;
+    diff='LOW';
+    sign='';
+    nbEnSmall = 0;
+    nbRndMed = 0;
+    spawnEvtMed = [];
+    nbRndHard = 0;
+    spawnEvtHard = [];
     location;
 
     constructor(room: RenderRoom, loc) {
@@ -27,5 +34,13 @@ export default class RenderEntry {
         sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
         sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
         this.sprite = sprite;
+    }
+
+    toExportJSON() {
+        return {
+            diff:this.diff,sign:this.sign,loc:this.location,dest:this.dest?this.dest.id:-1,en_sm:this.nbEnSmall,
+            en_med:{nb:this.nbRndMed,events:this.spawnEvtMed},
+            en_big:{nb:this.nbRndHard,events:this.spawnEvtHard}
+        };
     }
 }

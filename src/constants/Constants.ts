@@ -11,8 +11,7 @@ export const SCENE_LOAD = { key: 'load' }
 export const SCENE_MENU = { key: 'menu' }
 export const SCENE_EDITOR = {
     key: 'editor',
-    mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' },
-    active:true
+    mapAdd: { isoPlugin: 'iso', isoPhysics: 'isoPhysics' }
 }
 export const SCENE_INTERACT = {
     key: 'interact',
