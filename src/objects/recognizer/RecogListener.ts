@@ -1,6 +1,6 @@
 import { DollarRecognizer, Point } from 'outlines';
 import 'phaser';
-import { GameModule } from '../utils/GameUtils';
+import { GameModule } from '../utils/GameModule';
 import { EVENTS } from '../../constants/Enums';
 
 export default class RecogListener {

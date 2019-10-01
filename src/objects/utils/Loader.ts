@@ -1,7 +1,8 @@
-import { ENEMY_SPAWN_EVENT, ENTRY_DIFF, LOCATION } from "../../constants/Enums";
+import { ENTRY_DIFF } from "../../constants/Enums";
 import Entry from "../core/Entry";
 import Level from "../core/Level";
 import Room from "../core/Room";
+import { Location } from '../../constants/Location';
 
 export default class Loader {
     static loadLevel = (jsonObj): Level => {
@@ -23,7 +24,7 @@ export default class Loader {
 
     }
     static loadEntry = (jsonObj): Entry => {
-        let e = new Entry(LOCATION.parse(jsonObj.loc), jsonObj.dest, jsonObj.sign, ENTRY_DIFF.parse(jsonObj.diff));//add other params
+        let e = new Entry(Location.parse(jsonObj.loc), jsonObj.dest, jsonObj.sign, ENTRY_DIFF.parse(jsonObj.diff));//add other params
         e.nbEnSmall = jsonObj.en_sm;
         if (jsonObj.en_med.nb) {
             e.nbEnMed = jsonObj.en_med.nb;

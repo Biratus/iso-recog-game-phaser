@@ -2,8 +2,8 @@ import 'phaser';
 import { IsoSprite } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from '../../constants/Constants';
 import { ENEMY_TYPE, EVENTS } from '../../constants/Enums';
-import { GameModule } from '../utils/GameUtils';
 import { renderer } from '../render/Renderer';
+import { GameModule } from '../utils/GameModule';
 
 export default class Enemy {
     static _idCount = 0;

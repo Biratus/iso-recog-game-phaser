@@ -1,18 +1,17 @@
 import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
 import { SCENE_GAME, SCENE_TUTORIAL } from "../constants/Constants";
+import { EVENTS } from '../constants/Enums';
 import Enemy from "../objects/character/Enemy";
 import Level from "../objects/core/Level";
 import RecogListener from "../objects/recognizer/RecogListener";
 import AnimationGraph from "../objects/render/AnimationGraph";
 import Renderer, { renderer } from "../objects/render/Renderer";
-import ArrayUtils from "../objects/utils/ArrayUtils";
-import { GameModule } from "../objects/utils/GameUtils";
+import { GameModule } from "../objects/utils/GameModule";
 import Loader from "../objects/utils/Loader";
-import { Timeout } from "../objects/utils/Timeout";
-import MapUtils from '../objects/utils/MapUtils';
 import { RenderUtils } from '../objects/utils/RenderUtils';
-import { LOCATION, EVENTS } from '../constants/Enums';
+import { Timeout } from "../objects/utils/Timeout";
+import { Location } from '../constants/Location';
 
 export default class TutorialScene extends Phaser.Scene {
 
@@ -123,7 +122,7 @@ export default class TutorialScene extends Phaser.Scene {
 
     start() {
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-            if (!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+            if (!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
             enMana.start();
         });
     }
@@ -164,7 +163,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.isPause = false;
         this.recogListener.enable();
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-            if (!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+            if (!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
             enMana.start();
         });
 
@@ -174,7 +173,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.currentLevel.update(time, delta);
         this.animationGraph.update(time, delta);
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-            if (enMana.isOver()) renderer.emitter.emit(EVENTS.ENTRY_SMOKE + LOCATION.name(enMana.entry.location));
+            if (enMana.isOver()) renderer.emitter.emit(EVENTS.ENTRY_SMOKE + Location.name(enMana.entry.location));
         });
         renderer.update(time, delta);
     }
@@ -234,10 +233,10 @@ export default class TutorialScene extends Phaser.Scene {
         this.input.on('pointerup', (pointer) => {
             this.recogListener.emitter.emit('pointerup', pointer);
         });
-        renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
+        renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (Location: string) => {
             if (!this.over) return;
             renderer.emitter.emit(EVENTS.TAP_INDICATION);
-            let renderEntry = renderer.currentEntriesSprite[location];
+            let renderEntry = renderer.currentEntriesSprite[Location];
             GameModule.currentScene.tweens.add({
                 targets: renderer.player,
                 isoX: renderEntry.isoX,

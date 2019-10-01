@@ -1,5 +1,5 @@
 import { GAME_CONFIG } from "../../constants/Constants";
-import { GameModule } from "../utils/GameUtils";
+import { GameModule } from "../utils/GameModule";
 import { renderer } from "./Renderer";
 import { RenderUtils } from "../utils/RenderUtils";
 import { Point3 } from 'phaser3-plugin-isometric';

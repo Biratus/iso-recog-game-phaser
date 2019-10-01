@@ -1,37 +1,3 @@
-
-export const LOCATION = Object.freeze({
-    TOP: { x: 0, y: -1 },
-    BOTTOM: { x: 0, y: 1 },
-    RIGHT: { x: 1, y: 0 },
-    LEFT: { x: -1, y: 0 },
-    ORIGIN: { x: 0, y: 0 },
-    enum: (): string[] => ['TOP', 'BOTTOM', 'RIGHT', 'LEFT'],
-    parse: (str) => {
-        for (let val of LOCATION.enum()) {
-            if (str == val) return LOCATION[val];
-        }
-    },
-    name: (loc: { x: number, y: number }): string | undefined => {
-        for (let l of LOCATION.enum()) {
-            if (LOCATION[l].x == loc.x && LOCATION[l].y == loc.y) return l;
-        }
-        return undefined;
-    },
-    add: (l1, l2) => ({ x: l1.x + l2.x, y: l1.y + l2.y, z: l1.z ? l2.z : 0 + l2.z ? l2.z : 0 }),
-    multLoc: (l1, l2) => ({ x: l1.x * l2.x, y: l1.y * l2.y, z: l1.z ? l2.z : 0 * l2.z ? l2.z : 0 }),
-    isOrigin: (loc) => loc.x === 0 && loc.y === 0,
-    equals: (l1, l2) => l1.x === l2.x && l1.y === l2.y,
-    signFromCoord: (c) => ({ x: c.x == 0 ? 0 : c.x / Math.abs(c.x), y: c.y == 0 ? 0 : c.y / Math.abs(c.y), z: c.z ? c.z == 0 ? 0 : c.z / Math.abs(c.z) : 0 }),
-    signFromIsoCoord: (c) => ({ x: c.isoX == 0 ? 0 : c.isoX / Math.abs(c.isoX), y: c.isoY == 0 ? 0 : c.isoY / Math.abs(c.isoY), z: c.isoZ ? c.isoZ == 0 ? 0 : c.isoZ / Math.abs(c.isoZ) : 0 }),
-    opposite: (loc) => {
-        for (let val of LOCATION.enum()) {
-            if (LOCATION.equals(LOCATION.ORIGIN, LOCATION.add(loc, LOCATION[val]))) return LOCATION[val];
-        }
-    },
-    switchXY: (c) => ({ x: c.y, y: c.x }),
-    multiply: (l, number) => ({ x: l.x * number, y: l.y * number, z: l.z * number }),
-});
-
 export enum ENTRY_DIFF {
     LOW
 };
@@ -63,18 +29,18 @@ export const ENEMY_SPAWN_EVENT = Object.freeze({
     }
 });
 
-export const EVENTS = Object.freeze({
-    ENEMY_KILLED: 'enemyKilled',
-    ENEMY_SPAWN: 'enemySpawn',
-    REACH_CENTER: 'reachCenter',
-    GAME_START: 'gameStart',
-    ENTRY_SMOKE: 'entrySmoke',
-    SHAPE_DRAWN: 'shapeDrawn',
-    ENTRY_CLICK: 'entry_click',
-    WAVE_END: 'waveEnd',
-    TAP_INDICATION: 'tapIndic',
-    LIGHT: 'light'
-});
+export const enum EVENTS {
+    ENEMY_KILLED = 'enemyKilled',
+    ENEMY_SPAWN = 'enemySpawn',
+    REACH_CENTER = 'reachCenter',
+    GAME_START = 'gameStart',
+    ENTRY_SMOKE = 'entrySmoke',
+    SHAPE_DRAWN = 'shapeDrawn',
+    ENTRY_CLICK = 'entry_click',
+    WAVE_END = 'waveEnd',
+    TAP_INDICATION = 'tapIndic',
+    LIGHT = 'light'
+};
 
 export const INTERACTION_EVENT = Object.freeze({
 });

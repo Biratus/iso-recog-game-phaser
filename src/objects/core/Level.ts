@@ -1,5 +1,5 @@
 import Room from "./Room";
-import { GameModule } from "../utils/GameUtils";
+import { GameModule } from "../utils/GameModule";
 import { EVENTS } from "../../constants/Enums";
 
 export default class Level {

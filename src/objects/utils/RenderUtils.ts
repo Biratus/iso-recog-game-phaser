@@ -1,8 +1,8 @@
 import { Point } from 'outlines';
 import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
-import { GameModule } from './GameUtils';
-import { LOCATION } from '../../constants/Enums';
+import { GameModule } from './GameModule';
+import { Location } from '../../constants/Location';
 import GameScene from '../../scenes/GameScene';
 
 export module RenderUtils {
@@ -92,11 +92,11 @@ export module RenderUtils {
         let p = (<any>Object).assign({},spr.isoPosition);
         p.z+=spr.isoBounds.halfHeight;
 
-        let opp = LOCATION.opposite(LOCATION.signFromCoord(spr.isoPosition));
+        let opp = Location.opposite(Location.signFromCoord(spr.isoPosition));
         let w = RenderUtils.spriteHalfIsoWidth(spr);
         p.x+=opp.x*w;
         p.y+=opp.y*w;
-        let switched = LOCATION.signFromCoord(LOCATION.switchXY(p));
+        let switched = Location.signFromCoord(Location.switchXY(p));
         let s={x:p.x+switched.x*w,y:p.y+switched.y*w};
         let e={x:p.x-switched.x*w,y:p.y-switched.y*w};
         if(proj2d) {

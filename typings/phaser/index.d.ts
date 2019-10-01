@@ -9716,7 +9716,7 @@
 //              * 
 //              * A Geometry Mask uses a Graphics Game Object to determine which pixels of the masked Game Object(s) should be clipped. For any given point of a masked Game Object's texture, the pixel will only be displayed if the Graphics Game Object of the Geometry Mask has a visible pixel at the same position. The color and alpha of the pixel from the Geometry Mask do not matter.
 //              * 
-//              * The Geometry Mask's location matches the location of its Graphics object, not the location of the masked objects. Moving or transforming the underlying Graphics object will change the mask (and affect the visibility of any masked objects), whereas moving or transforming a masked object will not affect the mask. You can think of the Geometry Mask (or rather, of the its Graphics object) as an invisible curtain placed in front of all masked objects which has its own visual properties and, naturally, respects the camera's visual properties, but isn't affected by and doesn't follow the masked objects by itself.
+//              * The Geometry Mask's Location matches the Location of its Graphics object, not the Location of the masked objects. Moving or transforming the underlying Graphics object will change the mask (and affect the visibility of any masked objects), whereas moving or transforming a masked object will not affect the mask. You can think of the Geometry Mask (or rather, of the its Graphics object) as an invisible curtain placed in front of all masked objects which has its own visual properties and, naturally, respects the camera's visual properties, but isn't affected by and doesn't follow the masked objects by itself.
 //              */
 //             class GeometryMask {
 //                 /**
@@ -10372,7 +10372,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -10391,7 +10391,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -10410,7 +10410,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11274,7 +11274,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11293,7 +11293,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11312,7 +11312,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11924,7 +11924,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11943,7 +11943,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -11962,7 +11962,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -13000,7 +13000,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -13018,7 +13018,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -13036,7 +13036,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -14412,7 +14412,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -14431,7 +14431,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -14450,7 +14450,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -14944,7 +14944,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -14963,7 +14963,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -14982,7 +14982,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -16262,7 +16262,7 @@
 //              * a 2D array of tile indexes. Pass in `null` for no data.
 //              * @param insertNull Controls how empty tiles, tiles with an index of -1, in the
 //              * map data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//              * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//              * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //              * the tile data doesn't need to change then setting this value to `true` will help with memory
 //              * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //              * the default value set. Default false.
@@ -17180,7 +17180,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -17199,7 +17199,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -17218,7 +17218,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -17983,7 +17983,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -18002,7 +18002,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -18021,7 +18021,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -19375,7 +19375,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -19394,7 +19394,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -19413,7 +19413,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -20567,7 +20567,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -20586,7 +20586,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -20605,7 +20605,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -20729,15 +20729,15 @@
 //                 /**
 //                  * Emits particles from each active emitter.
 //                  * @param count The number of particles to release from each emitter. The default is the emitter's own {@link Phaser.GameObjects.Particles.ParticleEmitter#quantity}.
-//                  * @param x The x-coordinate to to emit particles from. The default is the x-coordinate of the emitter's current location.
-//                  * @param y The y-coordinate to to emit particles from. The default is the y-coordinate of the emitter's current location.
+//                  * @param x The x-coordinate to to emit particles from. The default is the x-coordinate of the emitter's current Location.
+//                  * @param y The y-coordinate to to emit particles from. The default is the y-coordinate of the emitter's current Location.
 //                  */
 //                 emitParticle(count?: integer, x?: number, y?: number): Phaser.GameObjects.Particles.ParticleEmitterManager;
 
 //                 /**
 //                  * Emits particles from each active emitter.
-//                  * @param x The x-coordinate to to emit particles from. The default is the x-coordinate of the emitter's current location.
-//                  * @param y The y-coordinate to to emit particles from. The default is the y-coordinate of the emitter's current location.
+//                  * @param x The x-coordinate to to emit particles from. The default is the x-coordinate of the emitter's current Location.
+//                  * @param y The y-coordinate to to emit particles from. The default is the y-coordinate of the emitter's current Location.
 //                  * @param count The number of particles to release from each emitter. The default is the emitter's own {@link Phaser.GameObjects.Particles.ParticleEmitter#quantity}.
 //                  */
 //                 emitParticleAt(x?: number, y?: number, count?: integer): Phaser.GameObjects.Particles.ParticleEmitterManager;
@@ -21617,7 +21617,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -21636,7 +21636,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -21655,7 +21655,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -22830,7 +22830,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -22849,7 +22849,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -22868,7 +22868,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -23554,7 +23554,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -23573,7 +23573,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -23592,7 +23592,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -24328,7 +24328,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -24347,7 +24347,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -24366,7 +24366,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -24963,7 +24963,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -24982,7 +24982,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -25001,7 +25001,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -25593,7 +25593,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -25612,7 +25612,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -25631,7 +25631,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -26308,7 +26308,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -26327,7 +26327,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -26346,7 +26346,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -26990,7 +26990,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -27009,7 +27009,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -27028,7 +27028,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -27686,7 +27686,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -27705,7 +27705,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -27724,7 +27724,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -28335,7 +28335,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -28354,7 +28354,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -28373,7 +28373,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -28968,7 +28968,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -28987,7 +28987,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -29006,7 +29006,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -29584,7 +29584,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -29603,7 +29603,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -29622,7 +29622,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30289,7 +30289,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30308,7 +30308,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30327,7 +30327,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30948,7 +30948,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30967,7 +30967,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -30986,7 +30986,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -31581,7 +31581,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -31600,7 +31600,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -31619,7 +31619,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -32209,7 +32209,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -32228,7 +32228,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -32247,7 +32247,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -33480,7 +33480,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -33499,7 +33499,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -33518,7 +33518,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -34403,7 +34403,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -34422,7 +34422,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -34441,7 +34441,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -35135,7 +35135,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -35154,7 +35154,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -35173,7 +35173,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -39072,9 +39072,9 @@
 //                 shiftKey: boolean;
 
 //                 /**
-//                  * The location of the modifier key. 0 for standard (or unknown), 1 for left, 2 for right, 3 for numpad.
+//                  * The Location of the modifier key. 0 for standard (or unknown), 1 for left, 2 for right, 3 for numpad.
 //                  */
-//                 location: number;
+//                 Location: number;
 
 //                 /**
 //                  * The timestamp when the key was last pressed down.
@@ -46237,7 +46237,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -46256,7 +46256,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -46275,7 +46275,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -46987,7 +46987,7 @@
 //                  * 
 //                  * You must give a maximum speed value, beyond which the game object won't go any faster.
 //                  * 
-//                  * Note: The game object does not continuously track the target. If the target changes location during transit the game object will not modify its course.
+//                  * Note: The game object does not continuously track the target. If the target changes Location during transit the game object will not modify its course.
 //                  * Note: The game object doesn't stop moving once it reaches the destination coordinates.
 //                  * @param gameObject Any Game Object with an Arcade Physics body.
 //                  * @param x The x coordinate to accelerate towards.
@@ -47003,7 +47003,7 @@
 //                  * 
 //                  * You must give a maximum speed value, beyond which the game object won't go any faster.
 //                  * 
-//                  * Note: The game object does not continuously track the target. If the target changes location during transit the game object will not modify its course.
+//                  * Note: The game object does not continuously track the target. If the target changes Location during transit the game object will not modify its course.
 //                  * Note: The game object doesn't stop moving once it reaches the destination coordinates.
 //                  * @param gameObject Any Game Object with an Arcade Physics body.
 //                  * @param destination The Game Object to move towards. Can be any object but must have visible x/y properties.
@@ -47029,7 +47029,7 @@
 //                  * Move the given display object towards the x/y coordinates at a steady velocity.
 //                  * If you specify a maxTime then it will adjust the speed (over-writing what you set) so it arrives at the destination in that number of seconds.
 //                  * Timings are approximate due to the way browser timers work. Allow for a variance of +- 50ms.
-//                  * Note: The display object does not continuously track the target. If the target changes location during transit the display object will not modify its course.
+//                  * Note: The display object does not continuously track the target. If the target changes Location during transit the display object will not modify its course.
 //                  * Note: The display object doesn't stop moving once it reaches the destination coordinates.
 //                  * Note: Doesn't take into account acceleration, maxVelocity or drag (if you've set drag or acceleration too high this object may not move at all)
 //                  * @param gameObject Any Game Object with an Arcade Physics body.
@@ -47044,7 +47044,7 @@
 //                  * Move the given display object towards the destination object at a steady velocity.
 //                  * If you specify a maxTime then it will adjust the speed (overwriting what you set) so it arrives at the destination in that number of seconds.
 //                  * Timings are approximate due to the way browser timers work. Allow for a variance of +- 50ms.
-//                  * Note: The display object does not continuously track the target. If the target changes location during transit the display object will not modify its course.
+//                  * Note: The display object does not continuously track the target. If the target changes Location during transit the display object will not modify its course.
 //                  * Note: The display object doesn't stop moving once it reaches the destination coordinates.
 //                  * Note: Doesn't take into account acceleration, maxVelocity or drag (if you've set drag or acceleration too high this object may not move at all)
 //                  * @param gameObject Any Game Object with an Arcade Physics body.
@@ -47496,7 +47496,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -47515,7 +47515,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -47534,7 +47534,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -52038,7 +52038,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -52057,7 +52057,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -52076,7 +52076,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -53208,7 +53208,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -53227,7 +53227,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -53246,7 +53246,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -55397,7 +55397,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -55416,7 +55416,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -55435,7 +55435,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -56575,7 +56575,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -56594,7 +56594,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -56613,7 +56613,7 @@
 //                  * 
 //                  * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //                  * 
-//                  * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//                  * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //                  * It does not change the Game Objects actual position values.
 //                  * 
 //                  * A value of 1 means it will move exactly in sync with a camera.
@@ -60165,7 +60165,7 @@
 
 //                 /**
 //                  * [description]
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  */
@@ -60173,7 +60173,7 @@
 
 //                 /**
 //                  * [description]
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  * @param y [description]
@@ -60182,7 +60182,7 @@
 
 //                 /**
 //                  * [description]
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  * @param y [description]
@@ -60192,7 +60192,7 @@
 
 //                 /**
 //                  * Sets uniform of a WebGLProgram
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x X component
 //                  * @param y Y component
@@ -60203,7 +60203,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param arr The new value to be used for the uniform variable.
 //                  */
@@ -60211,7 +60211,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param arr The new value to be used for the uniform variable.
 //                  */
@@ -60219,7 +60219,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param arr The new value to be used for the uniform variable.
 //                  */
@@ -60227,7 +60227,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param arr The new value to be used for the uniform variable.
 //                  */
@@ -60235,7 +60235,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  */
@@ -60243,7 +60243,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  * @param y [description]
@@ -60252,7 +60252,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x [description]
 //                  * @param y [description]
@@ -60262,7 +60262,7 @@
 
 //                 /**
 //                  * Sets the value of a uniform variable in the given WebGLProgram.
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param x X component
 //                  * @param y Y component
@@ -60273,7 +60273,7 @@
 
 //                 /**
 //                  * [description]
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param transpose [description]
 //                  * @param matrix [description]
@@ -60282,7 +60282,7 @@
 
 //                 /**
 //                  * [description]
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param transpose [description]
 //                  * @param matrix [description]
@@ -60291,7 +60291,7 @@
 
 //                 /**
 //                  * Sets uniform of a WebGLProgram
-//                  * @param program The target WebGLProgram from which the uniform location will be looked-up.
+//                  * @param program The target WebGLProgram from which the uniform Location will be looked-up.
 //                  * @param name The name of the uniform to look-up and modify.
 //                  * @param transpose Is the matrix transposed
 //                  * @param matrix Matrix data
@@ -63636,7 +63636,7 @@
 //             /**
 //              * Given a Texture and an `x` and `y` coordinate this method will return a new
 //              * Color object that has been populated with the color and alpha values of the pixel
-//              * at that location in the Texture.
+//              * at that Location in the Texture.
 //              * @param x The x coordinate of the pixel within the Texture.
 //              * @param y The y coordinate of the pixel within the Texture.
 //              * @param key The unique string-based key of the Texture.
@@ -63646,7 +63646,7 @@
 
 //             /**
 //              * Given a Texture and an `x` and `y` coordinate this method will return a value between 0 and 255
-//              * corresponding to the alpha value of the pixel at that location in the Texture. If the coordinate
+//              * corresponding to the alpha value of the pixel at that Location in the Texture. If the coordinate
 //              * is out of bounds it will return null.
 //              * @param x The x coordinate of the pixel within the Texture.
 //              * @param y The y coordinate of the pixel within the Texture.
@@ -64139,16 +64139,16 @@
 //             getTilesWithinWorldXY(worldX: number, worldY: number, width: number, height: number, filteringOptions?: object, camera?: Phaser.Cameras.Scene2D.Camera): Phaser.Tilemaps.Tile[];
 
 //             /**
-//              * Checks if there is a tile at the given location (in tile coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in tile coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * @param tileX The x coordinate, in tiles, not pixels.
 //              * @param tileY The y coordinate, in tiles, not pixels.
 //              */
 //             hasTileAt(tileX: integer, tileY: integer): boolean;
 
 //             /**
-//              * Checks if there is a tile at the given location (in world coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in world coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * @param worldX The x coordinate, in pixels.
 //              * @param worldY The y coordinate, in pixels.
 //              * @param camera The Camera to use when factoring in which tiles to return. Default main camera.
@@ -64158,8 +64158,8 @@
 //             /**
 //              * Puts a tile at the given tile coordinates in the specified layer. You can pass in either an index
 //              * or a Tile object. If you pass in a Tile, all attributes will be copied over to the specified
-//              * location. If you pass in an index, only the index at the specified location will be changed.
-//              * Collision information will be recalculated at the specified location.
+//              * Location. If you pass in an index, only the index at the specified Location will be changed.
+//              * Collision information will be recalculated at the specified Location.
 //              * @param tile The index of this tile to set or a Tile object.
 //              * @param tileX The x coordinate, in tiles, not pixels.
 //              * @param tileY The y coordinate, in tiles, not pixels.
@@ -64170,8 +64170,8 @@
 //             /**
 //              * Puts a tile at the given world coordinates (pixels) in the specified layer. You can pass in either
 //              * an index or a Tile object. If you pass in a Tile, all attributes will be copied over to the
-//              * specified location. If you pass in an index, only the index at the specified location will be
-//              * changed. Collision information will be recalculated at the specified location.
+//              * specified Location. If you pass in an index, only the index at the specified Location will be
+//              * changed. Collision information will be recalculated at the specified Location.
 //              * @param tile The index of this tile to set or a Tile object.
 //              * @param worldX The x coordinate, in pixels.
 //              * @param worldY The y coordinate, in pixels.
@@ -64183,8 +64183,8 @@
 //             /**
 //              * Puts an array of tiles or a 2D array of tiles at the given tile coordinates in the specified
 //              * layer. The array can be composed of either tile indexes or Tile objects. If you pass in a Tile,
-//              * all attributes will be copied over to the specified location. If you pass in an index, only the
-//              * index at the specified location will be changed. Collision information will be recalculated
+//              * all attributes will be copied over to the specified Location. If you pass in an index, only the
+//              * index at the specified Location will be changed. Collision information will be recalculated
 //              * within the region tiles were changed.
 //              * @param tile A row (array) or grid (2D array) of Tiles or tile indexes to place.
 //              * @param tileX The x coordinate, in tiles, not pixels.
@@ -64212,7 +64212,7 @@
 //              * collision information.
 //              * @param tileX The x coordinate, in tiles, not pixels.
 //              * @param tileY The y coordinate, in tiles, not pixels.
-//              * @param replaceWithNull If true, this will replace the tile at the specified location with null instead of a Tile with an index of -1. Default true.
+//              * @param replaceWithNull If true, this will replace the tile at the specified Location with null instead of a Tile with an index of -1. Default true.
 //              * @param recalculateFaces `true` if the faces data should be recalculated. Default true.
 //              */
 //             removeTileAt(tileX: integer, tileY: integer, replaceWithNull?: boolean, recalculateFaces?: boolean): Phaser.Tilemaps.Tile;
@@ -64222,7 +64222,7 @@
 //              * collision information.
 //              * @param worldX The x coordinate, in pixels.
 //              * @param worldY The y coordinate, in pixels.
-//              * @param replaceWithNull If true, this will replace the tile at the specified location with null instead of a Tile with an index of -1. Default true.
+//              * @param replaceWithNull If true, this will replace the tile at the specified Location with null instead of a Tile with an index of -1. Default true.
 //              * @param recalculateFaces `true` if the faces data should be recalculated. Default true.
 //              * @param camera The Camera to use when calculating the tile index from the world values. Default main camera.
 //              */
@@ -64348,7 +64348,7 @@
 //              * Sets a global collision callback for the given tile index within the layer. This will affect all
 //              * tiles on this layer that have the same index. If a callback is already set for the tile index it
 //              * will be replaced. Set the callback to null to remove it. If you want to set a callback for a tile
-//              * at a specific location on the map then see setTileLocationCallback.
+//              * at a specific Location on the map then see setTileLocationCallback.
 //              * @param indexes Either a single tile index, or an array of tile indexes to have a
 //              * collision callback set for.
 //              * @param callback The callback that will be invoked when the tile is collided with.
@@ -64861,7 +64861,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -64880,7 +64880,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -64899,7 +64899,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -65459,7 +65459,7 @@
 //                  * @param json The Weltmeister JSON object.
 //                  * @param insertNull Controls how empty tiles, tiles with an index of -1, in the map
 //                  * data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//                  * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//                  * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //                  * the tile data doesn't need to change then setting this value to `true` will help with memory
 //                  * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //                  * the default value set.
@@ -65482,7 +65482,7 @@
 //              * ignored for Tiled JSON.
 //              * @param insertNull Controls how empty tiles, tiles with an index of -1, in the map
 //              * data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//              * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//              * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //              * the tile data doesn't need to change then setting this value to `true` will help with memory
 //              * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //              * the default value set.
@@ -65497,7 +65497,7 @@
 //              * @param tileHeight The height of a tile in pixels.
 //              * @param insertNull Controls how empty tiles, tiles with an index of -1, in the map
 //              * data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//              * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//              * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //              * the tile data doesn't need to change then setting this value to `true` will help with memory
 //              * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //              * the default value set.
@@ -65512,7 +65512,7 @@
 //              * @param tileHeight The height of a tile in pixels.
 //              * @param insertNull Controls how empty tiles, tiles with an index of -1, in the map
 //              * data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//              * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//              * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //              * the tile data doesn't need to change then setting this value to `true` will help with memory
 //              * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //              * the default value set.
@@ -65557,7 +65557,7 @@
 //                  * @param json The Tiled JSON object.
 //                  * @param insertNull Controls how empty tiles, tiles with an index of -1, in the map
 //                  * data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//                  * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//                  * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //                  * the tile data doesn't need to change then setting this value to `true` will help with memory
 //                  * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //                  * the default value set.
@@ -65617,7 +65617,7 @@
 //          * a 2D array of tile indexes.
 //          * @param insertNull Controls how empty tiles, tiles with an index of -1, in the
 //          * map data are handled. If `true`, empty locations will get a value of `null`. If `false`, empty
-//          * location will get a Tile object with an index of -1. If you've a large sparsely populated map and
+//          * Location will get a Tile object with an index of -1. If you've a large sparsely populated map and
 //          * the tile data doesn't need to change then setting this value to `true` will help with memory
 //          * consumption. However if your map is small or you need to update the tiles dynamically, then leave
 //          * the default value set. Default false.
@@ -65985,16 +65985,16 @@
 //             getTilesWithinShape(shape: Phaser.Geom.Circle | Phaser.Geom.Line | Phaser.Geom.Rectangle | Phaser.Geom.Triangle, filteringOptions?: object, camera?: Phaser.Cameras.Scene2D.Camera): Phaser.Tilemaps.Tile[];
 
 //             /**
-//              * Checks if there is a tile at the given location (in tile coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in tile coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * @param tileX [description]
 //              * @param tileY [description]
 //              */
 //             hasTileAt(tileX: integer, tileY: integer): boolean;
 
 //             /**
-//              * Checks if there is a tile at the given location (in world coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in world coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * @param worldX [description]
 //              * @param worldY [description]
 //              * @param camera [description] Default main camera.
@@ -66076,7 +66076,7 @@
 //              * Sets a global collision callback for the given tile index within the layer. This will affect all
 //              * tiles on this layer that have the same index. If a callback is already set for the tile index it
 //              * will be replaced. Set the callback to null to remove it. If you want to set a callback for a tile
-//              * at a specific location on the map then see setTileLocationCallback.
+//              * at a specific Location on the map then see setTileLocationCallback.
 //              * @param indexes Either a single tile index, or an array of tile indexes to have a
 //              * collision callback set for.
 //              * @param callback The callback that will be invoked when the tile is collided with.
@@ -66702,7 +66702,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -66721,7 +66721,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -66740,7 +66740,7 @@
 //              * 
 //              * The scroll factor controls the influence of the movement of a Camera upon this Game Object.
 //              * 
-//              * When a camera scrolls it will change the location at which this Game Object is rendered on-screen.
+//              * When a camera scrolls it will change the Location at which this Game Object is rendered on-screen.
 //              * It does not change the Game Objects actual position values.
 //              * 
 //              * A value of 1 means it will move exactly in sync with a camera.
@@ -67606,10 +67606,10 @@
 //             /**
 //              * Internally used. Returns the index of the object in one of the Tilemaps arrays whose name
 //              * property matches the given `name`.
-//              * @param location The Tilemap array to search.
+//              * @param Location The Tilemap array to search.
 //              * @param name The name of the array element to get.
 //              */
-//             getIndex(location: any[], name: string): number;
+//             getIndex(Location: any[], name: string): number;
 
 //             /**
 //              * Gets the LayerData from this.layers that is associated with `layer`, or null if an invalid
@@ -67723,8 +67723,8 @@
 //             getTilesetIndex(name: string): integer;
 
 //             /**
-//              * Checks if there is a tile at the given location (in tile coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in tile coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * 
 //              * If no layer specified, the map's current layer is used.
 //              * @param tileX The x coordinate, in tiles, not pixels.
@@ -67734,8 +67734,8 @@
 //             hasTileAt(tileX: integer, tileY: integer, layer?: Phaser.Tilemaps.LayerData): boolean;
 
 //             /**
-//              * Checks if there is a tile at the given location (in world coordinates) in the given layer. Returns
-//              * false if there is no tile or if the tile at that location has an index of -1.
+//              * Checks if there is a tile at the given Location (in world coordinates) in the given layer. Returns
+//              * false if there is no tile or if the tile at that Location has an index of -1.
 //              * 
 //              * If no layer specified, the maps current layer is used.
 //              * @param worldX The x coordinate, in pixels.
@@ -67754,8 +67754,8 @@
 //             /**
 //              * Puts a tile at the given tile coordinates in the specified layer. You can pass in either an index
 //              * or a Tile object. If you pass in a Tile, all attributes will be copied over to the specified
-//              * location. If you pass in an index, only the index at the specified location will be changed.
-//              * Collision information will be recalculated at the specified location.
+//              * Location. If you pass in an index, only the index at the specified Location will be changed.
+//              * Collision information will be recalculated at the specified Location.
 //              * 
 //              * If no layer specified, the maps current layer is used.
 //              * 
@@ -67771,8 +67771,8 @@
 //             /**
 //              * Puts a tile at the given world coordinates (pixels) in the specified layer. You can pass in either
 //              * an index or a Tile object. If you pass in a Tile, all attributes will be copied over to the
-//              * specified location. If you pass in an index, only the index at the specified location will be
-//              * changed. Collision information will be recalculated at the specified location.
+//              * specified Location. If you pass in an index, only the index at the specified Location will be
+//              * changed. Collision information will be recalculated at the specified Location.
 //              * 
 //              * If no layer specified, the maps current layer is used. This
 //              * cannot be applied to StaticTilemapLayers.
@@ -67788,8 +67788,8 @@
 //             /**
 //              * Puts an array of tiles or a 2D array of tiles at the given tile coordinates in the specified
 //              * layer. The array can be composed of either tile indexes or Tile objects. If you pass in a Tile,
-//              * all attributes will be copied over to the specified location. If you pass in an index, only the
-//              * index at the specified location will be changed. Collision information will be recalculated
+//              * all attributes will be copied over to the specified Location. If you pass in an index, only the
+//              * index at the specified Location will be changed. Collision information will be recalculated
 //              * within the region tiles were changed.
 //              * 
 //              * If no layer specified, the maps current layer is used.
@@ -67860,7 +67860,7 @@
 //              * This cannot be applied to StaticTilemapLayers.
 //              * @param tileX The x coordinate, in tiles, not pixels.
 //              * @param tileY The y coordinate, in tiles, not pixels.
-//              * @param replaceWithNull If true, this will replace the tile at the specified location with null instead of a Tile with an index of -1. Default true.
+//              * @param replaceWithNull If true, this will replace the tile at the specified Location with null instead of a Tile with an index of -1. Default true.
 //              * @param recalculateFaces `true` if the faces data should be recalculated. Default true.
 //              * @param layer The tile layer to search. If not given the current layer is used.
 //              */
@@ -67874,7 +67874,7 @@
 //              * This cannot be applied to StaticTilemapLayers.
 //              * @param worldX The x coordinate, in pixels.
 //              * @param worldY The y coordinate, in pixels.
-//              * @param replaceWithNull If true, this will replace the tile at the specified location with null instead of a Tile with an index of -1. Default true.
+//              * @param replaceWithNull If true, this will replace the tile at the specified Location with null instead of a Tile with an index of -1. Default true.
 //              * @param recalculateFaces `true` if the faces data should be recalculated. Default true.
 //              * @param camera The Camera to use when calculating the tile index from the world values. Default main camera.
 //              * @param layer The tile layer to use. If not given the current layer is used.
@@ -67989,7 +67989,7 @@
 //              * Sets a global collision callback for the given tile index within the layer. This will affect all
 //              * tiles on this layer that have the same index. If a callback is already set for the tile index it
 //              * will be replaced. Set the callback to null to remove it. If you want to set a callback for a tile
-//              * at a specific location on the map then see setTileLocationCallback.
+//              * at a specific Location on the map then see setTileLocationCallback.
 //              * 
 //              * If no layer specified, the map's current layer is used.
 //              * @param indexes Either a single tile index, or an array of tile indexes to have a collision callback set for.
@@ -71800,7 +71800,7 @@
 //     /**
 //      * Controls how empty tiles, tiles with an index of -1,
 //      * in the map data are handled. If `true`, empty locations will get a value of `null`. If `false`,
-//      * empty location will get a Tile object with an index of -1. If you've a large sparsely populated
+//      * empty Location will get a Tile object with an index of -1. If you've a large sparsely populated
 //      * map and the tile data doesn't need to change then setting this value to `true` will help with
 //      * memory consumption. However if your map is small or you need to update the tiles dynamically,
 //      * then leave the default value set.

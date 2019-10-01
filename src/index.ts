@@ -1,6 +1,6 @@
 import 'phaser'
-import { gameConfig } from './constants/GameConfig'
-import { GameModule } from './objects/utils/GameUtils';
+import { GameModule } from './objects/utils/GameModule';
+import { gameConfig } from './constants/Constants';
 
 window.onload = () => {
   /* eslint-disable no-unused-vars */

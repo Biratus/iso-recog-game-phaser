@@ -1,12 +1,12 @@
 import 'phaser';
-import { ENEMY_SPAWN_EVENT, ENEMY_TYPE, LOCATION, EVENTS } from '../../constants/Enums';
+import { ENEMY_TYPE, EVENTS } from '../../constants/Enums';
+import { Location } from '../../constants/Location';
 import Enemy from '../character/Enemy';
 import { renderer } from '../render/Renderer';
-import { GameModule } from '../utils/GameUtils';
+import { GameModule } from '../utils/GameModule';
+import MapUtils from '../utils/MapUtils';
 import { Timeout } from '../utils/Timeout';
 import Entry from './Entry';
-import MapUtils from '../utils/MapUtils';
-import { Events } from 'phaser';
 
 export default class EnemyManager {
     entry: Entry;
@@ -60,12 +60,12 @@ export default class EnemyManager {
                 this.nbRndMed--;
                 break;
         }
-        // console.log('spawning ' + type + ' ' + LOCATION.name(this.entry.location));
+        // console.log('spawning ' + type + ' ' + Location.name(this.entry.Location));
         return this.spawn(type);
     }
 
     getEnemyConfig(type) {
-        let opEntry = renderer.getEntryTopBackLocationAt(LOCATION.name(this.entry.location)!);
+        let opEntry = renderer.getEntryTopBackLocationAt(Location.name(this.entry.location)!);
         let position = { x: opEntry.x, y: opEntry.y };
         // let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
         //TODO figure out z with level.currentRoom.z;
@@ -108,7 +108,7 @@ export default class EnemyManager {
     }
 
     start() {
-        console.log('EnMana '+this.entry.sign+' '+LOCATION.name(this.entry.location)+'\n totEnemies '+this.totEnemies);
+        // console.log('EnMana '+this.entry.sign+' '+Location.name(this.entry.location)+'\n totEnemies '+this.totEnemies);
         let smallInter = 2.5 * 1000 + this.totEnemies * 500;
         let medInter = 4.5 * 1000 + this.totEnemies * 500;
         let rndInter = 0.5 * 1000 + this.totEnemies * 250;

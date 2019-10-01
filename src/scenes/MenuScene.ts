@@ -1,6 +1,6 @@
 import 'phaser';
 import { SCENE_MENU, SCENE_TUTORIAL, SCENE_GAME } from '../constants/Constants';
-import { GameModule } from '../objects/utils/GameUtils';
+import { GameModule } from '../objects/utils/GameModule';
 import Renderer, { renderer } from '../objects/render/Renderer';
 
 export default class MenuScene extends Phaser.Scene {

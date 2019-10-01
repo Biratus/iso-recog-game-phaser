@@ -1,4 +1,4 @@
-import { GameModule } from "./GameUtils";
+import { GameModule } from "./GameModule";
 
 export class Timeout {
     static Type = { TIMEOUT: 0, INTERVAL: 1 };

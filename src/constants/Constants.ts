@@ -1,3 +1,9 @@
+import BootScene from "../scenes/BootScene"
+import LoadScene from "../scenes/LoadScene"
+import MenuScene from "../scenes/MenuScene"
+import GameScene from "../scenes/GameScene"
+import TutorialScene from "../scenes/TutorialScene"
+
 export const SCENE_BOOT = { key: 'boot' }
 export const SCENE_GAME = {
     key: 'game',
@@ -9,10 +15,6 @@ export const SCENE_TUTORIAL = {
 }
 export const SCENE_LOAD = { key: 'load' }
 export const SCENE_MENU = { key: 'menu' }
-
-export const ENEMY_CONFIG = {
-    scale: 0.2
-}
 
 export const GAME_CONFIG = {
     scale: 1,
@@ -26,8 +28,12 @@ export const GAME_CONFIG = {
     enablePhysics: false
 }
 
-export const DEFAULT_ROOM_CONFIG = {
-    key: "abstractTile_01",
-    // block_size: 17// /!\ IMPAIR /!\
-    block_size: 13// /!\ IMPAIR /!\
-}
+export const gameConfig = {
+    type: Phaser.WEBGL,
+    parent: 'gameContainer',
+    scene: [BootScene, LoadScene, MenuScene,GameScene, TutorialScene]
+    // resolution:10
+    // physics:{
+    //   debug:true
+    // }
+  }

@@ -4,16 +4,14 @@ import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
 import { SCENE_GAME } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
-import { INTERACTION_EVENT, LOCATION, EVENTS } from '../constants/Enums';
+import { EVENTS } from '../constants/Enums';
 import Level from '../objects/core/Level';
 import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
 import Renderer, { renderer } from '../objects/render/Renderer';
-import { GameModule } from '../objects/utils/GameUtils';
+import { GameModule } from '../objects/utils/GameModule';
 import Loader from '../objects/utils/Loader';
-import { Timeout } from '../objects/utils/Timeout';
-import { RenderUtils } from '../objects/utils/RenderUtils';
-
+import { Location } from '../constants/Location';
 
 export default class GameScene extends Phaser.Scene {
 
@@ -132,7 +130,7 @@ export default class GameScene extends Phaser.Scene {
     this.info.setText('fps :'+(1000 / delta).toFixed(3)+'\ncombo: x'+this.currentLevel.currentRoom.combo);
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
       if(enMana.isOver()) {
-        renderer.emitter.emit(EVENTS.ENTRY_SMOKE+LOCATION.name(enMana.entry.location));
+        renderer.emitter.emit(EVENTS.ENTRY_SMOKE+Location.name(enMana.entry.location));
       }
     });
   }
@@ -183,11 +181,11 @@ export default class GameScene extends Phaser.Scene {
       if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
 
-    renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
+    renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (Location: string) => {
       if (this.activeState !== GameScene.STATES.IDLE) return;
       renderer.emitter.emit(EVENTS.TAP_INDICATION);
       let r = this.currentLevel.currentRoom;
-      let dest = r._entries[location].dest;
+      let dest = r._entries[Location].dest;
       renderer.renderTransition(r, dest, () => {
         this.activeState = GameScene.STATES.RECOG
         this.currentLevel.currentRoom = dest;
@@ -204,7 +202,7 @@ export default class GameScene extends Phaser.Scene {
   }
   startEnemyManagers() {
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-      if(!enMana.isOver()) renderer.smokeEntry(LOCATION.name(enMana.entry.location)!);
+      if(!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
       enMana.start();
     });
   }
