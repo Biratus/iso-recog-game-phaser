@@ -11,6 +11,7 @@ import { LOCATION, ENTRY_DIFF, ENEMY_EVENTS } from '../constants/Enums';
 import LoadScene from './LoadScene';
 import Loader from '../objects/utils/Loader';
 import { isAbsolute } from 'path';
+import { renderer } from '../objects/render/Renderer';
 export default class InteractionScene extends Phaser.Scene {
 
     graphics: Phaser.GameObjects.Graphics;
@@ -45,7 +46,7 @@ export default class InteractionScene extends Phaser.Scene {
     }
 
     create = () => {
-        this.cameras.main.x = GameModule.interactionPanel.x;
+        this.cameras.main.x = GameModule.interactionPanel.x-GameModule.interactionPanel.width/2;
 
         this.gui = new dat.GUI();
         this.buildModal();
@@ -124,6 +125,10 @@ export default class InteractionScene extends Phaser.Scene {
         });
         this.roomFolder.add(room, 'isFinish').name('Finish').onChange((val) => {
             this.editor.changeFinish(val, room);
+        });
+        this.roomFolder.add(room, 'diff').min(0).step(1);
+        this.roomFolder.add(room, 'drop',RenderRoom.possibleDrops).onChange((val) => {
+            renderer.setDropOnRoom(room,val);
         });
         for (let loc of LOCATION.enum()) {
             let obj = {};

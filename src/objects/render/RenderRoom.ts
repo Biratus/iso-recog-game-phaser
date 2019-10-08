@@ -8,11 +8,13 @@ import MapUtils from "../utils/MapUtils";
 export default class RenderRoom {
     static idCount = 0;
     static rooms: RenderRoom[] = [];
+    static possibleDrops = ['NONE', 'STONE', 'STONE_2nd', 'STONE_Direction', 'STONE_SLOW', 'STONE_LIGHT', 'STONE_KEY', 'STONE_RESURECT', 'STONE_COMBO'];
 
     _id: number;
     _entries: { [key: string]: RenderEntry } = {};
     diff = 0;
     sprite: IsoSprite;
+    drop = '';
     isStart = false;
     isFinish = false;
 
@@ -44,6 +46,9 @@ export default class RenderRoom {
     on(key, func) { this.sprite.on(key, func); }
 
     toExportJSON() {
-        return { id: this.id, diff: this.diff, entries: MapUtils.of(this._entries).map((entry) => entry.toExportJSON()) };
+        return {
+            id: this.id, diff: this.diff, drop: this.drop,
+            entries: MapUtils.of(this._entries).map((entry) => entry.toExportJSON())
+        };
     }
 }

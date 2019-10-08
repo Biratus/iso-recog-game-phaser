@@ -117,8 +117,7 @@ export default class EditorScene extends Phaser.Scene {
     }
 
     deleteEntry(room: RenderRoom, loc) {
-        // renderer.deleteEntry(loc);
-
+        renderer.deleteEntry(room,loc);
     }
 
     select(entity: RenderEntry | RenderRoom) {
@@ -149,6 +148,8 @@ export default class EditorScene extends Phaser.Scene {
         let startRoom = levelMap[level.start].room;
         let room = renderer.addRoom();
         room.id=startRoom.id;
+        room.diff=startRoom.diff;
+        room.drop=startRoom.drop || '';
         levelMap[room.id].render = room;
         for(let e of startRoom.entries) {
             let entry = this.addEntry(room,e.loc);
@@ -157,8 +158,10 @@ export default class EditorScene extends Phaser.Scene {
     }
 
     loadRoom(room,entry,levelMap) {
-        let renderRoom = this.addRoom(entry);
-        (<RenderRoom>renderRoom).id=room.id;
+        let renderRoom = <RenderRoom>this.addRoom(entry);
+        renderRoom.id=room.id;
+        renderRoom.diff=room.diff;
+        renderRoom.drop=room.drop || '';
         levelMap[room.id].render = renderRoom;
         for(let e of room.entries) {
             let entry = this.addEntry(<RenderRoom>renderRoom,e.loc);

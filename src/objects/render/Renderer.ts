@@ -60,7 +60,7 @@ export default class Renderer {
     startIndic:Phaser.GameObjects.Image;
     finishIndic:Phaser.GameObjects.Image;
 
-    rooms:{[key:number]: RenderRoom};
+    drops:{[key:number]: Phaser.GameObjects.Image} = {};
 
     constructor() {
         this.terrainContainer = GameModule.currentScene.add.container(0, 0);
@@ -88,10 +88,6 @@ export default class Renderer {
         this.terrainContainer.sort('depth');
     }
 
-    isEmpty() {
-        return MapUtils.of(this.rooms).length()==0;
-    }
-
     addRoom(entry?:RenderEntry):RenderRoom {
         let room;
         if(entry) {
@@ -110,6 +106,17 @@ export default class Renderer {
         this.terrainContainer.add(entry.sprite);
         return entry;
     }
+    deleteEntry(room,loc) {
+        let entry = room._entries[loc];
+        entry.sprite.destroy();
+        if(entry.dest) {
+            let opp = <string>LOCATION.name(LOCATION.opposite(LOCATION.name(loc)));
+            let entryOpp = entry.dest._entries[opp];
+            entryOpp.dest = undefined;
+            this.deleteEntry(entry.dest,opp);
+        }
+        delete room._entries[loc];
+    }
 
     changeStart(loc,setVisible=true) {
         this.startIndic.visible=setVisible;
@@ -120,6 +127,19 @@ export default class Renderer {
         this.finishIndic.visible=setVisible;
         this.finishIndic.x=loc.x;
         this.finishIndic.y=loc.y;
+    }
+    
+    setDropOnRoom(room,drop) {
+        if(this.drops[room.id]) {
+            if(drop == 'NONE') {
+                this.drops[room.id].destroy();
+                delete this.drops[room.id];
+            } else this.drops[room.id].setTexture(drop);
+        } else if(drop!='NONE'){
+            let loc = RenderUtils.topXYFromIsoSprite(room.sprite);
+            this.drops[room.id] = GameModule.currentScene.add.image(loc.x,loc.y,drop).setScale(0.5);
+            this.terrainOverlayContainer.add(this.drops[room.id]);
+        }
     }
 
     /*renderRoom = (room: Room) => {

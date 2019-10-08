@@ -29,8 +29,15 @@
         "smoke_04_gray.png",
         "smoke_05_gray.png",
         "fire_01_gray.png",
-        "fire_02_gray.png"
-        
+        "fire_02_gray.png",
+        "STONE.png",
+        "STONE_2nd.png",
+        "STONE_Direction.png",
+        "STONE_SLOW.png",
+        "STONE_LIGHT.png",
+        "STONE_KEY.png",
+        "STONE_RESURECT.png",
+        "STONE_COMBO.png"
     ],
     "json": [
         "tutorial.json",
@@ -43,10 +50,10 @@
         "floating_blue_spritesheet.png": {
             "frameWidth": 322,
             "frameHeight": 341,
-            "endFrame":37
+            "endFrame": 37
         }
     },
-    "atlas":[
+    "atlas": [
         "p_bg",
         "p_bg2",
         "p_bg_square",
