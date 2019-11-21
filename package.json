@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Phaser3 Typescript Webpack Boilerplate",
   "scripts": {
-    "build:web": "cross-env PLATFORM=web webpack --config webpack.prod.js",
-    "build:android": "cross-env PLATFORM=android webpack --config webpack.prod.js",
-    "build:ios": "cross-env PLATFORM=ios webpack --config webpack.prod.js",
+    "build:web": "python assets/generateAssets.py && cross-env PLATFORM=web webpack --config webpack.prod.js",
+    "build:android": "python assets/generateAssets.py && cross-env PLATFORM=android webpack --config webpack.prod.js",
+    "build:ios": "python assets/generateAssets.py && cross-env PLATFORM=ios webpack --config webpack.prod.js",
     "dev": "python assets/generateAssets.py && cross-env PLATFORM=web webpack-dev-server --config webpack.dev.js"
   },
   "author": "Vlad Faust <mail@vladfaust.com>",
