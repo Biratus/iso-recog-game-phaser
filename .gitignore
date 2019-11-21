@@ -5,3 +5,4 @@
 /yarn.lock
 /android
 package-lock\.json
+assets/json/assets.json
