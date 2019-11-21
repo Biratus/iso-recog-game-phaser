@@ -1,7 +1,7 @@
 import { DollarRecognizer, Point } from 'outlines';
 import 'phaser';
-import { GameModule } from '../utils/GameModule';
 import { EVENTS } from '../../constants/Enums';
+import { GameModule } from '../../utils/GameModule';
 
 export default class RecogListener {
     points: Point[] = [];

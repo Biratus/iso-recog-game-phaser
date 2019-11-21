@@ -3,10 +3,10 @@ import { ENEMY_TYPE, EVENTS } from '../../constants/Enums';
 import { Location } from '../../constants/Location';
 import Enemy from '../character/Enemy';
 import { renderer } from '../render/Renderer';
-import { GameModule } from '../utils/GameModule';
-import MapUtils from '../utils/MapUtils';
-import { Timeout } from '../utils/Timeout';
 import Entry from './Entry';
+import { GameModule } from '../../utils/GameModule';
+import { Timeout } from '../../utils/Timeout';
+import MapUtils from '../../utils/MapUtils';
 
 export default class EnemyManager {
     entry: Entry;

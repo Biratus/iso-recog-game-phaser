@@ -5,11 +5,11 @@ import { EVENTS } from "../../constants/Enums";
 import GameScene from '../../scenes/GameScene';
 import Entry from "../core/Entry";
 import Room from "../core/Room";
-import { GameModule } from "../utils/GameModule";
-import { LevelModule } from "../utils/LevelModule";
-import { RenderUtils } from "../utils/RenderUtils";
-import { Timeout } from '../utils/Timeout';
 import { Location } from '../../constants/Location';
+import { GameModule } from '../../utils/GameModule';
+import { RenderUtils } from '../../utils/RenderUtils';
+import { LevelModule } from '../../utils/LevelModule';
+import { Timeout } from '../../utils/Timeout';
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;

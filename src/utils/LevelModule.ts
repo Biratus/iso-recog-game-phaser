@@ -1,5 +1,5 @@
-import Entry from "../core/Entry";
-import Room from "../core/Room";
+import Room from "../objects/core/Room";
+import Entry from "../objects/core/Entry";
 
 export module LevelModule {
     export function entryBetween(source: Room, dest: Room): Entry | undefined {

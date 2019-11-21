@@ -7,11 +7,11 @@ import Level from "../objects/core/Level";
 import RecogListener from "../objects/recognizer/RecogListener";
 import AnimationGraph from "../objects/render/AnimationGraph";
 import Renderer, { renderer } from "../objects/render/Renderer";
-import { GameModule } from "../objects/utils/GameModule";
-import Loader from "../objects/utils/Loader";
-import { RenderUtils } from '../objects/utils/RenderUtils';
-import { Timeout } from "../objects/utils/Timeout";
 import { Location } from '../constants/Location';
+import { Timeout } from '../utils/Timeout';
+import { GameModule } from '../utils/GameModule';
+import Loader from '../utils/Loader';
+import { RenderUtils } from '../utils/RenderUtils';
 
 export default class TutorialScene extends Phaser.Scene {
 

@@ -1,6 +1,6 @@
 import Room from "./Room";
-import { GameModule } from "../utils/GameModule";
 import { EVENTS } from "../../constants/Enums";
+import { GameModule } from "../../utils/GameModule";
 
 export default class Level {
     name: string;

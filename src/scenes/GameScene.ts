@@ -9,9 +9,9 @@ import Level from '../objects/core/Level';
 import RecogListener from '../objects/recognizer/RecogListener';
 import AnimationGraph from '../objects/render/AnimationGraph';
 import Renderer, { renderer } from '../objects/render/Renderer';
-import { GameModule } from '../objects/utils/GameModule';
-import Loader from '../objects/utils/Loader';
 import { Location } from '../constants/Location';
+import { GameModule } from '../utils/GameModule';
+import Loader from '../utils/Loader';
 
 export default class GameScene extends Phaser.Scene {
 

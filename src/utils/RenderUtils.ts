@@ -1,9 +1,9 @@
 import { Point } from 'outlines';
-import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
+import { IsoSprite, Point3 } from 'phaser3-plugin-isometric';
 import ArrayUtils from './ArrayUtils';
 import { GameModule } from './GameModule';
-import { Location } from '../../constants/Location';
-import GameScene from '../../scenes/GameScene';
+import { Location } from '../constants/Location';
+import GameScene from '../scenes/GameScene';
 
 export module RenderUtils {
     export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }

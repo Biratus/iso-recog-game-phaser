@@ -1,8 +1,8 @@
-import { ENTRY_DIFF } from "../../constants/Enums";
-import Entry from "../core/Entry";
-import Level from "../core/Level";
-import Room from "../core/Room";
-import { Location } from '../../constants/Location';
+import Level from "../objects/core/Level";
+import Room from "../objects/core/Room";
+import Entry from "../objects/core/Entry";
+import { Location } from "../constants/Location";
+import { ENTRY_DIFF } from "../constants/Enums";
 
 export default class Loader {
     static loadLevel = (jsonObj): Level => {
