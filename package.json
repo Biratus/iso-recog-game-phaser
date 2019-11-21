@@ -6,7 +6,7 @@
     "build:web": "python assets/generateAssets.py && cross-env PLATFORM=web webpack --config webpack.prod.js",
     "build:android": "python assets/generateAssets.py && cross-env PLATFORM=android webpack --config webpack.prod.js",
     "build:ios": "python assets/generateAssets.py && cross-env PLATFORM=ios webpack --config webpack.prod.js",
-    "dev": "python assets/generateAssets.py && cross-env PLATFORM=web webpack-dev-server --config webpack.dev.js"
+    "dev": "cross-env PLATFORM=web webpack-dev-server --config webpack.dev.js"
   },
   "author": "Vlad Faust <mail@vladfaust.com>",
   "license": "MIT",
