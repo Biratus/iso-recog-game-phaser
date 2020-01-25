@@ -17,8 +17,8 @@ export default class Entry {
     nbEnMed: number;
     spawnEvtMed: any[] = [];
 
-    constructor(Location, destId, sign, diff) {
-        this.location = Location;
+    constructor(location, destId, sign, diff) {
+        this.location = location;
         this.destId = destId;
         this.sign = sign;
         this.diff = diff;

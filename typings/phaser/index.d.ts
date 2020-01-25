@@ -72219,6 +72219,7 @@ declare module Phaser.Plugins {
             origin: Phaser.Geom.Point;
             projectionAngle: number;
             scene: Phaser.Scene;
+            _transform: any[];
 
             constructor(scene: Phaser.Scene, projectionAngle: number);
 

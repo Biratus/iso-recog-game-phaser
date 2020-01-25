@@ -62,7 +62,7 @@ export default class TutorialScene extends Phaser.Scene {
             sceneKey: 'isoPhysics'
         });
         localStorage.removeItem('userShapes');
-        this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
+        this._screenSize = Phaser.Math.Distance.Between(0, 0, GameModule.width(), GameModule.height());
         this.recogListener = new RecogListener(this.events);
         this.animationGraph = new AnimationGraph(this.add.graphics({
             x: 0, y: 0,
@@ -76,13 +76,13 @@ export default class TutorialScene extends Phaser.Scene {
         this.children.sortChildrenFlag = true;
         // ISO PLUGIN
         // this.isoPhysics.world.gravity.setTo(0, 0, -500);
-        let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
-        let ry = 0.75 * window.innerHeight / this.sys.game.canvas.height;
+        let rx = 0.5 * GameModule.width() / this.sys.game.canvas.width;
+        let ry = 0.75 * GameModule.height() / this.sys.game.canvas.height;
         this.iso.projector.origin.setTo(rx, ry);
         this.iso.projector.projectionAngle = CLASSIC;
 
         // GRAPHICS
-        // this.currentShapeTxt = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+        // this.currentShapeTxt = this.add.text(GameModule.width() * 0.35, GameModule.height() * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
         // this.info = this.add.text(50, 50, this.projectionText, { color: 'red', size: '50px' });
 
         // let startBtn = this.add.image(50, 100, 'button_green');
@@ -113,7 +113,7 @@ export default class TutorialScene extends Phaser.Scene {
         this.start();
 
         //DEBUG
-        // let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
+        // let debugBtn = this.add.image(GameModule.width() * 0.7, 0, 'button_red');
         // debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
         // debugBtn.on('pointerdown', () => {
         //     console.log('GameModule.currentScene', this);
@@ -128,8 +128,8 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     userInputShape(shape) {
-        let totW = window.innerWidth;
-        let totH = window.innerHeight;
+        let totW = GameModule.width();
+        let totH = GameModule.height();
         let size = 0.4 * totW;
         let holeSize = size * 0.6;
         let x, y, path;
@@ -142,9 +142,9 @@ export default class TutorialScene extends Phaser.Scene {
                 path = new Phaser.Curves.Path(x, y).lineTo(x, y + w).lineTo(x + w, y + w).lineTo(x + w, y).closePath();
                 break;
             case 'CIRCLE':
-                x = window.innerWidth * 0.15 + totW / 2; y = totH / 2;
-                // path = new Phaser.Geom.Circle(x, y, window.innerWidth * 0.3);
-                path = new Phaser.Curves.Path(x, y).circleTo(window.innerWidth * 0.15, true);
+                x = GameModule.width() * 0.15 + totW / 2; y = totH / 2;
+                // path = new Phaser.Geom.Circle(x, y, GameModule.width() * 0.3);
+                path = new Phaser.Curves.Path(x, y).circleTo(GameModule.width() * 0.15, true);
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }

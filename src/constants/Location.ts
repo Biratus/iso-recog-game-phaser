@@ -1,11 +1,11 @@
 export module Location {
-    export var TOP: { x: 0, y: -1 };
-    export var BOTTOM: { x: 0, y: 1 };
-    export var RIGHT: { x: 1, y: 0 };
-    export var LEFT: { x: -1, y: 0 };
-    export var ORIGIN: { x: 0, y: 0 };
+    export var TOP = { x: 0, y: -1 };
+    export var BOTTOM = { x: 0, y: 1 };
+    export var RIGHT = { x: 1, y: 0 };
+    export var LEFT = { x: -1, y: 0 };
+    export var ORIGIN = { x: 0, y: 0 };
     export function values(): string[] {
-        return ['TOP', 'BOTTOM', 'RIGHT', 'LEFT'];
+        return ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'];
     }
     export function parse(str): { x: number, y: number } | undefined {
         for (let val of Location.values()) {

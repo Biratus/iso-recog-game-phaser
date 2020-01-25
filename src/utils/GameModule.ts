@@ -1,4 +1,5 @@
 import ArrayUtils from "./ArrayUtils";
+import GameScene from "../scenes/GameScene";
 
 export module GameModule {
 	export var debug = true;
@@ -50,5 +51,19 @@ export module GameModule {
 	}
 	export function lowZIndex() {
 		return ArrayUtils.of(GameModule.currentScene.children.list).minValue((c) => c.depth) - 1;
+	}
+
+	export const width = () => <number>GameModule.currentScene.game.config.width;
+	export const height = () => <number>GameModule.currentScene.game.config.height;
+	export const centerX = () => (<number>GameModule.currentScene.game.config.width)/2;
+	export const centerY = () => (<number>GameModule.currentScene.game.config.height)/2;
+	export function debug2D(spr) {
+		let isoSpr = spr;
+		let x = isoSpr.x - isoSpr.width / 2;
+		let y = isoSpr.y - isoSpr.height / 2;
+		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y, x, y + isoSpr.height);
+		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y, x + isoSpr.width, y);
+		(<GameScene>GameModule.currentScene).graphics.lineBetween(x + isoSpr.width, y, x + isoSpr.width, y + isoSpr.height);
+		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y + isoSpr.height, x + isoSpr.width, y + isoSpr.height);
 	}
 }
