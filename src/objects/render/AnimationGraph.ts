@@ -1,4 +1,9 @@
 import { GameModule } from "../../utils/GameModule";
+import { renderer } from "./Renderer";
+import GameScene from "../../scenes/GameScene";
+import { IsoSprite,Point3 } from 'phaser3-plugin-isometric';
+import { RenderUtils } from "../../utils/RenderUtils";
+
 
 export default class AnimationGraph {
     intervals: any = {};
@@ -23,6 +28,32 @@ export default class AnimationGraph {
 
     update(time, delta) {
         for (let i in this.updates) this.updates[i](time, delta);
+        this.mainGraphics.depth = GameModule.topZIndex();
+        // let pts = [{x:0,y:0,z:0},{x:0,y:0,z:500}].map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt));
+        // this.debugPoints(pts);
+        
+        // let {x,y} = renderer.getEntryTopLocationAt('TOP',false);
+        // this.debugIsoBounds(renderer.currentRoomSprite);
+        
+        // let bounds = renderer.currentRoomSprite.isoBounds;
+        // let p = GameModule.gameScene().iso.projector.project(<Point3>{x:bounds.centerX,y:bounds.centerY,z:bounds.z+bounds.height});
+        // this.mainGraphics.fillCircle(p.x,p.y,2);
+        // // debugger;
+    }
+
+    debugIsoBounds(sprite:IsoSprite) {
+        let bounds = sprite.isoBounds;
+        let p = GameModule.gameScene().iso.projector.project(<Point3>{x:bounds.x,y:bounds.y,z:bounds.z+bounds.height});
+        this.mainGraphics.fillCircle(p.x,p.y,2);
+        p = GameModule.gameScene().iso.projector.project(<Point3>{x:bounds.x+bounds.widthX,y:bounds.y,z:bounds.z+bounds.height});
+        this.mainGraphics.fillCircle(p.x,p.y,2);
+        p = GameModule.gameScene().iso.projector.project(<Point3>{x:bounds.x+bounds.widthX,y:bounds.y+bounds.widthY,z:bounds.z+bounds.height});
+        this.mainGraphics.fillCircle(p.x,p.y,2);
+        p = GameModule.gameScene().iso.projector.project(<Point3>{x:bounds.x,y:bounds.y+bounds.widthY,z:bounds.z+bounds.height});
+        this.mainGraphics.fillCircle(p.x,p.y,2);
+        // let w = RenderUtils.spriteIsoWidth(sprite);
+        // let h = RenderUtils.spriteIsoHeight(sprite);
+
     }
 
     drawDashedHollowRect(config: { x: number, y: number, w: number, h: number, holeW: number, holeH: number, rectColor: number, rectAlpha: number, dashSize: number, dashGap: number, strokeColor: number, strokeAlpha: number }) {
@@ -132,5 +163,24 @@ export default class AnimationGraph {
             this.mainGraphics.fillCircle(p.x, p.y, 2);
         }
         // this.mainGraphics.lineBetween(line.x1,line.y1,line.x2,line.y2);
+    }
+
+    debugPoints(pts) {
+        let prev,first;
+        this.mainGraphics.lineStyle(2,0xff0000,1.0);
+        for(let pt of pts) {
+            if(prev) {
+                this.mainGraphics.lineBetween(prev.x, prev.y, pt.x, pt.y);
+            } else first=pt;
+            prev=pt;
+        }
+        this.mainGraphics.lineBetween(prev.x, prev.y, first.x, first.y)
+    }
+    debugPoint(pt) {
+        this.mainGraphics.fillCircle(pt.x,pt.y,2);
+    }
+    drawPolygon(polygon:Phaser.Geom.Rectangle) {
+        this.mainGraphics.lineStyle(2,0xff0000,1.0);
+        this.mainGraphics.strokeRectShape(polygon);
     }
 }

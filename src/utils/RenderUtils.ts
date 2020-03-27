@@ -4,16 +4,20 @@ import ArrayUtils from './ArrayUtils';
 import { GameModule } from './GameModule';
 import { Location } from '../constants/Location';
 import GameScene from '../scenes/GameScene';
+import Room from '../objects/core/Room';
+import { RENDER_VAR, GAME_CONFIG } from '../constants/Constants';
+import { InspectOptions } from 'util';
 
 export module RenderUtils {
-    export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight - sprite.displayWidth / 2; }
-    export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.displayWidth / 2, 2) + Math.pow(sprite.displayWidth / 4, 2)); }
+    export var roomTexture = "roomFull.roomFull";
+    export function spriteIsoHeight(sprite: IsoSprite) { return sprite.height * GAME_CONFIG.scale * 0.5; }
+    export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.width / 2, 2) + Math.pow(sprite.width / 4, 2)) * GAME_CONFIG.scale; }
     export function spriteHalfIsoWidth(sprite: IsoSprite) { return RenderUtils.spriteIsoWidth(sprite) / 2; }
     export function spriteHalfIsoHeight(sprite: IsoSprite) { return RenderUtils.spriteIsoHeight(sprite) / 2; }
-    export function topXYFromIsoSprite(sprite: IsoSprite,proj2d = false) { 
-        let p = (<any>Object).assign({},sprite.isoPosition);
-        p.z+=sprite.isoBounds.halfHeight;
-        return proj2d?GameModule.currentScene.iso.projector.project(p):p; 
+    export function topXYFromIsoSprite(sprite: IsoSprite, proj2d = false) {
+        let p = (<any>Object).assign({}, sprite.isoPosition);
+        p.z += sprite.isoBounds.halfHeight;
+        return proj2d ? GameModule.currentScene.iso.projector.project(p) : p;
     }
     export function posAreNear(val, pos, maxDist) {
         if (pos.length == 0) return false;
@@ -88,22 +92,22 @@ export module RenderUtils {
 
     }
 
-    export function getTopFrontLine(spr,proj2d = false) :Phaser.Geom.Line{        
-        let p = (<any>Object).assign({},spr.isoPosition);
-        p.z+=spr.isoBounds.halfHeight;
+    export function getTopFrontLine(spr, proj2d = false): Phaser.Geom.Line {
+        let p = (<any>Object).assign({}, spr.isoPosition);
+        p.z += spr.isoBounds.halfHeight;
 
         let opp = Location.opposite(Location.signFromCoord(spr.isoPosition));
         let w = RenderUtils.spriteHalfIsoWidth(spr);
-        p.x+=opp.x*w;
-        p.y+=opp.y*w;
+        p.x += opp.x * w;
+        p.y += opp.y * w;
         let switched = Location.signFromCoord(Location.switchXY(p));
-        let s={x:p.x+switched.x*w,y:p.y+switched.y*w};
-        let e={x:p.x-switched.x*w,y:p.y-switched.y*w};
-        if(proj2d) {
-            s = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:s.x,y:s.y,z:p.z});
-            e = (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>{x:e.x,y:e.y,z:p.z});
+        let s = { x: p.x + switched.x * w, y: p.y + switched.y * w };
+        let e = { x: p.x - switched.x * w, y: p.y - switched.y * w };
+        if (proj2d) {
+            s = GameModule.gameScene().iso.projector.project(<Point3>{ x: s.x, y: s.y, z: p.z });
+            e = GameModule.gameScene().iso.projector.project(<Point3>{ x: e.x, y: e.y, z: p.z });
         }
-        return new Phaser.Geom.Line(s.x,s.y,e.x,e.y);
+        return new Phaser.Geom.Line(s.x, s.y, e.x, e.y);
     }
 
     export function test() {
@@ -115,5 +119,49 @@ export module RenderUtils {
         console.assert(!RenderUtils.pointInCircle({ x: 20, y: 20 }, { x: 0, y: 0, rad: 10 }), ' !pointInCircle({x:20,y:20},{x:0,y:0,rad:10})');
         console.assert(!RenderUtils.pointInCircle({ x: 30, y: 20 }, { x: 0, y: 0, rad: 20 }), ' !pointInCircle({x:30,y:20},{x:0,y:0,rad:20})');
         console.assert(!RenderUtils.pointInCircle({ x: 20, y: 30 }, { x: 0, y: 0, rad: 20 }), ' !pointInCircle({x:20,y:30},{x:0,y:0,rad:20})');
+    }
+
+    export function textureFrom(room: Room) {
+        return RenderUtils.roomTexture + Location.values().filter(l => room._entries[l]).map(l => l.charAt(0)).join('');
+    }
+
+    export function distToEntryCenter(sprite: IsoSprite) {
+        let gapWSpr = (RENDER_VAR.origW - RENDER_VAR.entry[0]) / sprite.displayWidth;
+        let gapHSpr = (RENDER_VAR.origH * 0.5 - RENDER_VAR.entry[1]) / sprite.displayHeight;
+        let middleSquare = { x: 0, y: 0, w: sprite.displayWidth - gapWSpr * 2, h: sprite.displayHeight * 0.5 - gapHSpr * 2 }
+        if (sprite.originX == 0.5) {
+            middleSquare.x = sprite.x;
+            middleSquare.y = sprite.y - gapHSpr - middleSquare.h / 2;
+        } else {
+            middleSquare.x = sprite.x + gapWSpr + middleSquare.w / 2;
+            middleSquare.y = sprite.y + gapHSpr + middleSquare.h / 2;
+        }
+        let e = [middleSquare.x + middleSquare.w / 2, middleSquare.y + middleSquare.h / 2];
+        return Math.sqrt(Math.pow(e[0], 2) + Math.pow(-e[1], 2));
+    }
+
+    export function getEntryCenterFromRoom(sprite: IsoSprite, loc: string): { x: number, y: number, z: number } {
+        let tile_width = RenderUtils.spriteIsoWidth(sprite) * GAME_CONFIG.roomScale;
+        // console.log("tile_width",tile_width);
+        let canvasLoc = Location.multiply(Location[loc], tile_width * GAME_CONFIG.entryScaleToRoom);
+        return canvasLoc;
+    }
+
+    export function getEntryPolygon(sprite:IsoSprite,loc:string,inIso = true) {
+        let center = RenderUtils.getEntryCenterFromRoom(sprite, loc);
+        center.z = 0;
+        let w = GameModule.width() * 0.04;
+        let top=center.y - w;
+        let bottom=center.y + w;
+        let left=center.x - w;
+        let right=center.x + w;
+        let ptsShape = [
+            { x: right, y: bottom, z: 0 },
+            { x: right, y: top, z: 0 },
+            { x: left, y: top, z: 0 },
+            { x: left, y: bottom, z: 0 }
+        ];
+        if(inIso) return {top,bottom,right,left,points:ptsShape};
+        else return new Phaser.Geom.Polygon(ptsShape.map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt)));
     }
 }

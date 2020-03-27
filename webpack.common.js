@@ -1,6 +1,6 @@
 const path = require('path');
-//let {PythonShell} = require('python-shell');
-//PythonShell.run('./assets/generateAssets.py',null,() => {});
+// let {PythonShell} = require('python-shell');
+// PythonShell.run('./assets/generateAssets.py',null,() => {});
 
 module.exports = {
   entry: path.resolve(__dirname, 'src/index.ts'),

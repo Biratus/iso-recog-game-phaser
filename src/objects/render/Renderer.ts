@@ -2,19 +2,18 @@ import { IsoSprite, Point3 } from 'phaser3-plugin-isometric';
 import { GAME_CONFIG } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
 import { EVENTS } from "../../constants/Enums";
-import GameScene from '../../scenes/GameScene';
-import Entry from "../core/Entry";
-import Room from "../core/Room";
 import { Location } from '../../constants/Location';
 import { GameModule } from '../../utils/GameModule';
-import { RenderUtils } from '../../utils/RenderUtils';
 import { LevelModule } from '../../utils/LevelModule';
+import { RenderUtils } from '../../utils/RenderUtils';
 import { Timeout } from '../../utils/Timeout';
+import Entry from "../core/Entry";
+import Room from "../core/Room";
+import { Tweens } from 'phaser';
 
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
     children: IsoSprite[] = [];
-    tween: Phaser.Tweens.Tween;
 
     constructor() { }
 
@@ -27,6 +26,7 @@ class IsoGroup {
         this.prevX = val;
     }
     set y(val) {
+        // console.log('sety ' + val + ' on ' + this.children.length + ' child');
         if (this.prevY !== undefined) {
             for (let c of this.children) {
                 c.isoY += val - this.prevY!;
@@ -45,8 +45,14 @@ export default class Renderer {
         'BOTTOM': { texture: 'CLASSIC_w1_Z0.5_olighterdarker_in' },
         'LEFT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_out' },
         'RIGHT': { texture: 'CLASSIC_w1_Z0.5_olightermedium_in' },
-    }
-    static roomTexture = 'CLASSIC_Elongated_w1_Z1o_mediumdarker';
+    };
+    static flipEntry = {
+        'TOP': { x: -1, y: -1 },
+        'BOTTOM': { x: 1, y: 1 },
+        'LEFT': { x: 1, y: -1 },
+        'RIGHT': { x: -1, y: 1 },
+    };
+    static roomTexture = 'roomFull.roomFullB';
     static playerTexture = 'plyer';
     static entryOffset = 4.5;
 
@@ -62,21 +68,32 @@ export default class Renderer {
     rendererContainer: Phaser.GameObjects.Container;
     uiContainer: Phaser.GameObjects.Container;
 
+    bg: IsoSprite;
+    emitter = new Phaser.Events.EventEmitter();
+
+    // Particle
+    particles: { [key: string]: Phaser.GameObjects.Particles.ParticleEmitter } = {};
+    shapeClueEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+    shapeClueParticle: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    smokeParticle: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    smokeEmitters: { [key: string]: Phaser.GameObjects.Particles.ParticleEmitter } = {};
+
+    // Tween
     player: IsoSprite;
     playerTween: Phaser.Tweens.Tween;
     lightSource: Phaser.GameObjects.Sprite;
     lightSourceTween: Phaser.Tweens.Tween;
-
-    bg: IsoSprite;
-    emitter = new Phaser.Events.EventEmitter();
-
-    particles: { [key: string]: Phaser.GameObjects.Particles.ParticleEmitter } = {};
+    tapIndic2d: Phaser.GameObjects.Sprite;
+    tapIndic2dTween: Phaser.Tweens.Tween;
+    tapIndic3d: Phaser.GameObjects.Sprite;
+    tapIndic3dTween: Phaser.Tweens.Tween;
 
     spriteInitialized = false;
     roomTransitionPlaying = false;
     debug = false;
 
     constructor() {
+        // GameModule.currentScene.game.scale.setGameSize(GameModule.width(),GameModule.height());
         GameModule.currentScene.cameras.main.alpha = 0;
         GameModule.currentScene.add.tween({
             targets: GameModule.currentScene.cameras.main,
@@ -84,9 +101,18 @@ export default class Renderer {
             duration: 1000,
             ease: Phaser.Math.Easing.Quartic.In
         });
-        this.bg = GameModule.currentScene.add.image(window.innerWidth / 2, window.innerHeight / 2, 'background8');
-        this.bg.scaleX = window.innerWidth / this.bg.width;
-        this.bg.scaleY = window.innerHeight / this.bg.height;
+        this.buildBackground();
+
+        this.rendererContainer.add(this.terrainContainer);
+        this.rendererContainer.add(this.characterContainer);
+        this.rendererContainer.add(this.terrainOverlayContainer);
+        // this.rendererContainer.add(this.uiContainer);
+    }
+
+    buildBackground() {
+        this.bg = GameModule.currentScene.add.image(GameModule.centerX(), GameModule.centerY(), 'background8');
+        this.bg.scaleX = GameModule.width() / this.bg.width;
+        this.bg.scaleY = GameModule.height() / this.bg.height;
         this.bg.depth = -999;
         this.terrainContainer = GameModule.currentScene.add.container(0, 0);
         this.characterContainer = GameModule.currentScene.add.container(0, 0);
@@ -97,7 +123,7 @@ export default class Renderer {
         // let assets = ['p_white', 'p_yellow'];
         // let sizeFactor = 0.85;
         // let offsetY = 0;
-        // let rectSource = new Phaser.Geom.Rectangle(window.innerWidth*(1-sizeFactor), window.innerHeight*(1-sizeFactor-offsetY), window.innerWidth*sizeFactor, window.innerHeight*(sizeFactor-offsetY));
+        // let rectSource = new Phaser.Geom.Rectangle(GameModule.width()*(1-sizeFactor), GameModule.height()*(1-sizeFactor-offsetY), GameModule.width()*sizeFactor, GameModule.height()*(sizeFactor-offsetY));
         // for (let a of assets) {
         //     let e = currentScene.add.particles(a).createEmitter({
         //         x: 0,
@@ -130,7 +156,7 @@ export default class Renderer {
         e.setEmitZone({
             type: 'random', source: {
                 getRandomPoint: (vec) => {
-                    let p = new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight).getRandomPoint();
+                    let p = new Phaser.Geom.Rectangle(0, 0, GameModule.width(), GameModule.height()).getRandomPoint();
                     vec.x = p.x;
                     vec.y = p.y;
                     return vec;
@@ -138,166 +164,229 @@ export default class Renderer {
             }
         });
         this.rendererContainer.add(e.manager);
-        this.rendererContainer.add(this.terrainContainer);
-        this.rendererContainer.add(this.characterContainer);
-        this.rendererContainer.add(this.terrainOverlayContainer);
-        // this.rendererContainer.add(this.uiContainer);
         this.particles.bg = e;
     }
 
     update(time, delta) {
+        //3d axes
+        //vertical
+        // let pts = [{x:0,y:0,z:0},{x:0,y:0,z:500}].map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt));
+        // GameModule.gameScene().animationGraph.debugPoints(pts);
+
+        // let pts = [{ x: 0, y: 0, z: 0 }, { x: 0, y: 500, z: 0 }].map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt));
+        // GameModule.gameScene().animationGraph.debugPoints(pts);
+
+        // pts = [{ x: 0, y: 0, z: 0 }, { x: 500, y: 0, z: 0 }].map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt));
+        // GameModule.gameScene().animationGraph.debugPoints(pts);
+
         this.terrainContainer.sort('depth');
     }
 
     renderRoom = (room: Room) => {
+
         this.initSprites();
-        //render current room sprite with room texture
+        console.log("Set texture to " + RenderUtils.textureFrom(room));
+        this.currentRoomSprite.setTexture(RenderUtils.textureFrom(room));
         this.currentRoomSprite.visible = true;
         this.currentRoomSprite.isoX = 0;
         this.currentRoomSprite.isoY = 0;
-        for (let loc of Location.values()) {
-            //render sprite with entry texture
-            let sprite = this.currentEntriesSprite[loc];
-            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
-            let canvasLoc = Location.multiply(Location[loc], tile_width / 2);
-            tile_width = RenderUtils.spriteIsoWidth(sprite);
-            sprite.isoX = canvasLoc.x + (tile_width / 2) * Location[loc].x - Location[loc].x * Renderer.entryOffset * GAME_CONFIG.scale;
-            sprite.isoY = canvasLoc.y + (tile_width / 2) * Location[loc].y - Location[loc].y * Renderer.entryOffset * GAME_CONFIG.scale;
-            if (room.getEntry(Location[loc])) sprite.visible = true;
-            else sprite.visible = false;
-        }
-
     }
+
+    /*
+    
+    ----- INITIALIZATION ----- 
+
+    */
 
     private initSprites = () => {
         if (this.spriteInitialized) return;
 
         this.initSpritesRoom();
+        this.initPlayerSprites();
+        this.initShapeClueParticles();
+        this.initSmokeParticles();
 
-        this.group.children = this.getAllSprites();
-        this.terrainContainer.add(this.group.children);
+        this.initUISprites();
+        this.initEvents();
+
         this.spriteInitialized = true;
     }
 
     private initSpritesRoom = () => {
-        //current Room
         this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
         this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
         this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
+        this.currentRoomSprite.isoZ = -RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.5 * GAME_CONFIG.roomScale;
         this.currentRoomSprite.texture.source.forEach(src => src.resolution = 100);
-        //current Entries
-        this.currentEntriesSprite = {};
-        for (let loc of Location.values()) {
-            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
-            let canvasLoc = Location.multiply(Location[loc], tile_width / 2);
-            let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
-            sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-            sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-            sprite.texture.source.forEach(src => src.resolution = 10);
-            tile_width = RenderUtils.spriteIsoWidth(sprite);
-            sprite.isoX += (tile_width / 2) * Location[loc].x - Location[loc].x * 100;
-            sprite.isoY += (tile_width / 2) * Location[loc].y - Location[loc].y * 100;
-            sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
-            sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-            sprite.on('pointerdown', () => this.emitter.emit(EVENTS.ENTRY_CLICK, loc));
-            this.currentEntriesSprite[loc] = sprite;
-        }
-        //current Room Transition
+
         this.currentRoomTransitionSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
         this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
         this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomTransitionSprite.isoZ -= RenderUtils.spriteIsoHeight(this.currentRoomSprite) / 2;
-        this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 10);
+        this.currentRoomTransitionSprite.isoZ = -RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.5 * GAME_CONFIG.roomScale;
+        this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 100);
         this.currentRoomTransitionSprite.visible = false;
-        // this.currentRoomTransitionSprite.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
-        //current Entries Transition
-        this.currentEntriesTransitionSprite = {};
+
+        this.group.children = this.getAllSprites();
+        this.terrainContainer.add(this.group.children);
+    }
+
+    private initPlayerSprites = () => {
+        this.player = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
+        this.player.scaleY = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
+        this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
+        this.player.isoX = 0;
+        this.player.isoY = 0;
+        // this.player.isoZ += RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.2;
+        // this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
+        this.player.texture.source.forEach(src => src.resolution = 10);
+        this.player.setDepth(GameModule.topZIndex());
+        this.characterContainer.add(this.player);
+    }
+
+    private initUISprites = () => {
+        this.tapIndic2d = GameModule.currentScene.add.sprite(0, 0, 'tapindic').setScale(0.5);
+        this.tapIndic2dTween = GameModule.currentScene.add.tween({
+            targets: this.tapIndic2d,
+            scale: { from: 0.2, to: 0.6 },
+            alpha: { from: 1, to: 0 },
+            duration: 400,
+            ease: 'Quadratic.InOut'
+        });
+        this.uiContainer.add(this.tapIndic2d);
+
+        this.tapIndic3d = GameModule.currentScene.add.sprite(0, 0, 'circle_skew').setScale(0.35).setVisible(false);
+        this.tapIndic3d.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+        this.terrainOverlayContainer.add(this.tapIndic3d);
+        this.tapIndic3dTween = GameModule.currentScene.add.tween({
+            targets: this.tapIndic3d,
+            scale: 0.25,
+            alpha: 0.5,
+            duration: 300,
+            yoyo: true,
+            loop: -1,
+            ease: 'Quadratic.InOut'
+        });
+    }
+
+    private initSmokeParticles = () => {
+        this.smokeParticle = GameModule.currentScene.add.particles('smoke_06_gray');
+        this.terrainOverlayContainer.add(this.smokeParticle);
         for (let loc of Location.values()) {
-            let tile_width = RenderUtils.spriteIsoWidth(this.currentRoomSprite);
-            let canvasLoc = Location.multiply(Location[loc], tile_width / 2);
-            let sprite = GameModule.currentScene.add.isoSprite(canvasLoc.x, canvasLoc.y, 0, Renderer.entryTextures[loc].texture);
-            sprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-            sprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.entryScale;
-            sprite.texture.source.forEach(src => src.resolution = 10);
-            tile_width = RenderUtils.spriteIsoWidth(sprite);
-            sprite.isoX += (tile_width / 2) * Location[loc].x;
-            sprite.isoY += (tile_width / 2) * Location[loc].y;
-            sprite.isoZ -= RenderUtils.spriteIsoHeight(sprite) / 2;
-            sprite.visible = false;
-            sprite.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-            sprite.on('pointerdown', () => this.emitter.emit(EVENTS.ENTRY_CLICK, loc));
-            this.currentEntriesTransitionSprite[loc] = sprite;
+            let event = EVENTS.ENTRY_SMOKE + loc;
+            let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, false);
+            let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
+            this.smokeEmitters[loc] = this.smokeParticle.createEmitter({
+                alpha: { start: 1, end: 0.2 },
+                scale: { start: 0, end: 0.1 },
+                // speed: 2,
+                // gravityY: -5,
+                angle: { min: -85, max: -95 },
+                rotate: { min: -180, max: 180 },
+                lifespan: 1000,
+                // lifespan: { min: 500, max: 700 },
+                // blendMode: 'SCREEN',
+                frequency: 300,
+                x: 0,
+                y: 0,
+                emitZone: {
+                    type: 'random', source: {
+                        getRandomPoint: (vec) => {
+                            let rnd = aabb.getRandomPoint();
+                            while (!emitShape.contains(rnd.x, rnd.y)) rnd = aabb.getRandomPoint();
+                            vec.x = rnd.x;
+                            vec.y = rnd.y;
+                            return vec;
+                        }
+                    }
+                }
+            });
+            this.emitter.on(event, () => {
+                this.smokeEmitters[loc].stop();
+            });
+            this.smokeEmitters[loc].stop();
+            //debug
+            // let pts = aabb.getPoints(4);
+            // GameModule.gameScene().animationGraph.drawPolygon(emitShape);
+            // GameModule.gameScene().animationGraph.debugPoint(GameModule.gameScene().iso.projector.project(<Point3>center));
+            // GameModule.gameScene().animationGraph.debugPoints(pts);
+
         }
     }
+
+    private initShapeClueParticles = () => {
+        this.shapeClueParticle = GameModule.currentScene.add.particles('blue');
+        this.shapeClueEmitter = this.shapeClueParticle.createEmitter({
+            scale: { start: 0.35, end: 0 },
+            speed: { min: -10, max: 10 },
+            blendMode: 'SCREEN',
+            lifespan: 1500,
+            frequency: 20
+        });
+        this.shapeClueEmitter.stop();
+        this.uiContainer.add(this.shapeClueParticle);
+    }
+
+    private initEvents = () => {
+        for (let loc of Location.values()) {
+            let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, false);
+            GameModule.currentScene.input.on('pointerdown', (evt) => {
+                if (emitShape.contains(evt.x, evt.y)) {
+                    console.log("CLICK ON " + loc);
+                    this.emitter.emit(EVENTS.ENTRY_CLICK, loc);
+                }
+            });
+        }
+    }
+
+    /*
+    
+    ----- TRANSITION ----- 
+
+    */
     renderTransition = (source: Room, dest: Room, callback: Function) => {
         if (this.roomTransitionPlaying) return;
         this.roomTransitionPlaying = true;
 
-        //check with source texture
-        if (!this.currentRoomSprite || this.currentRoomSprite.key != Renderer.roomTexture) {
-            this.renderRoom(source);
-        }
-        //TODO change all texture according to dest
-        // this.currentRoomTransitionSprite.texture=
+        this.currentRoomTransitionSprite.setTexture(RenderUtils.textureFrom(dest));
 
         let entryExit = LevelModule.entryBetween(source, dest);
+        console.log("GOING THROUGH " + Location.name(entryExit!.location), entryExit);
 
         let loc = this.getRoomLocAt(entryExit);
         if (!loc) {
             console.error("No entry between " + source._id + " and " + dest._id);
             return;
         }
-        this.renderRoomTransition(dest, loc);
+        this.renderRoomTransition(loc);
 
         this.startTransition(entryExit, callback);
     }
 
-    private getRoomLocAt(entry?: Entry): { x: number, y: number } | undefined {
-        if (!entry) return undefined;
-        let w = RenderUtils.spriteHalfIsoWidth(this.currentRoomSprite) + RenderUtils.spriteHalfIsoWidth(this.currentRoomTransitionSprite) +
-            RenderUtils.spriteIsoWidth(this.currentEntriesTransitionSprite[Location.name(Location.opposite(entry.location))!])
-            + RenderUtils.spriteIsoWidth(this.currentEntriesSprite[Location.name(entry.location)!])
-        return Location.multiply(entry.location, w);
-    }
-
-    private renderRoomTransition(room: Room, loc: { x: number, y: number }) {
-        this.getTransitionSprites().forEach(spr => spr.shouldAppear = false);
+    private renderRoomTransition(loc: { x: number, y: number }) {
         this.currentRoomTransitionSprite.isoX = loc.x;
         this.currentRoomTransitionSprite.isoY = loc.y;
-        this.currentRoomTransitionSprite.shouldAppear = true;
-        for (let entry of room.entries()) {
-            let entrySpr = this.currentEntriesTransitionSprite[Location.name(entry.location)!];
-            let newLoc = Location.add(loc,
-                Location.multiply(entry.location, RenderUtils.spriteHalfIsoWidth(this.currentRoomTransitionSprite) + RenderUtils.spriteHalfIsoWidth(entrySpr)));
-            newLoc = Location.add(newLoc, Location.multiply(entry.location, -1 * Renderer.entryOffset * GAME_CONFIG.scale));
-            entrySpr.isoX = newLoc.x;
-            entrySpr.isoY = newLoc.y;
-            entrySpr.shouldAppear = true;
-        }
-        Timeout.in(10).do(() => this.getTransitionSprites().filter(spr => spr.shouldAppear).forEach(spr => spr.visible = true)).start();
+        Timeout.in(10).do(() => this.currentRoomTransitionSprite.visible = true).start();
     }
 
     private startTransition(entry?: Entry, callback?: Function) {
         if (!entry) return;
-        if (this.playerTween) GameModule.currentScene.tweens.remove(this.playerTween);
+        let entryLoc = this.getEntryTopLoc(Location.name(entry.location));
         this.playerTween = GameModule.currentScene.tweens.add({
             targets: this.player,
-            isoX: this.currentEntriesSprite[Location.name(entry.location)!].isoX,
-            isoY: this.currentEntriesSprite[Location.name(entry.location)!].isoY,
             duration: 1700,
             ease: Phaser.Math.Easing.Linear.Linear,
             delay: 0,
-            yoyo: true
+            yoyo: true,
+            isoX:  entryLoc.x,
+            isoY: entryLoc.y
         });
+        this.playerTween.restart();
         Timeout.in(990).do(() => {
-            let loc = Location.multLoc({ x: -1, y: -1 },
-                {
-                    x: this.currentRoomTransitionSprite.isoX,
-                    y: this.currentRoomTransitionSprite.isoY
-                });
-            if (this.group.tween) GameModule.currentScene.tweens.remove(this.group.tween);
-            this.group.tween = GameModule.currentScene.tweens.add({
+            let loc = Location.multLoc({ x: -1, y: -1 }, {
+                x: this.currentRoomTransitionSprite.isoX,
+                y: this.currentRoomTransitionSprite.isoY
+            });
+            GameModule.currentScene.tweens.add({
                 targets: this.group,
                 x: loc.x,
                 y: loc.y,
@@ -341,44 +430,45 @@ export default class Renderer {
         let sprs: IsoSprite[] = [];
         sprs.push(this.currentRoomSprite);
         sprs.push(this.currentRoomTransitionSprite);
-        for (let l of Location.values()) {
-            sprs.push(this.currentEntriesSprite[l]);
-            sprs.push(this.currentEntriesTransitionSprite[l]);
-        }
         return sprs;
     }
 
     getTransitionSprites(): IsoSprite[] {
         let sprs: IsoSprite[] = [];
         sprs.push(this.currentRoomTransitionSprite);
-        for (let l of Location.values()) sprs.push(this.currentEntriesTransitionSprite[l]);
         return sprs;
     }
+    /*
+    
+    ----- LOCATION COORDS ----- 
 
-    renderPlayer() {
-        this.player = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
-        this.player.scaleY = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
-        this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
-        this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
-        this.player.texture.source.forEach(src => src.resolution = 10);
-        this.player.setDepth(GameModule.topZIndex());
-        this.characterContainer.add(this.player);
+    */
+    getEntryTopBackLocationAt(loc, inIso = true): { x: number, y: number, z: number } {
+        let locNum = <{ x: number, y: number }>Location.parse(loc);
+        let opp = (<string>Location.name(<{ x: number, y: number }>Location.opposite(locNum))).toLowerCase();
+        let top = RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, inIso)[opp];
+        if (locNum.x == 0) top = { x: 0, y: top, z: 0 };
+        else if (locNum.y == 0) top = { x: top, y: 0, z: 0 };
+        return top;
     }
 
-    getEntryTopLocationAt(loc): IsoSprite {
-        let e = renderer.currentEntriesSprite[loc];
-        return {
-            x: e.isoX, y: e.isoY, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
-        };
+    getEntryTopLoc(loc): { x: number, y: number, z: number } {
+        let pos = RenderUtils.getEntryCenterFromRoom(renderer.currentRoomSprite, loc);
+        pos.z = 0;
+        return pos;
     }
 
-    getEntryTopBackLocationAt(loc): { x: number, y: number, z: number } {
-        let e = renderer.currentEntriesSprite[loc];
-        let locXY = <{x:number,y:number}>Location.parse(loc);
-        let sprIsoW = RenderUtils.spriteHalfIsoWidth(e);
-        return {
-            x: e.isoX + locXY.x * sprIsoW, y: e.isoY + locXY.y * sprIsoW, z: e.isoZ + RenderUtils.spriteHalfIsoHeight(e)
-        };
+    getRoomLocAt(entry?: Entry): { x: number, y: number } | undefined {
+        if (!entry) return undefined;
+        let locStr = Location.name(entry.location);
+        let w = GAME_CONFIG.scale * GAME_CONFIG.roomScale * this.currentRoomSprite.width * 0.2;
+        let entryBack = this.getEntryTopBackLocationAt(locStr);
+        entryBack = Location.add(Location.multiply(entry.location, w), entryBack);
+        entryBack = Location.add(Location.multiply(entry.location, RenderUtils.spriteHalfIsoWidth(this.currentRoomSprite)), entryBack);
+        // debug
+        // let pt = GameModule.gameScene().iso.projector.project(<Point3>entryBack);
+        // GameModule.gameScene().animationGraph.debugPoint(pt);
+        return entryBack;
     }
 
     pauseBackgroundParticles() {
@@ -392,18 +482,12 @@ export default class Renderer {
 
     pauseSmokeParticles() {
         for (let location of Location.values()) {
-            //     for (let i = 0; i < 4; i++) {
-            //         if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
-            //     }
             if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].stop();
         }
 
     }
     resumeSmokeParticles() {
         for (let location of Location.values()) {
-            // for (let i = 0; i < 4; i++) {
-            //     if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].start();
-            // }
             if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].start();
         }
 
@@ -414,7 +498,7 @@ export default class Renderer {
             this.playerTween.stop();
             GameModule.currentScene.tweens.remove(this.playerTween);
         }
-        let knockbackDist = window.innerWidth * 0.025;
+        let knockbackDist = GameModule.width() * 0.025;
         this.player.setTint(0xff002b);
         this.playerTween = GameModule.currentScene.add.tween({
             targets: this.player,
@@ -429,20 +513,16 @@ export default class Renderer {
     }
 
     tapIndication(x, y, onClick, destroyEvt) {
-        let img = GameModule.currentScene.add.sprite(x, y, 'circle_skew').setScale(0.35);
-        this.terrainOverlayContainer.add(img);
-        let tween = GameModule.currentScene.add.tween({
-            targets: img,
-            scale: 0.25,
-            alpha: 0.5,
-            duration: 300,
-            yoyo: true,
-            loop: -1,
-            ease: 'Quadratic.InOut'
+        this.tapIndic3d.x = x;
+        this.tapIndic3d.y = y;
+        this.tapIndic3d.visible = true;
+        this.tapIndic3dTween.restart();
+
+        this.tapIndic3d.on('pointerup', onClick);
+        this.emitter.addListener(destroyEvt, () => {
+            this.tapIndic3d.visible = false;
+            this.tapIndic3dTween.stop();
         });
-        img.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-        img.on('pointerup', onClick);
-        this.emitter.addListener(destroyEvt, () => { img.destroy(); tween.stop(); });
     }
 
     sceneTransition(sceneKey, onSceneEnd = () => { }) {
@@ -457,103 +537,61 @@ export default class Renderer {
             }
         });
     }
-    textIndx = 0;
-    smokeEntry(location: string, destroyEvt = EVENTS.ENTRY_SMOKE + location) {
-        let textures = [
-            "smoke_06_gray",
-            "smoke_08_gray",
-            "smoke_07_gray",
-            "smoke_01_gray",
-            "smoke_02_gray",
-            "smoke_03_gray",
-            "smoke_04_gray",
-            "smoke_05_gray",]
-        if (this.textIndx >= textures.length) this.textIndx = 0;
-        let smoke = GameModule.currentScene.add.particles(textures[0]);
-        this.textIndx++;
-        // let line2d = RenderUtils.getTopFrontLine(this.currentEntriesSprite[location], true);
-        let center = RenderUtils.topXYFromIsoSprite(this.currentEntriesSprite[location]);
-        let w = RenderUtils.spriteHalfIsoWidth(this.currentEntriesSprite[location]) * 0.4;
-        let ptsShape = [{ x: center.x + w, y: center.y + w, z: center.z }, { x: center.x + w, y: center.y - w, z: center.z }, { x: center.x - w, y: center.y - w, z: center.z }, { x: center.x - w, y: center.y + w, z: center.z }];
+    smokeEntry(location: string) {
+        this.smokeEmitters[location].start();
 
-        let emitShape = new Phaser.Geom.Polygon(ptsShape.map(pt => (<GameScene>GameModule.currentScene).iso.projector.project(<Point3>pt)));
-        let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
-        let pts = aabb.getPoints(4);
-        // for (let i = 0; i < 4; i++) {
-        //     let pt = pts[i];
-        //     if (this.particles[EVENTS.ENTRY_SMOKE + location + i]) this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
-        //     let rnd = aabb.getRandomPoint();
-        //     while (!emitShape.contains(rnd.x, rnd.y)) rnd = aabb.getRandomPoint();
-        //     this.particles[EVENTS.ENTRY_SMOKE + location + i] = smoke.createEmitter({
-        //         alpha: { start: 1, end: 0 },
-        //         scale: { start: 0, end: 0.15 },
-        //         speed: 20,
-        //         accelerationY: -70,
-        //         angle: { min: 20, max: 120 },
-        //         // rotate: { min: -180, max: 180 },
-        //         lifespan: { min: 900, max: 1000 },
-        //         // blendMode: 'SCREEN',
-        //         frequency: 300,
-        //         x: pt.x,
-        //         y: pt.y
-        //     });
-        // }
-        if (this.particles[EVENTS.ENTRY_SMOKE + location]) this.particles[EVENTS.ENTRY_SMOKE + location].stop();
-        this.particles[EVENTS.ENTRY_SMOKE + location] = smoke.createEmitter({
-            alpha: { start: 1, end: 0 },
-            scale: { start: 0, end: 0.2 },
-            speed: 20,
-            accelerationY: -70,
-            angle: { min: -85, max: -95 },
-            // rotate: { min: -180, max: 180 },
-            lifespan: { min: 900, max: 1000 },
-            // blendMode: 'SCREEN',
-            frequency: 80,
-            x: 0,
-            y: 0,
-            emitZone: {
-                type: 'random', source: {
-                    getRandomPoint: (vec) => {
-                        let rnd = aabb.getRandomPoint();
-                        while (!emitShape.contains(rnd.x, rnd.y)) rnd = aabb.getRandomPoint();
-                        vec.x = rnd.x;
-                        vec.y = rnd.y;
-                        return vec;
-                    }
-                }
-            }
-        });
-        this.emitter.once(destroyEvt, () => {
-            // for (let i = 0; i < 4; i++) {
-            //     this.particles[EVENTS.ENTRY_SMOKE + location + i].stop();
-            //     delete this.particles[EVENTS.ENTRY_SMOKE + location + i];
-            // }
-            this.particles[EVENTS.ENTRY_SMOKE + location].stop();
-            delete this.particles[EVENTS.ENTRY_SMOKE + location];
-        });
-        this.particles[EVENTS.ENTRY_SMOKE + location].manager.setDepth(GameModule.topZIndex());
-        this.terrainOverlayContainer.add(this.particles[EVENTS.ENTRY_SMOKE + location].manager);
-        return textures[this.textIndx - 1];
+        //debug
+        // let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, location, false);
+        // let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
+        // let pts = aabb.getPoints(4);
+        // GameModule.gameScene().animationGraph.drawPolygon(aabb);
+        // GameModule.gameScene().animationGraph.debugPoint(GameModule.gameScene().iso.projector.project(<Point3>center));
+        // GameModule.gameScene().animationGraph.debugPoints(pts);
     }
 
-    shapeClue(path, destroyEvt) {
+    shapeClue(path: Phaser.Curves.Path, destroyEvt) {
         if (this.particles.hasOwnProperty(destroyEvt)) this.emitter.emit(destroyEvt);
 
-        let p = GameModule.currentScene.add.particles('blue');
-        this.particles[destroyEvt] = p.createEmitter({
-            scale: { start: 0.35, end: 0 },
-            speed: { min: -10, max: 10 },
-            blendMode: 'SCREEN',
-            lifespan: 1500,
-            frequency: 20,
-            emitZone: { type: 'edge', source: path, quantity: 30, yoyo: false }
+        // duration of the drawing
+        let drawSpeed = 3000;
+        // time to wait before drawing again
+        let delayTime = 1000;
+        let startTime = new Date().getTime();
+
+        this.tapIndic2d.x = path.startPoint.x;
+        this.tapIndic2d.y = path.startPoint.y;
+        this.tapIndic2dTween.restart();
+
+        // let emitZone = { type: 'edge', source: path, quantity: 30 };
+        this.shapeClueEmitter.setPosition(
+            () => {
+                let position = (new Date().getTime() - startTime) / drawSpeed;
+                return path.getPoint(position > 1 ? 1 : position).x
+            },
+            () => {
+                let position = (new Date().getTime() - startTime) / drawSpeed;
+                return path.getPoint(position > 1 ? 1 : position).y
+            });
+        this.shapeClueEmitter.start();
+        let deleteAll;
+        let delayTimeout = Timeout.in(delayTime).do(() => {
+            this.shapeClue(path, destroyEvt);
         });
-        this.emitter.once(destroyEvt, () => {
-            p.destroy();
-            if (this.particles[destroyEvt]) this.particles[destroyEvt].stop();
-            delete this.particles[destroyEvt];
-        });
-        this.uiContainer.add(this.particles[destroyEvt].manager);
+        let timeout = Timeout.in(drawSpeed).do(() => {
+            deleteAll();
+            delayTimeout.start();
+        }).start();
+        deleteAll = () => {
+            // p.destroy();
+            // img.destroy();
+            // tween.stop();
+            timeout.destroy();
+            delayTimeout.destroy();
+            // if (this.particles[destroyEvt]) this.particles[destroyEvt].remove();
+            // delete this.particles[destroyEvt];
+            this.shapeClueEmitter.stop();
+        }
+        this.emitter.once(destroyEvt, deleteAll);
     }
 
     focusLight(sprite, endEvent) {

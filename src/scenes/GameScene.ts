@@ -1,7 +1,7 @@
 import 'phaser';
 import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import { SCENE_GAME } from '../constants/Constants';
+import { SCENE_GAME, GAME_CONFIG } from '../constants/Constants';
 // import { MapRenderer } from '../objects/render/MapRenderer';
 // import Tile from '../objects/render/Tile';
 import { EVENTS } from '../constants/Enums';
@@ -53,12 +53,12 @@ export default class GameScene extends Phaser.Scene {
       url: IsoPhysics,
       sceneKey: 'isoPhysics'
     });
-    this._screenSize = Phaser.Math.Distance.Between(0, 0, window.innerWidth, window.innerHeight);
+    this._screenSize = Phaser.Math.Distance.Between(0, 0, GameModule.width(), GameModule.height());
     this.recogListener = new RecogListener(this.events);
     this.animationGraph = new AnimationGraph(this.add.graphics({
       x: 0, y: 0,
       lineStyle: { color: 0xffffff, width: 10 },
-      fillStyle: { color: 0xffffff, alpha: 1 }
+      fillStyle: { color: 0xff0000, alpha: 1 }
     }));
     Renderer.init();
   }
@@ -72,20 +72,19 @@ export default class GameScene extends Phaser.Scene {
 
     // ISO PLUGIN
     // this.isoPhysics.world.gravity.setTo(0, 0, -500);
-    let rx = 0.5 * window.innerWidth / this.sys.game.canvas.width;
-    let ry = 0.75 * window.innerHeight / this.sys.game.canvas.height;
+    let rx = 0.5 * GameModule.width() / this.sys.game.canvas.width;
+    let ry = 0.5 * GameModule.height() / this.sys.game.canvas.height;
     this.iso.projector.origin.setTo(rx, ry);
     this.iso.projector.projectionAngle = CLASSIC;
 
     // GRAPHICS
-    // this.currentShape = this.add.text(window.innerWidth * 0.35, window.innerHeight * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
+    // this.currentShape = this.add.text(GameModule.width() * 0.35, GameModule.height() * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
     this.info = this.add.text(50, 50, '', { color: 'red', size: '50px' });
     //LEVEL 
-    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_big').Level);
+    this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test').Level);
     this.currentLevel.preload();
     this.currentLevel.create();
     renderer.renderRoom(this.currentLevel.currentRoom);
-    renderer.renderPlayer();
 
     console.log('iso', this.iso);
     console.log('physics', this.isoPhysics);
@@ -93,11 +92,11 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
 
     // START GAME
-    this.activeState = GameScene.STATES.RECOG;
+    this.activeState = GameScene.STATES.IDLE;
     this.resume();
     // this.info.setText(renderer.smokeEntry('TOP'))
 
-    // let s = this.add.image(20, window.innerHeight * 0.2, 'button_green');
+    // let s = this.add.image(20, GameModule.height() * 0.2, 'button_green');
     // s.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     // s.on('pointerup', () => {
     //   t.destroy();
@@ -111,7 +110,7 @@ export default class GameScene extends Phaser.Scene {
     // });
 
     //DEBUG
-    let debugBtn = this.add.image(window.innerWidth * 0.7, 0, 'button_red');
+    let debugBtn = this.add.image(GameModule.width() * 0.7, 0, 'button_red');
     debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
     debugBtn.on('pointerdown', () => {
       console.log('GameModule.currentScene', this);
@@ -119,20 +118,22 @@ export default class GameScene extends Phaser.Scene {
 
 
     });
-    // let squareW=window.innerWidth*0.5;
-    // this.animationGraph.drawHollowRect(window.innerWidth*0.5-squareW/2,window.innerHeight*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
+    // let squareW=GameModule.width()*0.5;
+    // this.animationGraph.drawHollowRect(GameModule.width()*0.5-squareW/2,GameModule.height()*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
   }
 
   update(time: number, delta: number) {
     this.currentLevel.update(time, delta);
-    this.animationGraph.update(time, delta);
     renderer.update(time, delta);
-    this.info.setText('fps :'+(1000 / delta).toFixed(3)+'\ncombo: x'+this.currentLevel.currentRoom.combo);
+    this.info.setText('fps :' + (1000 / delta).toFixed(3) 
+      + '\ncombo: x' + this.currentLevel.currentRoom.combo
+      + '\nRoom id: ' + this.currentLevel.currentRoom.id);
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-      if(enMana.isOver()) {
-        renderer.emitter.emit(EVENTS.ENTRY_SMOKE+Location.name(enMana.entry.location));
+      if (enMana.isOver()) {
+        renderer.emitter.emit(EVENTS.ENTRY_SMOKE + Location.name(enMana.entry.location));
       }
     });
+    this.animationGraph.update(time, delta);
   }
 
   pause() {
@@ -144,8 +145,8 @@ export default class GameScene extends Phaser.Scene {
   resume() {
     this.isPause = false;
     this.recogListener.enable();
-    if(this.activeState != GameScene.STATES.RECOG) console.warn('NOT IN RECOG MODE');
-    this.startEnemyManagers();
+    if (this.activeState != GameScene.STATES.RECOG) console.warn('NOT IN RECOG MODE');
+    else this.startEnemyManagers();
 
   }
 
@@ -156,12 +157,12 @@ export default class GameScene extends Phaser.Scene {
         return;
       }
 
-      if (result.Score < 0.93) {// BAD !!!
-        this.currentLevel.currentRoom.combo=1;
+      if (result.Score < GAME_CONFIG.recog_threshold) {// BAD !!!
+        this.currentLevel.currentRoom.combo = 1;
         renderer.fadeOutPoints(this.recogListener.points, 'red', 10);
         // this.currentShape.setText('Not Good Enough!');
       } else {// GOOD !!
-        this.currentLevel.currentRoom.combo+=2;
+        this.currentLevel.currentRoom.combo += 2;
         renderer.fadeOutPoints(this.recogListener.points, 'blue', 30);
         // this.currentShape.setText(result.Name);
         this.currentLevel.currentRoom.killEnemies(result.Name);
@@ -180,14 +181,14 @@ export default class GameScene extends Phaser.Scene {
       if (this.isPause) return;
       if (this.activeState == GameScene.STATES.RECOG) this.recogListener.emitter.emit('pointerup', pointer);
     });
-
-    renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (Location: string) => {
+    renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
       if (this.activeState !== GameScene.STATES.IDLE) return;
       renderer.emitter.emit(EVENTS.TAP_INDICATION);
       let r = this.currentLevel.currentRoom;
-      let dest = r._entries[Location].dest;
+      let dest = r._entries[location].dest;
       renderer.renderTransition(r, dest, () => {
-        this.activeState = GameScene.STATES.RECOG
+        this.activeState = GameScene.STATES.RECOG;
+        if(GameModule.friendly) this.activeState = GameScene.STATES.IDLE;
         this.currentLevel.currentRoom = dest;
         this.startEnemyManagers();
       });
@@ -200,10 +201,11 @@ export default class GameScene extends Phaser.Scene {
       this.activeState = GameScene.STATES.IDLE;
     });
   }
+  
   startEnemyManagers() {
     this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
-      if(!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
-      enMana.start();
+      if (!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
+      if(!GameModule.friendly) enMana.start();
     });
   }
 

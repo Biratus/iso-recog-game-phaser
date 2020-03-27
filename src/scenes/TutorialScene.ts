@@ -1,6 +1,6 @@
-import IsoPlugin, { IsoPhysics } from 'phaser3-plugin-isometric';
+import IsoPlugin, { IsoPhysics, Point3 } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import { SCENE_GAME, SCENE_TUTORIAL } from "../constants/Constants";
+import { SCENE_GAME, SCENE_TUTORIAL, GAME_CONFIG } from "../constants/Constants";
 import { EVENTS } from '../constants/Enums';
 import Enemy from "../objects/character/Enemy";
 import Level from "../objects/core/Level";
@@ -63,6 +63,7 @@ export default class TutorialScene extends Phaser.Scene {
         });
         localStorage.removeItem('userShapes');
         this._screenSize = Phaser.Math.Distance.Between(0, 0, GameModule.width(), GameModule.height());
+        // this.game.scale.displaySize.aspectRatio = GameModule.width() / GameModule.height();
         this.recogListener = new RecogListener(this.events);
         this.animationGraph = new AnimationGraph(this.add.graphics({
             x: 0, y: 0,
@@ -70,14 +71,16 @@ export default class TutorialScene extends Phaser.Scene {
             fillStyle: { color: 0xffffff, alpha: 1 }
         }));
         Renderer.init();
+        // renderer.initBasic();
     }
 
     create() {
+        // renderer.initComplete();
         this.children.sortChildrenFlag = true;
         // ISO PLUGIN
         // this.isoPhysics.world.gravity.setTo(0, 0, -500);
         let rx = 0.5 * GameModule.width() / this.sys.game.canvas.width;
-        let ry = 0.75 * GameModule.height() / this.sys.game.canvas.height;
+        let ry = 0.5 * GameModule.height() / this.sys.game.canvas.height;
         this.iso.projector.origin.setTo(rx, ry);
         this.iso.projector.projectionAngle = CLASSIC;
 
@@ -100,7 +103,6 @@ export default class TutorialScene extends Phaser.Scene {
         this.currentLevel.preload();
         this.currentLevel.create();
         renderer.renderRoom(this.currentLevel.currentRoom);
-        renderer.renderPlayer();
 
         this.initEvents();
 
@@ -111,6 +113,7 @@ export default class TutorialScene extends Phaser.Scene {
         // });
 
         this.start();
+        console.log(this);
 
         //DEBUG
         // let debugBtn = this.add.image(GameModule.width() * 0.7, 0, 'button_red');
@@ -119,7 +122,6 @@ export default class TutorialScene extends Phaser.Scene {
         //     console.log('GameModule.currentScene', this);
         // });
     }
-
     start() {
         this.currentLevel.currentRoom.getAllEnemiesManager().forEach((enMana) => {
             if (!enMana.isOver()) renderer.smokeEntry(Location.name(enMana.entry.location)!);
@@ -195,8 +197,8 @@ export default class TutorialScene extends Phaser.Scene {
         this.events.addListener(EVENTS.SHAPE_DRAWN, ({ result, list }) => {
             result = result || { Name: undefined, Score: 0 };
             list = list || [];
-           
-            let threshold = GameModule.debug ? 0.8 : 0.955;
+
+            let threshold = GameModule.debug ? 0.8 : GAME_CONFIG.recog_threshold;
             if (result.Name && result.Name.toUpperCase() === this.currentShape.shape.toUpperCase() && result.Score > threshold) {
                 renderer.resumeBackgroundParticles();
                 renderer.fadeOutPoints(this.recogListener.points, 'blue', 30);
@@ -215,11 +217,11 @@ export default class TutorialScene extends Phaser.Scene {
             if (this.currentLevel.currentRoom.getAllEnemiesManager().every((enMana) => enMana.isOver())) {
                 localStorage.setItem('tutorialOver', 'true');
                 for (let shape of this.userShapes) this.recogListener.addUserShape(shape.name, shape.points);
-                let entry = renderer.currentEntriesSprite.BOTTOM;
-                let pos = RenderUtils.topXYFromIsoSprite(entry,true);
-                renderer.tapIndication(pos.x, pos.y, () => {
+                let pos2d = GameModule.gameScene().iso.projector.project(<Point3>renderer.getEntryTopLoc('BOTTOM'));
+                renderer.tapIndication(pos2d.x, pos2d.y, () => {
                     renderer.emitter.emit(EVENTS.TAP_INDICATION);
-                }, 'tapIndic');
+                    
+                }, EVENTS.TAP_INDICATION);
                 this.over = true;
             }
         });
@@ -233,14 +235,14 @@ export default class TutorialScene extends Phaser.Scene {
         this.input.on('pointerup', (pointer) => {
             this.recogListener.emitter.emit('pointerup', pointer);
         });
-        renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (Location: string) => {
+        renderer.emitter.addListener(EVENTS.ENTRY_CLICK, (location: string) => {
             if (!this.over) return;
             renderer.emitter.emit(EVENTS.TAP_INDICATION);
-            let renderEntry = renderer.currentEntriesSprite[Location];
+            let renderEntry = renderer.getEntryTopLoc(location);
             GameModule.currentScene.tweens.add({
                 targets: renderer.player,
-                isoX: renderEntry.isoX,
-                isoY: renderEntry.isoY,
+                isoX: renderEntry.x,
+                isoY: renderEntry.y,
                 duration: 1700,
                 delay: 0,
                 onComplete: () => this.goToNextScene()
@@ -249,6 +251,6 @@ export default class TutorialScene extends Phaser.Scene {
     }
 
     goToNextScene() {
-        renderer.sceneTransition(SCENE_GAME.key, () => this.animationGraph.deleteAll());
+        renderer.sceneTransition(SCENE_GAME.key);
     }
 }

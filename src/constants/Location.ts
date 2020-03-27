@@ -5,7 +5,7 @@ export module Location {
     export var LEFT = { x: -1, y: 0 };
     export var ORIGIN = { x: 0, y: 0 };
     export function values(): string[] {
-        return ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'];
+        return ['TOP', 'LEFT','BOTTOM', 'RIGHT'];
     }
     export function parse(str): { x: number, y: number } | undefined {
         for (let val of Location.values()) {
@@ -19,7 +19,7 @@ export module Location {
         }
         return undefined;
     };
-    export function add(l1: { x: number, y: number, z?: number }, l2: { x: number, y: number, z?: number }) {
+    export function add(l1: { x: number, y: number, z?: number }, l2: { x: number, y: number, z: number }) {
         return { x: l1.x + l2.x, y: l1.y + l2.y, z: l1.z ? l2.z : 0 + l2.z! ? l2.z : 0 }
     };
     export function multLoc(l1: { x: number, y: number, z?: number }, l2: { x: number, y: number, z?: number }) {

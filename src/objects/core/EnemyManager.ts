@@ -66,12 +66,11 @@ export default class EnemyManager {
 
     getEnemyConfig(type) {
         let opEntry = renderer.getEntryTopBackLocationAt(Location.name(this.entry.location)!);
-        let position = { x: opEntry.x, y: opEntry.y };
         // let position = opEntry ? opEntry.getXYZLocation() : this.entry.getXYZLocation();
         //TODO figure out z with level.currentRoom.z;
         return {
-            x: position.x,
-            y: position.y,
+            x: opEntry.x,
+            y: opEntry.y,
             z: 0,
             sign: this.entry.sign.toLowerCase(),
             texture: 'en_' + type + '_' + this.entry.sign.toLowerCase()

@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Phaser3 Typescript Webpack Boilerplate",
   "scripts": {
-    "build:web": "python assets/generateAssets.py && cross-env PLATFORM=web webpack --config webpack.prod.js",
-    "build:android": "python assets/generateAssets.py && cross-env PLATFORM=android webpack --config webpack.prod.js",
-    "build:ios": "python assets/generateAssets.py && cross-env PLATFORM=ios webpack --config webpack.prod.js",
-    "dev": "cross-env PLATFORM=web webpack-dev-server --config webpack.dev.js"
+    "build:web": "py assets/generateAssets.py && cross-env PLATFORM=web webpack --config webpack.prod.js",
+    "build:android": "py assets/generateAssets.py && cross-env PLATFORM=android webpack --config webpack.prod.js",
+    "build:ios": "py assets/generateAssets.py && cross-env PLATFORM=ios webpack --config webpack.prod.js",
+    "dev": "py assets/generateAssets.py &&cross-env PLATFORM=web webpack-dev-server --config webpack.dev.js"
   },
   "author": "Vlad Faust <mail@vladfaust.com>",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
     "outlines": "git+https://github.com/Biratus/outlines.git",
-    "phaser": "^3.19.0",
+    "phaser": "^3.22.0",
     "phaser3-plugin-isometric": "git+https://github.com/Biratus/phaser3-plugin-isometric.git",
     "raw-loader": "^0.5.1",
     "typescript": "^2.8.3",

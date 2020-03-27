@@ -2,7 +2,8 @@ import ArrayUtils from "./ArrayUtils";
 import GameScene from "../scenes/GameScene";
 
 export module GameModule {
-	export var debug = true;
+	export var debug = false;
+	export var friendly = true;
 	export var currentScene: Phaser.Scene;
 	export var Unistrokes = {
 		"triangle": [
@@ -61,9 +62,12 @@ export module GameModule {
 		let isoSpr = spr;
 		let x = isoSpr.x - isoSpr.width / 2;
 		let y = isoSpr.y - isoSpr.height / 2;
-		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y, x, y + isoSpr.height);
-		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y, x + isoSpr.width, y);
-		(<GameScene>GameModule.currentScene).graphics.lineBetween(x + isoSpr.width, y, x + isoSpr.width, y + isoSpr.height);
-		(<GameScene>GameModule.currentScene).graphics.lineBetween(x, y + isoSpr.height, x + isoSpr.width, y + isoSpr.height);
+		GameModule.gameScene().graphics.lineBetween(x, y, x, y + isoSpr.height);
+		GameModule.gameScene().graphics.lineBetween(x, y, x + isoSpr.width, y);
+		GameModule.gameScene().graphics.lineBetween(x + isoSpr.width, y, x + isoSpr.width, y + isoSpr.height);
+		GameModule.gameScene().graphics.lineBetween(x, y + isoSpr.height, x + isoSpr.width, y + isoSpr.height);
+	}
+	export function gameScene() {
+		return <GameScene>GameModule.currentScene;
 	}
 }
