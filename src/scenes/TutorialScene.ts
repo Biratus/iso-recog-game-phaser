@@ -1,6 +1,6 @@
 import IsoPlugin, { IsoPhysics, Point3 } from 'phaser3-plugin-isometric';
 import { CLASSIC } from 'phaser3-plugin-isometric/src/Projector';
-import { SCENE_GAME, SCENE_TUTORIAL, GAME_CONFIG } from "../constants/Constants";
+import { SCENE_GAME, SCENE_TUTORIAL, GAME_CONFIG, DURATIONS } from "../constants/Constants";
 import { EVENTS } from '../constants/Enums';
 import Enemy from "../objects/character/Enemy";
 import Level from "../objects/core/Level";
@@ -132,21 +132,24 @@ export default class TutorialScene extends Phaser.Scene {
     userInputShape(shape) {
         let totW = GameModule.width();
         let totH = GameModule.height();
-        let size = 0.4 * totW;
+        let size = 0.3 * totW;
         let holeSize = size * 0.6;
-        let x, y, path;
+        let x = totW/2, y = totH/2, path;
         switch (shape.toUpperCase()) {
             case 'SQUARE':
-                x = (totW - size) / 2;
-                y = (totH - size) / 2;
+                // x = (totW - size) / 2;
+                // y = (totH - size) / 2;
+                x -=size/2;y-=size/2;
                 let w = (size + holeSize) / 2;
+                w = size;   
                 // path = new Phaser.Geom.Rectangle(x, y, w, w);
                 path = new Phaser.Curves.Path(x, y).lineTo(x, y + w).lineTo(x + w, y + w).lineTo(x + w, y).closePath();
                 break;
             case 'CIRCLE':
-                x = GameModule.width() * 0.15 + totW / 2; y = totH / 2;
+                // x = GameModule.width() * 0.15 + totW / 2; y = totH / 2;
+                x += size/2
                 // path = new Phaser.Geom.Circle(x, y, GameModule.width() * 0.3);
-                path = new Phaser.Curves.Path(x, y).circleTo(GameModule.width() * 0.15, true);
+                path = new Phaser.Curves.Path(x, y).circleTo(size/2, true);
                 break;
             default: console.log("CANNOT FIND CORRESPONDING SHAPE : " + shape);
         }
@@ -243,7 +246,7 @@ export default class TutorialScene extends Phaser.Scene {
                 targets: renderer.player,
                 isoX: renderEntry.x,
                 isoY: renderEntry.y,
-                duration: 1700,
+                duration: DURATIONS.tutorial.playerWalk,
                 delay: 0,
                 onComplete: () => this.goToNextScene()
             });

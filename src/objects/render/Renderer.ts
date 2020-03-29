@@ -1,5 +1,5 @@
 import { IsoSprite, Point3 } from 'phaser3-plugin-isometric';
-import { GAME_CONFIG } from "../../constants/Constants";
+import { GAME_CONFIG, DURATIONS } from "../../constants/Constants";
 // import MapManager, { MapRenderer } from "./MapRenderer";
 import { EVENTS } from "../../constants/Enums";
 import { Location } from '../../constants/Location';
@@ -9,8 +9,8 @@ import { RenderUtils } from '../../utils/RenderUtils';
 import { Timeout } from '../../utils/Timeout';
 import Entry from "../core/Entry";
 import Room from "../core/Room";
-import { Tweens } from 'phaser';
 
+export var renderer: Renderer;
 class IsoGroup {
     prevX: number | undefined = undefined; prevY: number | undefined = undefined;
     children: IsoSprite[] = [];
@@ -20,7 +20,7 @@ class IsoGroup {
     set x(val) {
         if (this.prevX !== undefined) {
             for (let c of this.children) {
-                c.isoX += val - this.prevX!;
+                c.isoX += val - this.prevX;
             }
         }
         this.prevX = val;
@@ -29,7 +29,7 @@ class IsoGroup {
         // console.log('sety ' + val + ' on ' + this.children.length + ' child');
         if (this.prevY !== undefined) {
             for (let c of this.children) {
-                c.isoY += val - this.prevY!;
+                c.isoY += val - this.prevY;
             }
         }
         this.prevY = val;
@@ -98,10 +98,17 @@ export default class Renderer {
         GameModule.currentScene.add.tween({
             targets: GameModule.currentScene.cameras.main,
             alpha: 1,
-            duration: 1000,
+            duration: DURATIONS.scene.fadeIn,
             ease: Phaser.Math.Easing.Quartic.In
         });
+        this.rendererContainer = GameModule.currentScene.add.container(0, 0);
         this.buildBackground();
+
+        this.terrainContainer = GameModule.currentScene.add.container(0, 0);
+        this.characterContainer = GameModule.currentScene.add.container(0, 0);
+        this.terrainOverlayContainer = GameModule.currentScene.add.container(0, 0);
+        this.uiContainer = GameModule.currentScene.add.container(0, 0);
+        this.rendererContainer.add(this.bg);
 
         this.rendererContainer.add(this.terrainContainer);
         this.rendererContainer.add(this.characterContainer);
@@ -113,13 +120,7 @@ export default class Renderer {
         this.bg = GameModule.currentScene.add.image(GameModule.centerX(), GameModule.centerY(), 'background8');
         this.bg.scaleX = GameModule.width() / this.bg.width;
         this.bg.scaleY = GameModule.height() / this.bg.height;
-        this.bg.depth = -999;
-        this.terrainContainer = GameModule.currentScene.add.container(0, 0);
-        this.characterContainer = GameModule.currentScene.add.container(0, 0);
-        this.terrainOverlayContainer = GameModule.currentScene.add.container(0, 0);
-        this.uiContainer = GameModule.currentScene.add.container(0, 0);
-        this.rendererContainer = GameModule.currentScene.add.container(0, 0);
-        this.rendererContainer.add(this.bg);
+        // this.bg.depth = -999;
         // let assets = ['p_white', 'p_yellow'];
         // let sizeFactor = 0.85;
         // let offsetY = 0;
@@ -185,7 +186,7 @@ export default class Renderer {
     renderRoom = (room: Room) => {
 
         this.initSprites();
-        console.log("Set texture to " + RenderUtils.textureFrom(room));
+        if (GameModule.debug) console.log("Set texture to " + RenderUtils.textureFrom(room));
         this.currentRoomSprite.setTexture(RenderUtils.textureFrom(room));
         this.currentRoomSprite.visible = true;
         this.currentRoomSprite.isoX = 0;
@@ -214,15 +215,14 @@ export default class Renderer {
 
     private initSpritesRoom = () => {
         this.currentRoomSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-        this.currentRoomSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomSprite.isoZ = -RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.5 * GAME_CONFIG.roomScale;
+        let factor = GameModule.width() * GAME_CONFIG.roomRatio / this.currentRoomSprite.width;
+        this.currentRoomSprite.scale = factor;
+        this.currentRoomSprite.isoZ = -RenderUtils.spriteHalfIsoHeight(this.currentRoomSprite);
         this.currentRoomSprite.texture.source.forEach(src => src.resolution = 100);
 
         this.currentRoomTransitionSprite = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.roomTexture);
-        this.currentRoomTransitionSprite.scaleY = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomTransitionSprite.scaleX = GAME_CONFIG.scale * GAME_CONFIG.roomScale;
-        this.currentRoomTransitionSprite.isoZ = -RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.5 * GAME_CONFIG.roomScale;
+        this.currentRoomTransitionSprite.scale = factor;
+        this.currentRoomTransitionSprite.isoZ = -RenderUtils.spriteHalfIsoHeight(this.currentRoomSprite);
         this.currentRoomTransitionSprite.texture.source.forEach(src => src.resolution = 100);
         this.currentRoomTransitionSprite.visible = false;
 
@@ -232,12 +232,9 @@ export default class Renderer {
 
     private initPlayerSprites = () => {
         this.player = GameModule.currentScene.add.isoSprite(0, 0, 0, Renderer.playerTexture);
-        this.player.scaleY = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
-        this.player.scaleX = GAME_CONFIG.scale * GAME_CONFIG.playerScale;
-        this.player.isoX = 0;
-        this.player.isoY = 0;
-        // this.player.isoZ += RenderUtils.spriteIsoHeight(this.currentRoomSprite) * 0.2;
-        // this.player.isoZ += RenderUtils.spriteIsoHeight(this.player) / 2;
+        let factor = GameModule.width() * GAME_CONFIG.playerRatio / this.player.width;
+        this.player.scale = factor;
+        this.player.isoZ += RenderUtils.spriteHalfIsoHeight(this.player);
         this.player.texture.source.forEach(src => src.resolution = 10);
         this.player.setDepth(GameModule.topZIndex());
         this.characterContainer.add(this.player);
@@ -249,7 +246,7 @@ export default class Renderer {
             targets: this.tapIndic2d,
             scale: { from: 0.2, to: 0.6 },
             alpha: { from: 1, to: 0 },
-            duration: 400,
+            duration: DURATIONS.tutorial.tap2d,
             ease: 'Quadratic.InOut'
         });
         this.uiContainer.add(this.tapIndic2d);
@@ -261,7 +258,7 @@ export default class Renderer {
             targets: this.tapIndic3d,
             scale: 0.25,
             alpha: 0.5,
-            duration: 300,
+            duration: DURATIONS.tutorial.tap3d,
             yoyo: true,
             loop: -1,
             ease: 'Quadratic.InOut'
@@ -273,7 +270,7 @@ export default class Renderer {
         this.terrainOverlayContainer.add(this.smokeParticle);
         for (let loc of Location.values()) {
             let event = EVENTS.ENTRY_SMOKE + loc;
-            let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, false);
+            let emitShape = new Phaser.Geom.Polygon(RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, 0.5, false).points);
             let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
             this.smokeEmitters[loc] = this.smokeParticle.createEmitter({
                 alpha: { start: 1, end: 0.2 },
@@ -305,10 +302,10 @@ export default class Renderer {
             });
             this.smokeEmitters[loc].stop();
             //debug
-            // let pts = aabb.getPoints(4);
-            // GameModule.gameScene().animationGraph.drawPolygon(emitShape);
+            // let center = RenderUtils.getEntryCenterFromRoom(this.currentRoomSprite, loc);
+            // center.z=0;
             // GameModule.gameScene().animationGraph.debugPoint(GameModule.gameScene().iso.projector.project(<Point3>center));
-            // GameModule.gameScene().animationGraph.debugPoints(pts);
+            // GameModule.gameScene().animationGraph.debugPoints(emitShape.getPoints(10));
 
         }
     }
@@ -328,10 +325,10 @@ export default class Renderer {
 
     private initEvents = () => {
         for (let loc of Location.values()) {
-            let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, false);
+            let emitShape = new Phaser.Geom.Polygon(RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, 0.9, false).points);
             GameModule.currentScene.input.on('pointerdown', (evt) => {
                 if (emitShape.contains(evt.x, evt.y)) {
-                    console.log("CLICK ON " + loc);
+                    if (GameModule.debug) console.log("CLICK ON " + loc);
                     this.emitter.emit(EVENTS.ENTRY_CLICK, loc);
                 }
             });
@@ -350,7 +347,7 @@ export default class Renderer {
         this.currentRoomTransitionSprite.setTexture(RenderUtils.textureFrom(dest));
 
         let entryExit = LevelModule.entryBetween(source, dest);
-        console.log("GOING THROUGH " + Location.name(entryExit!.location), entryExit);
+        if (GameModule.debug) console.log("GOING THROUGH " + Location.name(entryExit!.location), entryExit);
 
         let loc = this.getRoomLocAt(entryExit);
         if (!loc) {
@@ -370,18 +367,18 @@ export default class Renderer {
 
     private startTransition(entry?: Entry, callback?: Function) {
         if (!entry) return;
-        let entryLoc = this.getEntryTopLoc(Location.name(entry.location));
-        this.playerTween = GameModule.currentScene.tweens.add({
-            targets: this.player,
-            duration: 1700,
-            ease: Phaser.Math.Easing.Linear.Linear,
-            delay: 0,
-            yoyo: true,
-            isoX:  entryLoc.x,
-            isoY: entryLoc.y
-        });
-        this.playerTween.restart();
-        Timeout.in(990).do(() => {
+        // let entryLoc = this.getEntryTopLoc(Location.name(entry.location));
+        // this.playerTween = GameModule.currentScene.tweens.add({
+        //     targets: this.player,
+        //     duration: DURATIONS.player.crossRoom,
+        //     // ease: Phaser.Math.Easing.Quartic.In,
+        //     ease: Phaser.Math.Easing.Linear.Linear,
+        //     delay: 0,
+        //     yoyo: true,
+        //     isoX: entryLoc.x,
+        //     isoY: entryLoc.y
+        // });
+        Timeout.in(0).do(() => {
             let loc = Location.multLoc({ x: -1, y: -1 }, {
                 x: this.currentRoomTransitionSprite.isoX,
                 y: this.currentRoomTransitionSprite.isoY
@@ -390,8 +387,9 @@ export default class Renderer {
                 targets: this.group,
                 x: loc.x,
                 y: loc.y,
-                duration: 2400,
-                ease: Phaser.Math.Easing.Linear.Linear,
+                duration: DURATIONS.room.transition,
+                ease: Phaser.Math.Easing.Quartic.InOut,
+                // ease: Phaser.Math.Easing.Linear.Linear,
                 delay: 0,
                 onComplete: () => this.endTransition(callback!)
             });
@@ -411,13 +409,14 @@ export default class Renderer {
     private endTransition(callback: Function) {
         this.swap();
         GameModule.currentScene.add.tween({
-            targets: this.getTransitionSprites(),
+            targets: this.currentRoomTransitionSprite,
             alpha: 0,
-            duration: 2000,
+            duration: DURATIONS.room.fadeOutTransition,
             ease: Phaser.Math.Easing.Quadratic.In,
             delay: 0,
             onComplete: () => {
-                this.getTransitionSprites().forEach(spr => { spr.alpha = 1; spr.visible = false; });
+                this.currentRoomTransitionSprite.alpha = 1;
+                this.currentRoomTransitionSprite.visible = false;
                 this.currentRoomSprite.isoX = 0;
                 this.currentRoomSprite.isoY = 0;
                 this.roomTransitionPlaying = false;
@@ -426,18 +425,7 @@ export default class Renderer {
         });
     }
 
-    getAllSprites(): IsoSprite[] {
-        let sprs: IsoSprite[] = [];
-        sprs.push(this.currentRoomSprite);
-        sprs.push(this.currentRoomTransitionSprite);
-        return sprs;
-    }
-
-    getTransitionSprites(): IsoSprite[] {
-        let sprs: IsoSprite[] = [];
-        sprs.push(this.currentRoomTransitionSprite);
-        return sprs;
-    }
+    getAllSprites = () => [this.currentRoomSprite, this.currentRoomTransitionSprite]
     /*
     
     ----- LOCATION COORDS ----- 
@@ -445,15 +433,17 @@ export default class Renderer {
     */
     getEntryTopBackLocationAt(loc, inIso = true): { x: number, y: number, z: number } {
         let locNum = <{ x: number, y: number }>Location.parse(loc);
-        let opp = (<string>Location.name(<{ x: number, y: number }>Location.opposite(locNum))).toLowerCase();
-        let top = RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, inIso)[opp];
-        if (locNum.x == 0) top = { x: 0, y: top, z: 0 };
-        else if (locNum.y == 0) top = { x: top, y: 0, z: 0 };
+        // let opp = (<string>Location.name(<{ x: number, y: number }>Location.opposite(locNum))).toLowerCase();
+        let top = RenderUtils.getEntryPolygon(this.currentRoomSprite, loc, 1, inIso)[loc.toLowerCase()];
+        if (inIso) {
+            if (locNum.x == 0) top = { x: 0, y: top, z: 0 };
+            else if (locNum.y == 0) top = { x: top, y: 0, z: 0 };
+        }
         return top;
     }
 
     getEntryTopLoc(loc): { x: number, y: number, z: number } {
-        let pos = RenderUtils.getEntryCenterFromRoom(renderer.currentRoomSprite, loc);
+        let pos = RenderUtils.getEntryCenterFromRoom(this.currentRoomSprite, loc);
         pos.z = 0;
         return pos;
     }
@@ -461,14 +451,22 @@ export default class Renderer {
     getRoomLocAt(entry?: Entry): { x: number, y: number } | undefined {
         if (!entry) return undefined;
         let locStr = Location.name(entry.location);
-        let w = GAME_CONFIG.scale * GAME_CONFIG.roomScale * this.currentRoomSprite.width * 0.2;
-        let entryBack = this.getEntryTopBackLocationAt(locStr);
-        entryBack = Location.add(Location.multiply(entry.location, w), entryBack);
-        entryBack = Location.add(Location.multiply(entry.location, RenderUtils.spriteHalfIsoWidth(this.currentRoomSprite)), entryBack);
+        let w = RenderUtils.spriteIsoWidth(this.currentRoomSprite) * 0.05;
+        // let entryBack = this.getEntryTopBackLocationAt(locStr);
+        // entryBack = Location.add(Location.multiply(entry.location, w), entryBack);
+        // entryBack = Location.add(Location.multiply(entry.location, RenderUtils.spriteIsoWidth(this.currentRoomSprite)), entryBack);
+
+        let entryBack = Location.multiply(entry.location, RenderUtils.spriteIsoWidth(this.currentRoomSprite));
+        entryBack = Location.add(entryBack, Location.multiply(entry.location, RenderUtils.spriteIsoWidth(this.currentRoomSprite) * GAME_CONFIG.entryScaleToRoom));
         // debug
         // let pt = GameModule.gameScene().iso.projector.project(<Point3>entryBack);
         // GameModule.gameScene().animationGraph.debugPoint(pt);
+        // console.log(entryBack,pt);
         return entryBack;
+    }
+
+    distToCenter() {
+        return RenderUtils.spriteHalfIsoWidth(this.currentRoomSprite);
     }
 
     pauseBackgroundParticles() {
@@ -492,6 +490,11 @@ export default class Renderer {
         }
 
     }
+    /*
+    
+    ----- RENDER ----- 
+
+    */
 
     playerTakeHit(fromEntry: Entry) {
         if (this.playerTween) {
@@ -504,13 +507,14 @@ export default class Renderer {
             targets: this.player,
             isoX: { value: knockbackDist * fromEntry.location.x * -1, yoyo: true },
             isoY: { value: knockbackDist * fromEntry.location.y * -1, yoyo: true },
-            duration: 30,
+            duration: DURATIONS.player.backlash,
             onComplete: () => {
                 GameModule.currentScene.tweens.remove(this.playerTween);
                 this.player.clearTint();
             }
         });
     }
+
 
     tapIndication(x, y, onClick, destroyEvt) {
         this.tapIndic3d.x = x;
@@ -529,7 +533,7 @@ export default class Renderer {
         GameModule.currentScene.add.tween({
             targets: GameModule.currentScene.cameras.main,
             alpha: 0,
-            duration: 1000,
+            duration: DURATIONS.scene.fadeOut,
             ease: Phaser.Math.Easing.Quartic.Out,
             onComplete: () => {
                 onSceneEnd();
@@ -538,10 +542,11 @@ export default class Renderer {
         });
     }
     smokeEntry(location: string) {
+        if (GameModule.debug) console.log('smokEntry ' + location);
         this.smokeEmitters[location].start();
 
         //debug
-        // let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, location, false);
+        // let emitShape = <Phaser.Geom.Polygon>RenderUtils.getEntryPolygon(this.currentRoomSprite, location,0.5, false);
         // let aabb = Phaser.Geom.Polygon.GetAABB(emitShape);
         // let pts = aabb.getPoints(4);
         // GameModule.gameScene().animationGraph.drawPolygon(aabb);
@@ -551,9 +556,8 @@ export default class Renderer {
 
     shapeClue(path: Phaser.Curves.Path, destroyEvt) {
         if (this.particles.hasOwnProperty(destroyEvt)) this.emitter.emit(destroyEvt);
-
         // duration of the drawing
-        let drawSpeed = 3000;
+        let drawSpeed = path.getLength() * 5;
         // time to wait before drawing again
         let delayTime = 1000;
         let startTime = new Date().getTime();
@@ -563,15 +567,14 @@ export default class Renderer {
         this.tapIndic2dTween.restart();
 
         // let emitZone = { type: 'edge', source: path, quantity: 30 };
-        this.shapeClueEmitter.setPosition(
-            () => {
-                let position = (new Date().getTime() - startTime) / drawSpeed;
-                return path.getPoint(position > 1 ? 1 : position).x
-            },
-            () => {
-                let position = (new Date().getTime() - startTime) / drawSpeed;
-                return path.getPoint(position > 1 ? 1 : position).y
-            });
+        this.shapeClueEmitter.setPosition(() => {
+            let position = (new Date().getTime() - startTime) / drawSpeed;
+            return path.getPoint(position > 1 ? 1 : position).x
+        }, () => {
+            let position = (new Date().getTime() - startTime) / drawSpeed;
+            return path.getPoint(position > 1 ? 1 : position).y
+        });
+        // this.shapeClueEmitter.setFrequency(path.getLength()/drawSpeed);
         this.shapeClueEmitter.start();
         let deleteAll;
         let delayTimeout = Timeout.in(delayTime).do(() => {
@@ -613,7 +616,7 @@ export default class Renderer {
             targets: this.lightSource,
             alpha: 0.5,
             scale: 0.8,
-            duration: 1500,
+            duration: DURATIONS.tutorial.light,
             ease: 'Sine.easeInOut',
             loop: -1,
             yoyo: true
@@ -649,4 +652,3 @@ export default class Renderer {
 
     static init() { renderer = new Renderer(); }
 }
-export var renderer: Renderer;

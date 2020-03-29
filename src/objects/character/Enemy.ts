@@ -4,6 +4,7 @@ import { GAME_CONFIG } from '../../constants/Constants';
 import { ENEMY_TYPE, EVENTS } from '../../constants/Enums';
 import { renderer } from '../render/Renderer';
 import { GameModule } from '../../utils/GameModule';
+import { RenderUtils } from '../../utils/RenderUtils';
 
 export default class Enemy {
     static _idCount = 0;
@@ -18,7 +19,7 @@ export default class Enemy {
 
     type: string;
     sign: string;
-    speed: number;
+    speed: number;//px per sec
     isDead: boolean
 
     goToGoalConfig: any;
@@ -42,9 +43,9 @@ export default class Enemy {
     private createSprite() {
         // this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, this._config.texture);
         this.sprite = GameModule.currentScene.add.isoSprite(this._config.x, this._config.y, 0, 'en_'+this.type+'_'+this.sign);
-        this.sprite.scaleX *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
-        this.sprite.scaleY *= GAME_CONFIG.scale * GAME_CONFIG.enemyScale;
-        this.sprite.isoZ += this.sprite.isoBounds.height / 2;
+        let factor = GameModule.width() * GAME_CONFIG.playerRatio / this.sprite.width;
+        this.sprite.scale = factor;
+        this.sprite.isoZ += RenderUtils.spriteHalfIsoHeight(this.sprite);
         renderer.characterContainer.add(this.sprite);
     }
 
@@ -53,6 +54,7 @@ export default class Enemy {
         // console.log('dx='+Math.abs(this.sprite.isoX-x * GAME_CONFIG.scale * GAME_CONFIG.tile_size)/this.speed);
         // console.log('dy = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)+'ty = '+Math.abs(this.sprite.isoY-y * GAME_CONFIG.scale * GAME_CONFIG.tile_size)*300/this.speed);
         this.goToGoalConfig = { x, y, onGoalReached };
+        // debugger;
         this.tween = GameModule.currentScene.tweens.add({
             targets: this.sprite,
             onComplete: () => {
@@ -60,13 +62,13 @@ export default class Enemy {
             },
             props: {
                 isoX: {
-                    value: x * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
-                    duration: Math.abs(this.sprite.isoX - x * GAME_CONFIG.scale * GAME_CONFIG.tile_size) * 300 / this.speed,
+                    value: x,
+                    duration: renderer.distToCenter() / this.speed * 1000,
                     ease: 'Linear'
                 },
                 isoY: {
-                    value: y * GAME_CONFIG.scale * GAME_CONFIG.tile_size,
-                    duration: Math.abs(this.sprite.isoY - y * GAME_CONFIG.scale * GAME_CONFIG.tile_size) * 300 / this.speed,
+                    value: y,
+                    duration: renderer.distToCenter() / this.speed * 1000,
                     ease: 'Linear'
                 }
             },
@@ -74,7 +76,7 @@ export default class Enemy {
     }
 
     takeHit() {
-        console.log(this.type+' '+this.sign+' ouch');
+        if(GameModule.debug) console.log(this.type+' '+this.sign+' ouch');
         switch (this.type) {
             case ENEMY_TYPE.SMALL:
                 this.isDead = true;

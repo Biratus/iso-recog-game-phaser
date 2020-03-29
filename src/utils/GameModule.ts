@@ -3,7 +3,7 @@ import GameScene from "../scenes/GameScene";
 
 export module GameModule {
 	export var debug = false;
-	export var friendly = true;
+	export var friendly = false;
 	export var currentScene: Phaser.Scene;
 	export var Unistrokes = {
 		"triangle": [

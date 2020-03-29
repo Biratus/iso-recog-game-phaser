@@ -79,21 +79,9 @@
                 "entries": [
                     {
                         "diff": "LOW",
-                        "sign": "SQUARE",
-                        "loc": "TOP",
-                        "dest": 0,
-                        "en_sm": 0,
-                        "en_med": {
-                            "nb": 0,
-                            "events": []
-                        },
-                        "en_big": {}
-                    },
-                    {
-                        "diff": "LOW",
                         "sign": "CIRCLE",
                         "loc": "LEFT",
-                        "dest": 0,
+                        "dest": 1,
                         "en_sm": 0,
                         "en_med": {
                             "nb": 0,

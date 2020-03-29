@@ -177,7 +177,7 @@ export default class AnimationGraph {
         this.mainGraphics.lineBetween(prev.x, prev.y, first.x, first.y)
     }
     debugPoint(pt) {
-        this.mainGraphics.fillCircle(pt.x,pt.y,2);
+        this.mainGraphics.fillCircle(pt.x,pt.y,5);
     }
     drawPolygon(polygon:Phaser.Geom.Rectangle) {
         this.mainGraphics.lineStyle(2,0xff0000,1.0);

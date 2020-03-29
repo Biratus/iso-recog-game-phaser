@@ -10,8 +10,8 @@ import { InspectOptions } from 'util';
 
 export module RenderUtils {
     export var roomTexture = "roomFull.roomFull";
-    export function spriteIsoHeight(sprite: IsoSprite) { return sprite.height * GAME_CONFIG.scale * 0.5; }
-    export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.width / 2, 2) + Math.pow(sprite.width / 4, 2)) * GAME_CONFIG.scale; }
+    export function spriteIsoHeight(sprite: IsoSprite) { return sprite.displayHeight * 0.5; }
+    export function spriteIsoWidth(sprite: IsoSprite) { return Math.sqrt(Math.pow(sprite.displayWidth / 2, 2) + Math.pow(sprite.displayWidth / 4, 2)); }
     export function spriteHalfIsoWidth(sprite: IsoSprite) { return RenderUtils.spriteIsoWidth(sprite) / 2; }
     export function spriteHalfIsoHeight(sprite: IsoSprite) { return RenderUtils.spriteIsoHeight(sprite) / 2; }
     export function topXYFromIsoSprite(sprite: IsoSprite, proj2d = false) {
@@ -124,8 +124,8 @@ export module RenderUtils {
     export function textureFrom(room: Room) {
         return RenderUtils.roomTexture + Location.values().filter(l => room._entries[l]).map(l => l.charAt(0)).join('');
     }
-
-    export function distToEntryCenter(sprite: IsoSprite) {
+    // Depracted
+    /*export function distToEntryCenter(sprite: IsoSprite) {
         let gapWSpr = (RENDER_VAR.origW - RENDER_VAR.entry[0]) / sprite.displayWidth;
         let gapHSpr = (RENDER_VAR.origH * 0.5 - RENDER_VAR.entry[1]) / sprite.displayHeight;
         let middleSquare = { x: 0, y: 0, w: sprite.displayWidth - gapWSpr * 2, h: sprite.displayHeight * 0.5 - gapHSpr * 2 }
@@ -138,30 +138,28 @@ export module RenderUtils {
         }
         let e = [middleSquare.x + middleSquare.w / 2, middleSquare.y + middleSquare.h / 2];
         return Math.sqrt(Math.pow(e[0], 2) + Math.pow(-e[1], 2));
-    }
+    }*/
 
     export function getEntryCenterFromRoom(sprite: IsoSprite, loc: string): { x: number, y: number, z: number } {
-        let tile_width = RenderUtils.spriteIsoWidth(sprite) * GAME_CONFIG.roomScale;
-        // console.log("tile_width",tile_width);
-        let canvasLoc = Location.multiply(Location[loc], tile_width * GAME_CONFIG.entryScaleToRoom);
-        return canvasLoc;
+        return Location.multiply(Location[loc], RenderUtils.spriteHalfIsoWidth(sprite) + RenderUtils.spriteHalfIsoWidth(sprite) * GAME_CONFIG.entryScaleToRoom);
     }
 
-    export function getEntryPolygon(sprite:IsoSprite,loc:string,inIso = true) {
+    export function getEntryPolygon(sprite:IsoSprite,loc:string,scale:number,inIso = true) {
         let center = RenderUtils.getEntryCenterFromRoom(sprite, loc);
         center.z = 0;
-        let w = GameModule.width() * 0.04;
+        let w = GAME_CONFIG.entryScaleToRoom * RenderUtils.spriteIsoWidth(sprite) * scale;
         let top=center.y - w;
         let bottom=center.y + w;
         let left=center.x - w;
         let right=center.x + w;
-        let ptsShape = [
+        let ptsShape:any = [
             { x: right, y: bottom, z: 0 },
             { x: right, y: top, z: 0 },
             { x: left, y: top, z: 0 },
             { x: left, y: bottom, z: 0 }
         ];
-        if(inIso) return {top,bottom,right,left,points:ptsShape};
-        else return new Phaser.Geom.Polygon(ptsShape.map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt)));
+        if(!inIso) ptsShape = ptsShape.map(pt => GameModule.gameScene().iso.projector.project(<Point3>pt));
+            
+        return {top,bottom,right,left,points:ptsShape};
     }
 }

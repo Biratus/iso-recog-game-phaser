@@ -161,7 +161,7 @@ export default class EnemyManager {
     checkDeadEnemies() {
         for (let eId of this.alive.keys()) {
             if (this.alive.get(eId).isDead) {
-                console.log(this.alive.get(eId).sign+' is dead');
+                if(GameModule.debug) console.log(this.alive.get(eId).sign+' is dead');
                 this.alive.get(eId).sprite.destroy();
                 this.alive.get(eId).emitter.emit(EVENTS.ENEMY_KILLED);
 

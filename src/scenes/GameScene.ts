@@ -79,7 +79,7 @@ export default class GameScene extends Phaser.Scene {
 
     // GRAPHICS
     // this.currentShape = this.add.text(GameModule.width() * 0.35, GameModule.height() * 0.2, '', { font: '30px Arial', fill: '#ff0000' });
-    this.info = this.add.text(50, 50, '', { color: 'red', size: '50px' });
+    this.info = this.add.text(50, 50, '', { color: 'red', size: '20px' });
     //LEVEL 
     this.currentLevel = Loader.loadLevel(this.cache.json.get('level_test').Level);
     this.currentLevel.preload();
@@ -92,7 +92,7 @@ export default class GameScene extends Phaser.Scene {
     console.log("Renderer", renderer);
 
     // START GAME
-    this.activeState = GameScene.STATES.IDLE;
+    this.activeState = GameScene.STATES.RECOG;
     this.resume();
     // this.info.setText(renderer.smokeEntry('TOP'))
 
@@ -110,14 +110,14 @@ export default class GameScene extends Phaser.Scene {
     // });
 
     //DEBUG
-    let debugBtn = this.add.image(GameModule.width() * 0.7, 0, 'button_red');
-    debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
-    debugBtn.on('pointerdown', () => {
-      console.log('GameModule.currentScene', this);
-      // this.info.setText(renderer.smokeEntry('TOP'));
+    // let debugBtn = this.add.image(GameModule.width() * 0.7, 0, 'button_red');
+    // debugBtn.setInteractive(GameModule.currentScene.input.makePixelPerfect(100));
+    // debugBtn.on('pointerdown', () => {
+    //   console.log('GameModule.currentScene', this);
+    //   // this.info.setText(renderer.smokeEntry('TOP'));
 
 
-    });
+    // });
     // let squareW=GameModule.width()*0.5;
     // this.animationGraph.drawHollowRect(GameModule.width()*0.5-squareW/2,GameModule.height()*0.5-squareW/2,squareW,squareW,squareW*0.55,squareW*0.55,0xffffff,0.3);
   }
